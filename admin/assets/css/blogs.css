@@ -1,0 +1,806 @@
+/* =============================================================
+  BLOG-GENERATED STYLESHEET  (WordPress + Avada compatible)
+  ----------------------------------------------------------------
+  PURPOSE:  Comprehensive, comment‑rich styles the content‑generating
+            AI can reference when producing HTML for blog posts.
+            All utility selectors use the "blog-" prefix.
+            
+  IMPORTANT: This CSS is STRICTLY scoped to .blog-content areas only.
+            It should NEVER affect the global page background or any
+            styles outside of blog content areas.
+============================================================= */
+
+/* =============================================================
+  CRITICAL: PREVENT GLOBAL BACKGROUND CHANGES & COMPLETE ISOLATION
+============================================================= */
+/* Ensure this CSS file never affects the global page background */
+.blog-content {
+  /* Explicitly reset any inherited background */
+  background: inherit !important;
+  /* Contain all blog styling within this wrapper */
+  contain: layout style;
+  /* Create a new stacking context to isolate from parent styles */
+  isolation: isolate;
+  /* Prevent any background color inheritance */
+  background-color: transparent !important;
+  
+  /* Brand / Theme Palette (scoped to blog content only) */
+  --color-primary: var(--awb-color1, #0062ff);
+  --color-success: var(--awb-color2, #28a745);
+  --color-info:    var(--awb-color3, #17a2b8);
+  --color-warning: var(--awb-color4, #ffc107);
+  --color-danger:  var(--awb-color5, #dc3545);
+  --color-dark:    #212529;
+  --color-gray-100:#f8f9fa; 
+  --color-gray-200:#edf2f7; 
+  --color-gray-300:#dee2e6; 
+  --color-gray-700:#495057; 
+  --color-gray-800:#343a40; 
+  --color-gray-900:#212529;
+
+  /* Typography Scale */
+  --fs-xs:.8125rem; 
+  --fs-sm:.9rem; 
+  --fs-base:1rem; 
+  --fs-md:1.125rem; 
+  --fs-lg:1.25rem; 
+  --fs-xl:1.5rem; 
+  --fs-2xl:2rem; 
+  --fs-3xl:2.75rem;
+
+  /* Spacing Scale */
+  --spacing-xs:.25rem; 
+  --spacing-sm:.5rem; 
+  --spacing-md:1rem; 
+  --spacing-lg:1.5rem; 
+  --spacing-xl:2rem; 
+  --spacing-2xl:3rem; 
+  --spacing-3xl:4rem;
+
+  /* Radius & Shadows */
+  --radius-sm:.5rem; 
+  --radius-md:1rem; 
+  --radius-lg:1.5rem;
+  --shadow-sm:0 2px 8px rgba(0,0,0,.05);
+  --shadow-md:0 4px 16px rgba(0,0,0,.08);
+  --shadow-lg:0 8px 32px rgba(0,0,0,.1);
+  
+  /* Animation & Transitions */
+  --transition-fast: 0.15s ease;
+  --transition-medium: 0.3s ease;
+  --transition-slow: 0.5s ease;
+  
+  /* Base Styles - Isolated to blog content only */
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;
+  color: var(--color-dark);
+}
+
+.blog-content *,
+.blog-content *::before,
+.blog-content *::after {
+  box-sizing: border-box;
+}
+
+/* Blog Content Images - Max Width 350px */
+.blog-content img,
+.blog-content figure img,
+.blog-content .ai-generated-image img {
+    max-width: 350px !important;
+    width: auto;
+    height: auto;
+}
+
+/* Product Images - Smaller and Linkable */
+.blog-content .product-image,
+.blog-content .product-link img {
+    max-width: 250px !important;
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+    border: 2px solid var(--border-color, #e0e0e0);
+    transition: all 0.3s ease;
+    display: block;
+    margin: var(--spacing-md) auto;
+}
+
+.blog-content .product-link {
+    display: inline-block;
+    text-decoration: none;
+    margin: var(--spacing-md) 0;
+}
+
+.blog-content .product-link:hover img {
+    border-color: var(--primary-color, #007cba);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 123, 186, 0.15);
+}
+
+.blog-content .product-link:hover {
+    text-decoration: none;
+}
+
+/* Product Image Container */
+.blog-content .product-showcase {
+    text-align: center;
+    margin: var(--spacing-lg) 0;
+    padding: var(--spacing-md);
+    background-color: var(--background-light, #f8f9fa);
+    border-radius: 12px;
+    border: 1px solid var(--border-color, #e0e0e0);
+}
+
+.blog-content .product-showcase .product-link img {
+    margin: 0 auto var(--spacing-sm);
+}
+
+.blog-content .product-showcase .product-name {
+    font-weight: 600;
+    color: var(--text-primary, #333);
+    margin-bottom: var(--spacing-xs);
+    font-size: 1.1em;
+}
+
+.blog-content .product-showcase .product-description {
+    color: var(--text-secondary, #666);
+    font-size: 0.95em;
+    margin-bottom: var(--spacing-sm);
+}
+
+/* Inline Product Images */
+.blog-content .inline-product-image {
+    max-width: 200px !important;
+    float: right;
+    margin: 0 0 var(--spacing-md) var(--spacing-md);
+    border-radius: 6px;
+    border: 1px solid var(--border-color, #e0e0e0);
+}
+
+@media (max-width: 768px) {
+    .blog-content .inline-product-image {
+        float: none;
+        display: block;
+        margin: var(--spacing-md) auto;
+        max-width: 180px !important;
+    }
+}
+
+.blog-content .figure,
+.blog-content .ai-generated-image {
+  max-width: 350px;
+  margin: 0 auto var(--spacing-lg);
+}
+
+.blog-content figure,
+.blog-content .ai-generated-image {
+  text-align: center;
+  display: block;
+}
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4,
+.blog-content h5,
+.blog-content h6 {
+  margin: 0 0 var(--spacing-md) 0;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.blog-content p {
+  margin: 0 0 var(--spacing-md) 0;
+  line-height: 1.6;
+}
+
+/* Enhanced Base Margins */
+.blog-content > *:not(:last-child) { 
+  margin-bottom: var(--spacing-lg); 
+}
+
+.blog-content h1,
+.blog-content h2,
+.blog-content h3,
+.blog-content h4,
+.blog-content h5,
+.blog-content h6 {
+  margin-top: var(--spacing-xl);
+  margin-bottom: var(--spacing-md);
+}
+
+.blog-content h1:first-child,
+.blog-content h2:first-child,
+.blog-content h3:first-child {
+  margin-top: 0;
+}
+
+/* =============================================================
+  2. TYPOGRAPHY UTILITIES
+============================================================= */
+.blog-heading--hero{font-size:var(--fs-3xl);color:var(--color-dark);margin-bottom:var(--spacing-lg);font-weight:700}
+.blog-heading--section{font-size:var(--fs-2xl);color:var(--color-dark);margin-top:var(--spacing-2xl);margin-bottom:var(--spacing-lg);font-weight:600}
+.blog-text-lead{font-size:var(--fs-lg);color:var(--color-gray-700);margin-bottom:var(--spacing-lg);font-weight:400}
+.blog-text-muted{color:var(--color-gray-700)}
+.blog-text-small{font-size:var(--fs-sm)}
+
+/* =============================================================
+  3. LAYOUT HELPERS WITH ENHANCED MARGINS
+============================================================= */
+.blog-container{width:100%;padding:0 var(--spacing-md);margin-right:auto;margin-left:auto}
+@media(min-width:768px){.blog-container{max-width:720px;padding:0 var(--spacing-lg)}}
+@media(min-width:992px){.blog-container{max-width:960px}}
+@media(min-width:1200px){.blog-container{max-width:1140px}}
+
+.blog-row{display:flex;flex-wrap:wrap;margin:0 -0.75rem;margin-bottom:var(--spacing-lg)}
+.blog-col{flex:1 0 0%;padding:0.75rem}
+
+/* Section Spacing */
+.blog-section{margin-bottom:var(--spacing-3xl);padding:var(--spacing-xl) 0}
+.blog-section:first-child{padding-top:0}
+.blog-section:last-child{margin-bottom:0;padding-bottom:0}
+
+/* =============================================================
+  4. CARDS & PANELS WITH IMPROVED MARGINS
+============================================================= */
+.blog-card{
+  background:#fff;
+  border:1px solid var(--color-gray-300);
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  margin-bottom:var(--spacing-lg);
+  transition:box-shadow var(--transition-medium), transform var(--transition-medium);
+}
+.blog-card:hover{box-shadow:var(--shadow-md);transform:translateY(-2px)}
+.blog-card--primary{border-color:#00ccff;box-shadow:0 4px 15px rgba(0,204,255,0.3)}
+.blog-card--success{border-color:#20c997;box-shadow:0 4px 15px rgba(32,201,151,0.3)}
+.blog-card--info{border-color:#00d4ff;box-shadow:0 4px 15px rgba(0,212,255,0.3)}
+.blog-card--warning{border-color:#ffc107;box-shadow:0 4px 15px rgba(255,193,7,0.3)}
+.blog-card--danger{border-color:#e91e63;box-shadow:0 4px 15px rgba(233,30,99,0.3)}
+.blog-card--magenta{border-color:#e91e63;box-shadow:0 4px 15px rgba(233,30,99,0.3)}
+.blog-card--cyan{border-color:#00bcd4;box-shadow:0 4px 15px rgba(0,188,212,0.3)}
+.blog-card--purple{border-color:#9c27b0;box-shadow:0 4px 15px rgba(156,39,176,0.3)}
+.blog-card--teal{border-color:#20c997;box-shadow:0 4px 15px rgba(32,201,151,0.3)}
+.blog-card__header{
+  padding:var(--spacing-md) var(--spacing-lg);
+  color:#fff;
+  font-weight:700;
+  margin-bottom:0;
+  background:linear-gradient(135deg, var(--color-primary), #0099ff);
+  border-bottom:none;
+  text-shadow:0 1px 2px rgba(0,0,0,0.2);
+  position:relative;
+  overflow:hidden;
+}
+.blog-card__header::before {
+  content:"";
+  position:absolute;
+  top:0;
+  left:-100%;
+  width:100%;
+  height:100%;
+  background:linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+  transition:left 0.5s;
+}
+.blog-card:hover .blog-card__header::before {
+  left:100%;
+}
+.blog-card--primary .blog-card__header{background:linear-gradient(135deg, #0066cc, #00ccff);color:#fff}
+.blog-card--success .blog-card__header{background:linear-gradient(135deg, #28a745, #20c997);color:#fff}
+.blog-card--info .blog-card__header{background:linear-gradient(135deg, #17a2b8, #00d4ff);color:#fff}
+.blog-card--warning .blog-card__header{background:linear-gradient(135deg, #fd7e14, #ffc107);color:#fff;text-shadow:0 1px 2px rgba(0,0,0,0.3)}
+.blog-card--danger .blog-card__header{background:linear-gradient(135deg, #dc3545, #e91e63);color:#fff}
+.blog-card--magenta .blog-card__header{background:linear-gradient(135deg, #e91e63, #9c27b0);color:#fff}
+.blog-card--cyan .blog-card__header{background:linear-gradient(135deg, #00bcd4, #0097a7);color:#fff}
+.blog-card--purple .blog-card__header{background:linear-gradient(135deg, #6f42c1, #9c27b0);color:#fff}
+.blog-card--teal .blog-card__header{background:linear-gradient(135deg, #20c997, #17a2b8);color:#fff}
+.blog-card__body{
+  padding:var(--spacing-lg) var(--spacing-xl);
+  flex:1;
+}
+.blog-card__body > *:last-child{margin-bottom:0}
+
+/* =============================================================
+  5. ALERTS / TIPS WITH ENHANCED STYLING
+============================================================= */
+.blog-alert{
+  position:relative;
+  padding:var(--spacing-lg) var(--spacing-xl);
+  border-left:6px solid var(--color-primary);
+  background:linear-gradient(135deg, rgba(0,98,255,0.1), rgba(0,153,255,0.05));
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+  margin-bottom:var(--spacing-lg);
+  transition:all var(--transition-medium);
+}
+.blog-alert:hover{box-shadow:var(--shadow-md);transform:translateX(4px)}
+.blog-alert--info{border-color:#00d4ff;background:linear-gradient(135deg, rgba(0,212,255,0.15), rgba(23,162,184,0.05))}
+.blog-alert--success{border-color:#20c997;background:linear-gradient(135deg, rgba(32,201,151,0.15), rgba(40,167,69,0.05))}
+.blog-alert--warning{border-color:#ffc107;background:linear-gradient(135deg, rgba(255,193,7,0.15), rgba(253,126,20,0.05))}
+.blog-alert--danger{border-color:#e91e63;background:linear-gradient(135deg, rgba(233,30,99,0.15), rgba(220,53,69,0.05))}
+.blog-alert__title{
+  font-weight:700;
+  margin:0 0 var(--spacing-sm) 0;
+  font-size:var(--fs-md);
+  color:var(--color-dark);
+}
+.blog-alert > *:last-child{margin-bottom:0}
+
+/* =============================================================
+  6. BADGES & TAGS - VIBRANT COLORS
+============================================================= */
+.blog-badge{
+  display:inline-block;
+  padding:var(--spacing-xs) var(--spacing-sm);
+  font-size:var(--fs-xs);
+  font-weight:700;
+  border-radius:50rem;
+  line-height:1;
+  color:#fff;
+  background:linear-gradient(135deg, var(--color-primary), #0099ff);
+  margin-right:var(--spacing-xs);
+  margin-bottom:var(--spacing-xs);
+  transition:all var(--transition-fast);
+  text-shadow:0 1px 1px rgba(0,0,0,0.2);
+  box-shadow:0 2px 8px rgba(0,98,255,0.3);
+}
+.blog-badge:hover{opacity:0.9;transform:translateY(-2px) scale(1.05)}
+.blog-badge--success{background:linear-gradient(135deg, #28a745, #20c997);box-shadow:0 2px 8px rgba(32,201,151,0.3)}
+.blog-badge--info{background:linear-gradient(135deg, #17a2b8, #00d4ff);box-shadow:0 2px 8px rgba(0,212,255,0.3)}
+.blog-badge--warning{background:linear-gradient(135deg, #fd7e14, #ffc107);box-shadow:0 2px 8px rgba(255,193,7,0.3)}
+.blog-badge--danger{background:linear-gradient(135deg, #dc3545, #e91e63);box-shadow:0 2px 8px rgba(233,30,99,0.3)}
+.blog-badge--magenta{background:linear-gradient(135deg, #e91e63, #9c27b0);box-shadow:0 2px 8px rgba(233,30,99,0.3)}
+.blog-badge--cyan{background:linear-gradient(135deg, #00bcd4, #0097a7);box-shadow:0 2px 8px rgba(0,188,212,0.3)}
+.blog-badge--purple{background:linear-gradient(135deg, #6f42c1, #9c27b0);box-shadow:0 2px 8px rgba(156,39,176,0.3)}
+.blog-badge--outline{background:transparent;border:2px solid currentColor;color:var(--color-primary);text-shadow:none;box-shadow:none}
+
+/* =============================================================
+  7. BUTTONS (Avada fusion-button compatible)
+============================================================= */
+.blog-btn,.fusion-button.blog-btn{
+  display:inline-block;
+  padding:var(--spacing-sm) var(--spacing-md);
+  font-size:var(--fs-sm);
+  font-weight:600;
+  text-align:center;
+  text-decoration:none;
+  border-radius:var(--radius-sm);
+  transition:all var(--transition-fast);
+  color:#fff;
+  background:var(--color-primary);
+  border:none;
+  cursor:pointer;
+  margin-right:var(--spacing-sm);
+  margin-bottom:var(--spacing-sm);
+}
+.blog-btn:hover{opacity:.9;box-shadow:0 4px 10px rgba(0,0,0,.08);transform:translateY(-1px)}
+.blog-btn--success{background:var(--color-success)}
+.blog-btn--info{background:var(--color-info)}
+.blog-btn--warning{background:var(--color-warning);color:var(--color-dark)}
+.blog-btn--danger{background:var(--color-danger)}
+.blog-btn--outline{background:transparent;border:2px solid var(--color-primary)}
+.blog-btn--outline:hover{background:var(--color-primary);color:#fff}
+
+/* =============================================================
+  8. BOOTSTRAP ACCORDIONS (No JavaScript Required)
+============================================================= */
+.blog-accordion, .accordion {
+  border:1px solid var(--color-gray-300);
+  border-radius:var(--radius-md);
+  margin-bottom:var(--spacing-lg);
+  overflow:hidden;
+}
+
+.blog-accordion__item, .accordion-item {
+  border-bottom:1px solid var(--color-gray-300);
+  background:#fff;
+}
+.blog-accordion__item:last-child, .accordion-item:last-child{border-bottom:none}
+
+.blog-accordion__header, .accordion-header {
+  margin:0;
+}
+
+.blog-accordion__header button, .accordion-button {
+  background:var(--color-gray-100);
+  padding:var(--spacing-md) var(--spacing-lg);
+  cursor:pointer;
+  position:relative;
+  font-weight:600;
+  font-size:var(--fs-md);
+  transition:all var(--transition-medium);
+  user-select:none;
+  border:none;
+  width:100%;
+  text-align:left;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:var(--color-dark);
+  text-decoration:none;
+}
+
+.blog-accordion__header button:hover, .accordion-button:hover {
+  background:var(--color-gray-200);
+  color:var(--color-primary);
+}
+
+.blog-accordion__header button:focus, .accordion-button:focus {
+  outline:2px solid var(--color-primary);
+  outline-offset:2px;
+  box-shadow:none;
+}
+
+.blog-accordion__header button:not(.collapsed)::after, 
+.accordion-button:not(.collapsed)::after {
+  transform:rotate(180deg);
+}
+
+.blog-accordion__header button::after, .accordion-button::after {
+  content:"▼";
+  font-size:var(--fs-sm);
+  transition:transform var(--transition-medium);
+  color:var(--color-gray-700);
+  font-weight:normal;
+  background:none;
+  border:none;
+  width:auto;
+  height:auto;
+  margin:0;
+}
+
+.blog-accordion__body, .accordion-body {
+  padding:var(--spacing-lg);
+  background:#fff;
+  border-top:1px solid var(--color-gray-300);
+}
+
+.blog-accordion__body > *:last-child, .accordion-body > *:last-child {
+  margin-bottom:0;
+}
+
+/* Bootstrap Collapse Integration */
+.blog-accordion .collapse, .accordion .collapse {
+  border:none;
+}
+
+.blog-accordion .collapse.show, .accordion .collapse.show {
+  border-top:1px solid var(--color-gray-300);
+}
+
+/* Accordion Color Variants */
+.blog-accordion--primary .blog-accordion__header button, 
+.accordion.blog-accordion--primary .accordion-button {
+  background:rgba(0,98,255,0.1);
+}
+.blog-accordion--primary .blog-accordion__header button:not(.collapsed),
+.accordion.blog-accordion--primary .accordion-button:not(.collapsed) {
+  background:var(--color-primary);
+  color:#fff;
+}
+
+.blog-accordion--success .blog-accordion__header button,
+.accordion.blog-accordion--success .accordion-button {
+  background:rgba(40,167,69,0.1);
+}
+.blog-accordion--success .blog-accordion__header button:not(.collapsed),
+.accordion.blog-accordion--success .accordion-button:not(.collapsed) {
+  background:var(--color-success);
+  color:#fff;
+}
+
+/* =============================================================
+  9. COMPARISON / PRICING OPTIONS WITH BETTER SPACING
+============================================================= */
+.blog-compare{
+  display:flex;
+  flex-wrap:wrap;
+  gap:var(--spacing-lg);
+  margin-bottom:var(--spacing-xl);
+}
+.blog-compare__option{
+  flex:1 1 260px;
+  background:#fff;
+  border:2px solid var(--color-gray-300);
+  border-radius:var(--radius-md);
+  text-align:center;
+  padding:var(--spacing-xl);
+  box-shadow:var(--shadow-sm);
+  transition:all var(--transition-medium);
+  position:relative;
+}
+.blog-compare__option:hover{
+  box-shadow:var(--shadow-md);
+  transform:translateY(-4px);
+}
+.blog-compare__option--highlight{
+  border-color:var(--color-primary);
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-md);
+}
+.blog-compare__option h3, .blog-compare__option h4{
+  margin-bottom:var(--spacing-md);
+  color:var(--color-primary);
+}
+
+/* =============================================================
+ 10. IMAGE WRAPPERS WITH ENHANCED MARGINS
+============================================================= */
+.blog-image-hero{
+  border-radius:var(--radius-lg);
+  overflow:hidden;
+  box-shadow:var(--shadow-lg);
+  margin-bottom:var(--spacing-xl);
+  transition:all var(--transition-medium);
+}
+.blog-image-hero:hover{box-shadow:var(--shadow-lg);transform:scale(1.02)}
+.blog-image-figure{
+  text-align:center;
+  margin:var(--spacing-xl) 0;
+}
+.blog-image-figure img{
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+  transition:all var(--transition-medium);
+}
+.blog-image-figure:hover img{box-shadow:var(--shadow-md)}
+.blog-image-figure figcaption{
+  font-size:var(--fs-xs);
+  color:var(--color-gray-700);
+  margin-top:var(--spacing-sm);
+  font-style:italic;
+}
+
+/* =============================================================
+ 11. ENHANCED TABLES WITH BETTER SPACING
+============================================================= */
+.blog-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:var(--fs-sm);
+  margin-bottom:var(--spacing-lg);
+  border-radius:var(--radius-md);
+  overflow:hidden;
+  box-shadow:var(--shadow-sm);
+}
+.blog-table th,.blog-table td{
+  padding:var(--spacing-md) var(--spacing-md);
+  text-align:left;
+  border-right:1px solid var(--color-gray-300);
+}
+.blog-table th:last-child,.blog-table td:last-child{border-right:none}
+.blog-table thead{background:var(--color-dark);color:#fff}
+.blog-table thead th{font-weight:600;text-transform:uppercase;letter-spacing:0.5px}
+.blog-table tbody tr{transition:background-color var(--transition-fast)}
+.blog-table tbody tr:nth-child(even){background:var(--color-gray-100)}
+.blog-table tbody tr:hover{background:var(--color-gray-200)}
+
+/* Responsive Table */
+@media (max-width: 768px) {
+  .blog-table-responsive{
+    display:block;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+}
+
+/* =============================================================
+ 12. APEXCHARTS STYLING & CONTAINERS
+============================================================= */
+.blog-chart-container{
+  margin:var(--spacing-xl) 0;
+  padding:var(--spacing-lg);
+  background:#fff;
+  border-radius:var(--radius-md);
+  box-shadow:var(--shadow-sm);
+  border:1px solid var(--color-gray-300);
+}
+.blog-chart-container:hover{box-shadow:var(--shadow-md)}
+
+.blog-chart-title{
+  font-size:var(--fs-lg);
+  font-weight:700;
+  color:var(--color-dark);
+  margin-bottom:var(--spacing-md);
+  text-align:center;
+}
+
+.blog-chart-subtitle{
+  font-size:var(--fs-sm);
+  color:var(--color-gray-700);
+  margin-bottom:var(--spacing-lg);
+  text-align:center;
+}
+
+.blog-chart{
+  min-height:300px;
+  width:100%;
+}
+
+/* Chart Variants */
+.blog-chart--small{min-height:200px}
+.blog-chart--medium{min-height:350px}
+.blog-chart--large{min-height:500px}
+
+/* Chart Color Themes */
+.blog-chart--primary{border-left:4px solid var(--color-primary)}
+.blog-chart--success{border-left:4px solid var(--color-success)}
+.blog-chart--info{border-left:4px solid var(--color-info)}
+.blog-chart--warning{border-left:4px solid var(--color-warning)}
+
+/* ApexCharts Custom Styling */
+.apexcharts-tooltip{
+  background:rgba(0,0,0,0.8) !important;
+  border:none !important;
+  border-radius:var(--radius-sm) !important;
+  box-shadow:var(--shadow-lg) !important;
+}
+.apexcharts-tooltip-title{
+  background:transparent !important;
+  border:none !important;
+  color:#fff !important;
+  font-weight:600 !important;
+  padding:var(--spacing-xs) var(--spacing-sm) !important;
+}
+.apexcharts-tooltip-series-group{
+  background:transparent !important;
+  color:#fff !important;
+  padding:var(--spacing-xs) var(--spacing-sm) !important;
+}
+
+/* Chart Loading State */
+.blog-chart-loading{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:300px;
+  background:var(--color-gray-100);
+  border-radius:var(--radius-md);
+  color:var(--color-gray-700);
+  font-size:var(--fs-sm);
+}
+
+/* Responsive Charts */
+@media (max-width: 768px) {
+  .blog-chart-container{
+    padding:var(--spacing-md);
+  }
+  .blog-chart{
+    min-height:250px;
+  }
+  .blog-chart--large{
+    min-height:300px;
+  }
+}
+
+/* =============================================================
+ 13. UTILITY HELPERS (spacing, shadows, radius) - ENHANCED
+============================================================= */
+.blog-shadow-sm{box-shadow:var(--shadow-sm)!important}
+.blog-shadow-md{box-shadow:var(--shadow-md)!important}
+.blog-shadow-lg{box-shadow:var(--shadow-lg)!important}
+.blog-radius-sm{border-radius:var(--radius-sm)!important}
+.blog-radius-md{border-radius:var(--radius-md)!important}
+.blog-radius-lg{border-radius:var(--radius-lg)!important}
+
+/* Spacing Utilities */
+.blog-mt-0{margin-top:0!important}
+.blog-mt-sm{margin-top:var(--spacing-sm)!important}
+.blog-mt-md{margin-top:var(--spacing-md)!important}
+.blog-mt-lg{margin-top:var(--spacing-lg)!important}
+.blog-mt-xl{margin-top:var(--spacing-xl)!important}
+
+.blog-mb-0{margin-bottom:0!important}
+.blog-mb-sm{margin-bottom:var(--spacing-sm)!important}
+.blog-mb-md{margin-bottom:var(--spacing-md)!important}
+.blog-mb-lg{margin-bottom:var(--spacing-lg)!important}
+.blog-mb-xl{margin-bottom:var(--spacing-xl)!important}
+
+.blog-pt-0{padding-top:0!important}
+.blog-pt-sm{padding-top:var(--spacing-sm)!important}
+.blog-pt-md{padding-top:var(--spacing-md)!important}
+.blog-pt-lg{padding-top:var(--spacing-lg)!important}
+.blog-pt-xl{padding-top:var(--spacing-xl)!important}
+
+.blog-pb-0{padding-bottom:0!important}
+.blog-pb-sm{padding-bottom:var(--spacing-sm)!important}
+.blog-pb-md{padding-bottom:var(--spacing-md)!important}
+.blog-pb-lg{padding-bottom:var(--spacing-lg)!important}
+.blog-pb-xl{padding-bottom:var(--spacing-xl)!important}
+
+/* Text Alignment */
+.blog-text-left{text-align:left!important}
+.blog-text-center{text-align:center!important}
+.blog-text-right{text-align:right!important}
+
+/* Display Utilities */
+.blog-d-block{display:block!important}
+.blog-d-inline{display:inline!important}
+.blog-d-inline-block{display:inline-block!important}
+.blog-d-flex{display:flex!important}
+.blog-d-none{display:none!important}
+
+/* Flexbox Utilities */
+.blog-justify-center{justify-content:center!important}
+.blog-justify-between{justify-content:space-between!important}
+.blog-align-center{align-items:center!important}
+.blog-flex-wrap{flex-wrap:wrap!important}
+
+/* =============================================================
+ 14. RESPONSIVE DESIGN ENHANCEMENTS
+============================================================= */
+@media (max-width: 768px) {
+  .blog-container{padding:0 var(--spacing-sm)}
+  .blog-heading--hero{font-size:var(--fs-2xl)}
+  .blog-heading--section{font-size:var(--fs-xl)}
+  .blog-card__body{padding:var(--spacing-md)}
+  .blog-alert{padding:var(--spacing-md)}
+  .blog-compare{flex-direction:column}
+  .blog-compare__option{margin-bottom:var(--spacing-md)}
+  
+  /* Stack accordion headers on mobile */
+  .blog-accordion__header{
+    font-size:var(--fs-sm);
+    padding:var(--spacing-sm) var(--spacing-md);
+  }
+}
+
+/* =============================================================
+ 15. ANIMATION & INTERACTION ENHANCEMENTS
+============================================================= */
+.blog-fade-in{
+  animation:blogFadeIn 0.5s ease-in-out;
+}
+
+@keyframes blogFadeIn {
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.blog-slide-in{
+  animation:blogSlideIn 0.5s ease-out;
+}
+
+@keyframes blogSlideIn {
+  from{opacity:0;transform:translateX(-20px)}
+  to{opacity:1;transform:translateX(0)}
+}
+
+/* Hover Effects */
+.blog-hover-lift{
+  transition:transform var(--transition-medium);
+}
+.blog-hover-lift:hover{
+  transform:translateY(-4px);
+}
+
+/* =============================================================
+ 16. AVADA GLOBAL COLOR REFERENCE (READ-ONLY)
+============================================================= */
+/*
+:root {
+  --awb-color1:#...; --awb-color2:#...; --awb-color3:#...; --awb-color4:#...; --awb-color5:#...;
+}
+*/
+
+/* =============================================================
+ 17. PRINT STYLES
+============================================================= */
+@media print {
+  .blog-card, .blog-alert, .blog-chart-container{
+    box-shadow:none;
+    border:1px solid #ddd;
+  }
+  .blog-accordion__body{
+    max-height:none!important;
+    padding:var(--spacing-md)!important;
+  }
+  .blog-chart{
+    min-height:auto;
+  }
+}
+
+/* END BLOG-GENERATED STYLESHEET */
+  
