@@ -1,0 +1,25 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+
+Always reference [implementationTechnical.md](mdc:implementationTechnical.md) for technical specifications. If any technical needs change update this file with the changes.
+Always reference [implementationPlan.md](mdc:implementationPlan.md) for functionality requirements. If the user requires any changes to functionality, update this file.
+Always update [changelog.md](mdc:changelog.md) with any changes.
+Always refer to [database-structure.md](mdc:database-structure.md) for database structure quetions like field names and valid field values. Never assume database structure or field names without refrring to this document.
+Never create duplicate functionality
+All functions should prioritize logging for debugging and use [class-log-model.php](mdc:models/class-log-model.php). If debugging is on in the main plugin file ('AI_BLOG_GENERATOR_DEBUG' = true) then add extra detailed logs for debugging.
+Logs should be written as follows:
+    use AI_Blog_Generator\Utilities\Logger;
+    Logger::info( 'cron_hooks_registered', 'All cron hooks registered successfully' );
+Always use existing methods from other classes
+Follow WordPress coding standards strictly
+Include proper error handling in every method
+Log all important actions and errors
+Validate and sanitize all inputs
+Escape all outputs
+Use dependency injection for class dependencies
+Update documentation when making changes.
+gpt-image-1 is a valid model from openai. Do not change this at all, and particularly do not replace it with a DALL-E model.
+NEVER assume a datatype, functionality or naming convention in a dependency or the database. Always verify the correct functtions, methods, field names when referencing another object.
