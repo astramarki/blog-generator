@@ -200,22 +200,20 @@ class AI_Blog_Generator {
 	 * Define all hooks for the admin area.
 	 */
 	private function define_admin_hooks() {
-		// Only load admin functionality in admin area.
-		if ( ! is_admin() ) {
-			return;
-		}
-
 		// Initialize admin manager.
 		$admin_manager = new AI_Blog_Generator\Admin\Admin_Manager( $this->version );
 		
-		// Admin menu and pages.
-		$this->loader->add_action( 'admin_menu', $admin_manager, 'add_menu_pages' );
-		$this->loader->add_action( 'admin_enqueue_scripts', $admin_manager, 'enqueue_scripts' );
+		// Only load admin UI functionality in admin area.
+		if ( is_admin() ) {
+			// Admin menu and pages.
+			$this->loader->add_action( 'admin_menu', $admin_manager, 'add_menu_pages' );
+			$this->loader->add_action( 'admin_enqueue_scripts', $admin_manager, 'enqueue_scripts' );
+		}
 		
-		// Register AJAX handlers.
+		// Always register AJAX handlers (needed for both admin and frontend AJAX requests).
 		$admin_manager->register_ajax_handlers();
 		
-		// Initialize controllers for AJAX handling.
+		// Initialize controllers for AJAX handling (always needed for AJAX).
 		$this->init_controllers();
 	}
 

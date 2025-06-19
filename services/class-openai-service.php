@@ -849,13 +849,15 @@ class OpenAI_Service {
 	}
 
 	/**
-	 * Generate multiple images in batch.
+	 * Generate multiple images sequentially with detailed progress tracking.
+	 * Better alternative to batch generation - generates images one by one with status updates.
 	 *
 	 * @param array $image_requirements Array of image requirements with prompts and tokens.
+	 * @param callable $progress_callback Optional callback for progress updates.
 	 * @return array Results with success/failure for each image.
 	 */
-	public function generate_batch_images( $image_requirements ) {
-		$image_start_time = microtime( true ); // Track batch generation time
+	public function generate_images_sequentially( $image_requirements, $progress_callback = null ) {
+		$generation_start_time = microtime( true );
 		
 		$results = [
 			'results' => [],
@@ -867,25 +869,13 @@ class OpenAI_Service {
 			],
 		];
 
-		Logger::info( 'batch_image_generation_start', 'Starting batch image generation', [
+		Logger::info( 'sequential_image_generation_start', 'Starting sequential image generation', [
 			'total_images' => count( $image_requirements ),
 			'memory_usage' => memory_get_usage(),
-			'batch_start_time' => $image_start_time,
+			'generation_start_time' => $generation_start_time,
 		] );
-		
-		// Add detailed debug info about image requirements
-		foreach ( $image_requirements as $index => $requirement ) {
-			Logger::debug( 'batch_image_requirement_details', 'Image requirement details', [
-				'index' => $index,
-				'requirement_keys' => array_keys( $requirement ),
-				'prompt_length' => strlen( $requirement['prompt'] ?? '' ),
-				'token' => $requirement['token'] ?? 'none',
-				'has_seed_image' => ! empty( $requirement['seed_image'] ),
-				'seed_image_url' => $requirement['seed_image'] ?? 'none',
-			] );
-		}
 
-		// Track seed images used to ensure only one seed image is used across all requirements
+		// Track seed images used
 		$seed_image_used = null;
 		$has_seed_images = false;
 
@@ -894,157 +884,279 @@ class OpenAI_Service {
 			if ( ! empty( $requirement['seed_image'] ) ) {
 				$seed_image_used = $requirement['seed_image'];
 				$has_seed_images = true;
-				Logger::info( 'seed_image_selected', 'Selected seed image for batch processing', [
+				Logger::info( 'seed_image_selected', 'Selected seed image for sequential processing', [
 					'seed_image_url' => $seed_image_used,
 				] );
 				break; // Use only the first seed image found
 			}
 		}
 
+		// Process each image individually
 		foreach ( $image_requirements as $index => $requirement ) {
-			$processing_start = microtime( true );
+			$image_start = microtime( true );
 			$prompt = $requirement['prompt'] ?? '';
 			$token = $requirement['token'] ?? '{{image' . ( $index + 1 ) . '}}';
 			$alt_text = $requirement['alt_text'] ?? '';
+			$image_number = $index + 1;
+			$total_images = count( $image_requirements );
 			
-			Logger::info( 'processing_image_requirement', 'Processing image requirement', [
+			// Calculate progress percentage for this image
+			$progress_percentage = round( ( $index / $total_images ) * 100 );
+			
+			// Call progress callback if provided
+			if ( $progress_callback ) {
+				call_user_func( $progress_callback, [
+					'stage' => 'images',
+					'message' => "Generating image {$image_number} of {$total_images}: " . substr( $prompt, 0, 50 ) . '...',
+					'progress' => $progress_percentage,
+					'current_image' => $image_number,
+					'total_images' => $total_images,
+					'token' => $token
+				] );
+			}
+			
+			Logger::info( 'sequential_image_processing', "Processing image {$image_number} of {$total_images}", [
 				'index' => $index,
 				'token' => $token,
 				'prompt_length' => strlen( $prompt ),
 				'has_seed_image' => ! empty( $requirement['seed_image'] ),
 				'using_seed_image' => $has_seed_images,
-				'seed_image_url' => $seed_image_used,
+				'progress_percentage' => $progress_percentage,
 				'memory_usage' => memory_get_usage(),
-				'processing_start_time' => $processing_start,
 			] );
 
 			$image_result = null;
 
-			// Use seed image editing if we have a seed image (for ALL images in the batch)
-			if ( $has_seed_images && $seed_image_used ) {
-				Logger::info( 'using_seed_image_edit', 'Starting seed image edit for requirement', [
-					'token' => $token,
-					'seed_image_url' => $seed_image_used,
-					'prompt' => $prompt,
-					'memory_before' => memory_get_usage(),
-				] );
-				
-				$edit_start = microtime( true );
-				$image_result = $this->edit_image( $prompt, $seed_image_used );
-				$edit_duration = microtime( true ) - $edit_start;
-				
-				Logger::info( 'seed_image_edit_completed', 'Seed image edit completed', [
-					'token' => $token,
-					'duration_seconds' => $edit_duration,
-					'success' => $image_result['success'] ?? false,
-					'memory_after' => memory_get_usage(),
-					'error_message' => $image_result['message'] ?? 'none',
-				] );
-			} else {
-				Logger::info( 'using_standard_generation', 'Starting standard image generation', [
-					'token' => $token,
-					'prompt' => $prompt,
-					'memory_before' => memory_get_usage(),
-				] );
-				
-				$gen_start = microtime( true );
-				$image_result = $this->generate_image( $prompt );
-				$gen_duration = microtime( true ) - $gen_start;
-				
-				Logger::info( 'standard_generation_completed', 'Standard image generation completed', [
-					'token' => $token,
-					'duration_seconds' => $gen_duration,
-					'success' => $image_result['success'] ?? false,
-					'memory_after' => memory_get_usage(),
-					'error_message' => $image_result['message'] ?? 'none',
-				] );
-			}
-
-			if ( $image_result['success'] ) {
-				// Generate filename based on token and timestamp
-				$filename = 'ai-blog-image-' . sanitize_file_name( str_replace( [ '{{', '}}' ], '', $token ) ) . '-' . time();
-				
-				// Save to media library
-				$save_result = $this->save_to_media_library(
-					$image_result['image_data'],
-					$filename,
-					$alt_text,
-					$alt_text
-				);
-
-				if ( $save_result['success'] ) {
-					$results['results'][] = [
-						'success' => true,
+			try {
+				// Use seed image editing if we have a seed image
+				if ( $has_seed_images && $seed_image_used ) {
+					Logger::info( 'sequential_seed_image_edit', "Starting seed image edit for image {$image_number}", [
 						'token' => $token,
-						'attachment_id' => $save_result['attachment_id'],
-						'url' => $save_result['url'],
-						'alt_text' => $alt_text,
-						'cost' => $image_result['cost'],
-						'method' => $image_result['method'],
-					];
-					
-					$results['summary']['successful']++;
-					$results['summary']['total_cost'] += $image_result['cost'];
-					
-					Logger::info( 'batch_image_success', 'Successfully generated and saved image', [
-						'token' => $token,
-						'attachment_id' => $save_result['attachment_id'],
-						'cost' => $image_result['cost'],
-						'method' => $image_result['method'],
+						'seed_image_url' => $seed_image_used,
+						'prompt_preview' => substr( $prompt, 0, 100 ),
 					] );
+					
+					$image_result = $this->edit_image( $prompt, $seed_image_used );
+					
+					Logger::info( 'sequential_seed_edit_result', "Seed image edit completed for image {$image_number}", [
+						'token' => $token,
+						'success' => $image_result['success'] ?? false,
+						'error_message' => $image_result['message'] ?? 'none',
+					] );
+				} else {
+					Logger::info( 'sequential_standard_generation', "Starting standard generation for image {$image_number}", [
+						'token' => $token,
+						'prompt_preview' => substr( $prompt, 0, 100 ),
+					] );
+					
+					$image_result = $this->generate_image( $prompt );
+					
+					Logger::info( 'sequential_standard_result', "Standard generation completed for image {$image_number}", [
+						'token' => $token,
+						'success' => $image_result['success'] ?? false,
+						'error_message' => $image_result['message'] ?? 'none',
+					] );
+				}
+
+				if ( $image_result['success'] ) {
+					// Generate filename based on token and timestamp
+					$filename = 'ai-blog-image-' . sanitize_file_name( str_replace( [ '{{', '}}' ], '', $token ) ) . '-' . time() . '-' . $index;
+					
+					// Update progress: saving image
+					if ( $progress_callback ) {
+						call_user_func( $progress_callback, [
+							'stage' => 'images',
+							'message' => "Saving image {$image_number} of {$total_images} to media library...",
+							'progress' => $progress_percentage + 50 / $total_images, // Add proportional progress
+							'current_image' => $image_number,
+							'total_images' => $total_images,
+							'token' => $token
+						] );
+					}
+					
+					// Save to media library
+					$save_result = $this->save_to_media_library(
+						$image_result['image_data'],
+						$filename,
+						$alt_text,
+						$alt_text
+					);
+
+					if ( $save_result['success'] ) {
+						$results['results'][] = [
+							'success' => true,
+							'token' => $token,
+							'attachment_id' => $save_result['attachment_id'],
+							'url' => $save_result['url'],
+							'alt_text' => $alt_text,
+							'cost' => $image_result['cost'],
+							'method' => $image_result['method'],
+							'index' => $index,
+						];
+						
+						$results['summary']['successful']++;
+						$results['summary']['total_cost'] += $image_result['cost'];
+						
+						$image_duration = microtime( true ) - $image_start;
+						
+						Logger::info( 'sequential_image_success', "Successfully generated and saved image {$image_number}", [
+							'token' => $token,
+							'attachment_id' => $save_result['attachment_id'],
+							'cost' => $image_result['cost'],
+							'method' => $image_result['method'],
+							'duration_seconds' => $image_duration,
+						] );
+						
+						// Update progress: image completed
+						if ( $progress_callback ) {
+							call_user_func( $progress_callback, [
+								'stage' => 'images',
+								'message' => "Image {$image_number} of {$total_images} completed successfully!",
+								'progress' => round( ( ( $index + 1 ) / $total_images ) * 100 ),
+								'current_image' => $image_number,
+								'total_images' => $total_images,
+								'token' => $token,
+								'completed' => true
+							] );
+						}
+					} else {
+						$results['results'][] = [
+							'success' => false,
+							'token' => $token,
+							'error' => $save_result['message'],
+							'stage' => 'save',
+							'index' => $index,
+						];
+						
+						$results['summary']['failed']++;
+						
+						Logger::error( 'sequential_image_save_failed', "Failed to save image {$image_number}", [
+							'token' => $token,
+							'error' => $save_result['message'],
+						] );
+						
+						// Update progress: save failed
+						if ( $progress_callback ) {
+							call_user_func( $progress_callback, [
+								'stage' => 'images',
+								'message' => "Failed to save image {$image_number} of {$total_images}: " . $save_result['message'],
+								'progress' => round( ( ( $index + 1 ) / $total_images ) * 100 ),
+								'current_image' => $image_number,
+								'total_images' => $total_images,
+								'token' => $token,
+								'failed' => true
+							] );
+						}
+					}
 				} else {
 					$results['results'][] = [
 						'success' => false,
 						'token' => $token,
-						'error' => $save_result['message'],
+						'error' => $image_result['message'],
+						'stage' => 'generation',
+						'index' => $index,
 					];
 					
 					$results['summary']['failed']++;
 					
-					Logger::error( 'batch_image_save_failed', 'Failed to save generated image', [
+					Logger::error( 'sequential_image_generation_failed', "Failed to generate image {$image_number}", [
 						'token' => $token,
-						'error' => $save_result['message'],
+						'error' => $image_result['message'],
 					] );
+					
+					// Update progress: generation failed
+					if ( $progress_callback ) {
+						call_user_func( $progress_callback, [
+							'stage' => 'images',
+							'message' => "Failed to generate image {$image_number} of {$total_images}: " . $image_result['message'],
+							'progress' => round( ( ( $index + 1 ) / $total_images ) * 100 ),
+							'current_image' => $image_number,
+							'total_images' => $total_images,
+							'token' => $token,
+							'failed' => true
+						] );
+					}
 				}
-			} else {
+
+			} catch ( \Exception $e ) {
 				$results['results'][] = [
 					'success' => false,
 					'token' => $token,
-					'error' => $image_result['message'],
+					'error' => 'Exception: ' . $e->getMessage(),
+					'stage' => 'exception',
+					'index' => $index,
 				];
 				
 				$results['summary']['failed']++;
 				
-				Logger::error( 'batch_image_generation_failed', 'Failed to generate image', [
+				Logger::error( 'sequential_image_exception', "Exception during image {$image_number} generation", [
 					'token' => $token,
-					'error' => $image_result['message'],
+					'error' => $e->getMessage(),
+					'trace' => $e->getTraceAsString(),
 				] );
+				
+				// Update progress: exception occurred
+				if ( $progress_callback ) {
+					call_user_func( $progress_callback, [
+						'stage' => 'images',
+						'message' => "Error generating image {$image_number} of {$total_images}: " . $e->getMessage(),
+						'progress' => round( ( ( $index + 1 ) / $total_images ) * 100 ),
+						'current_image' => $image_number,
+						'total_images' => $total_images,
+						'token' => $token,
+						'failed' => true
+					] );
+				}
 			}
 
-			// Add a small delay between requests to avoid rate limiting
+			// Add a small delay between requests to avoid rate limiting (but not after the last image)
 			if ( $index < count( $image_requirements ) - 1 ) {
-				sleep( 1 );
+				sleep( 2 ); // 2-second delay between images
 			}
 			
-			// Add timeout protection for individual image generation
-			if ( isset( $image_start_time ) && ( microtime( true ) - $image_start_time ) > 480 ) { // 8 minutes per batch
-				Logger::warning( 'batch_image_timeout', 'Batch image generation approaching timeout, stopping early', [
+			// Check for overall timeout (individual timeout per image: 3 minutes max)
+			$total_elapsed = microtime( true ) - $generation_start_time;
+			if ( $total_elapsed > 540 ) { // 9 minutes total maximum
+				Logger::warning( 'sequential_image_timeout', 'Sequential image generation approaching timeout, stopping early', [
 					'processed' => $index + 1,
 					'total' => count( $image_requirements ),
-					'elapsed_seconds' => microtime( true ) - $image_start_time
+					'elapsed_seconds' => $total_elapsed
 				] );
+				
+				if ( $progress_callback ) {
+					call_user_func( $progress_callback, [
+						'stage' => 'images',
+						'message' => "Image generation timeout after processing " . ($index + 1) . " of {$total_images} images",
+						'progress' => round( ( ( $index + 1 ) / $total_images ) * 100 ),
+						'timeout' => true
+					] );
+				}
 				break;
 			}
 		}
 
-		Logger::info( 'batch_image_generation_complete', 'Batch image generation completed', [
+		$total_duration = microtime( true ) - $generation_start_time;
+
+		Logger::info( 'sequential_image_generation_complete', 'Sequential image generation completed', [
 			'total' => $results['summary']['total'],
 			'successful' => $results['summary']['successful'],
 			'failed' => $results['summary']['failed'],
 			'total_cost' => $results['summary']['total_cost'],
+			'total_duration_seconds' => $total_duration,
 			'used_seed_image' => $has_seed_images,
 			'seed_image_url' => $seed_image_used,
 		] );
+		
+		// Final progress update
+		if ( $progress_callback ) {
+			call_user_func( $progress_callback, [
+				'stage' => 'images',
+				'message' => "Image generation completed: {$results['summary']['successful']} successful, {$results['summary']['failed']} failed",
+				'progress' => 100,
+				'completed' => true,
+				'summary' => $results['summary']
+			] );
+		}
 
 		return $results;
 	}
@@ -1324,5 +1436,20 @@ class OpenAI_Service {
 				'message' => $e->getMessage(),
 			];
 		}
+	}
+
+	/**
+	 * Generate multiple images in batch (DEPRECATED - use generate_images_sequentially instead).
+	 * Backward compatibility alias for the new sequential method.
+	 *
+	 * @deprecated Use generate_images_sequentially() instead for better progress tracking.
+	 * @param array $image_requirements Array of image requirements with prompts and tokens.
+	 * @return array Results with success/failure for each image.
+	 */
+	public function generate_batch_images( $image_requirements ) {
+		Logger::warning( 'deprecated_method_used', 'generate_batch_images is deprecated, use generate_images_sequentially instead' );
+		
+		// Call the new sequential method without progress callback for backward compatibility
+		return $this->generate_images_sequentially( $image_requirements );
 	}
 }

@@ -255,15 +255,32 @@ class Background_Processor {
                 'memory_peak' => memory_get_peak_usage( true )
             ] );
 
-            // Update status to error
-            $this->update_generation_status( $idea_id, self::STATUS_ERROR, 'Generation failed: ' . $error_message );
-
             // Clean up the generation lock
             $this->remove_generation_lock( $idea_id );
 
-            // Reset idea status to approved so it can be tried again
+            // Set idea status to failed with error message - NO RETRY LOGIC
             $idea_model = new Idea_Model();
-            $idea_model->update( $idea_id, [ 'status' => 'approved' ] );
+            $error_status = 'Failed: ' . $error_message;
+            
+            // Handle specific error types with cleaner messages
+            if (strpos($error_message, 'Overloaded') !== false) {
+                $error_status = 'Failed: API Overloaded';
+            } elseif (strpos($error_message, 'timeout') !== false) {
+                $error_status = 'Failed: Timeout';
+            } elseif (strpos($error_message, 'Budget') !== false) {
+                $error_status = 'Failed: Budget Limit';
+            } elseif (strpos($error_message, 'Daily') !== false) {
+                $error_status = 'Failed: Daily Limit';
+            }
+            
+            $idea_model->update( $idea_id, [ 
+                'status' => 'failed',
+                'generation_error' => $error_status,
+                'generation_completed_at' => current_time( 'mysql' )
+            ] );
+            
+            // Update generation status to show failure
+            $this->update_generation_status( $idea_id, self::STATUS_ERROR, $error_status );
         }
     }
 
@@ -326,7 +343,7 @@ class Background_Processor {
         // Store status for 1 hour
         set_transient( "ai_blog_generation_status_{$idea_id}", $status_data, HOUR_IN_SECONDS );
 
-        Logger::debug( 'background_processor_status_update', 'Generation status updated', [
+        Logger::debug( 'background_processor_status_update', 'Generation status updated vv', [
             'idea_id' => $idea_id,
             'status' => $status,
             'message' => $message,

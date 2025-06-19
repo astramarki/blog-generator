@@ -5,6 +5,162 @@ All notable changes to the AI Blog Generator WordPress plugin will be documented
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.7] - 2024-12-19
+
+### Fixed
+- **CRITICAL: AJAX Handler Registration Issue**: Fixed AJAX handlers not being registered for WordPress AJAX requests
+- **Generation Button Functionality**: Resolved issue where clicking "Generate" button did nothing after confirmation modal
+- **Controller Initialization**: Fixed V2 controllers not being properly initialized for AJAX requests
+
+### Technical
+- Modified main plugin file to register AJAX handlers outside of admin-only scope
+- Ensured controller initialization occurs regardless of `is_admin()` context
+- Fixed plugin architecture to support both admin and frontend AJAX functionality
+
+### Root Cause
+- AJAX handlers were only registered when `is_admin()` returned `true`
+- WordPress AJAX requests to `admin-ajax.php` don't always trigger `is_admin()` to return `true`
+- This prevented the V2 controllers from being initialized and their AJAX handlers from being registered
+
+## [1.6.4] - 2025-01-17
+
+### Fixed
+- **CRITICAL: Complete Elimination of ALL Automatic Retry Logic**: Completely removed all automatic retry mechanisms that were causing endless generation loops and status update failures
+  - **Root Cause**: Multiple automatic retry systems were creating infinite loops when generations failed or timed out
+  - **Primary Issue**: Image generation timeouts were NOT failing the generation, allowing stuck processes to remain "active" while new generations started
+  - **Secondary Issue**: Queue cleanup logic was automatically removing "stuck" generations and allowing new ones to start
+  - **Tertiary Issue**: Multiple automatic queue processing calls were starting new generations when previous ones failed
+
+### Removed Automatic Retry Mechanisms
+- **1. Generation Queue Automatic Cleanup**: Removed `get_active_count()` timeout cleanup that was automatically removing "stuck" generations after 30 minutes and allowing new ones to start
+- **2. Automatic Queue Processing**: Removed `process_queue()` calls from `mark_failed()`, `mark_complete()`, and `cancel_generation()` methods that were automatically starting new generations
+- **3. Scheduler Service Auto-Processing**: Completely disabled `process_approved_ideas_queue()` automatic processing to prevent background automatic generation attempts
+- **4. Page Load Cleanup**: Disabled automatic cleanup on Approved Ideas page load that was resetting "stuck" generations to "approved" status
+- **5. Image Generation Continuation**: Changed image generation timeout/failure to FAIL the entire generation instead of continuing without images
+
+### Fixed Timeout Handling
+- **Image Generation Timeout**: Reduced timeout from 5 minutes to 3 minutes and made ANY image timeout or error fail the ENTIRE generation
+  - **Before**: Image timeouts would continue generation without images, leading to stuck processes
+  - **After**: Image timeouts immediately fail the generation with proper error status
+- **Timeout Error Messages**: Added specific "Failed: Image Timeout" error message for image generation timeouts
+- **Multiple Timeout Checks**: Added timeout validation at every stage of image generation process
+
+### System Behavior Changes
+- **No Automatic Retries**: Failed generations stay failed until manually retried by user
+- **No Background Processing**: All generation must be manually initiated through GUI
+- **Stuck Generation Handling**: Stuck generations remain stuck until manually cancelled (no automatic cleanup)
+- **Queue Management**: Queue processing is now entirely manual - no automatic progression
+
+### Technical Implementation
+- Modified `Generation_Queue::get_active_count()` to remove automatic cleanup logic
+- Modified `Generation_Queue::mark_failed()`, `mark_complete()`, and `cancel_generation()` to remove `process_queue()` calls
+- Modified `Content_Generator` image generation to fail entire generation on timeout/error instead of continuing
+- Disabled `Scheduler_Service::process_approved_ideas_queue()` completely
+- Disabled `Approved_Ideas_Controller_V2::cleanup_stuck_generations()` on page load
+- Added comprehensive timeout checking throughout image generation process
+
+### User Impact
+- ✅ **Status Updates Work**: Generations now properly show "generating" status and update in real-time
+- ✅ **No Duplicate Generations**: Only one generation can run per idea at a time
+- ✅ **Clear Error States**: Failed generations show specific error reasons (API Overloaded, Image Timeout, etc.)
+- ✅ **Manual Control**: Users have complete control over when generations start and retry
+- ⚠️ **Manual Intervention Required**: Stuck or failed generations require manual user action to retry or cancel
+
+## [1.6.3] - 2025-01-17
+
+### Fixed
+- **CRITICAL: "Idea is already generating" Error on Failed Generations**: Fixed issue where failed generations would show as "Ready" in GUI but throw "Idea is already generating" error when user tried to retry
+  - **Root Cause**: Mismatch between frontend display logic and backend generation queue status tracking
+  - **Problem**: When generations failed, the active generations transient cache wasn't properly cleaned up, causing queue to think idea was still generating while frontend showed it as "Ready"
+  - **Solution**: Enhanced `is_idea_generating()` method to validate both transient cache AND database status for consistency, with automatic cleanup of stale entries
+  - **User Impact**: Failed generations now properly allow retry attempts without showing "already generating" error
+
+- **Status Display and Retry Logic Improvements**:
+  - **Failed Status Display**: Failed generations now show as "Failed: [Reason] (Retryable)" instead of just "Failed: [Reason]"
+  - **Retry Functionality**: Failed ideas now show "Retry" button with refresh icon instead of regular "Generate" button
+  - **Consistent Actions**: Both "approved" and "failed" status ideas now have identical action button sets (Generate/Retry, Deny, View Details)
+  - **Visual Styling**: Added new `status-retry` badge class with orange background and red border to distinguish retryable failed states
+  - **User Experience**: Clear visual indication that failed generations can be retried by the user
+
+- **Generation Queue Status Validation**:
+  - **Database Consistency**: Queue now validates transient cache against database status before making decisions
+  - **Automatic Cleanup**: Stale generation entries automatically removed when status mismatch detected
+  - **Error Handling**: Better error messages distinguishing between different failure types (API Overloaded vs other errors)
+  - **Status Updates**: Fixed mark_failed() method to properly set status to "failed" instead of incorrectly resetting to "approved"
+
+### Technical Details
+- Enhanced `Generation_Queue::is_idea_generating()` with dual validation (transient + database)
+- Updated `Generation_Queue::mark_failed()` to set proper "failed" status with clean error messages
+- Added CSS styles for new `status-retry` badge class and improved progress bar styling
+- Updated JavaScript `createActionButtons()` to treat failed status same as approved for retry capability
+- Added logging for generation status mismatches and cleanup operations
+
+## [1.6.2] - 2025-01-17
+
+### Fixed
+- **CRITICAL: Endless Retry Loop on API Failures**: Fixed generations that failed due to API overload (HTTP 529) being reset to "approved" status, causing endless retry loops
+  - **Root Cause**: Background_Processor was resetting failed generations to "approved" status instead of setting them to "failed"
+  - **Problem**: When Anthropic API returned HTTP 529 (Overloaded), the system would reset the idea status to "approved", causing the scheduler to immediately retry the same generation, creating an infinite loop
+  - **Solution**: All failed generations now set status to "failed" with appropriate error messages and NO automatic retry
+  - **User Action Required**: Users must manually restart failed generations if desired - no automatic retries occur
+
+- **CRITICAL: Database Model Validation Error**: Fixed `Idea_Model` rejecting "failed" status during database updates
+  - **Root Cause**: The model's validate() method didn't include "failed" in the list of valid statuses
+  - **Problem**: When trying to set status to "failed", the database update would fail validation and the idea status wouldn't be properly updated
+  - **Solution**: Added "failed" to the valid statuses array in `Idea_Model::validate()`
+
+- **CRITICAL: JavaScript Status Update Response Structure Mismatch**: Fixed status updates not displaying in the frontend
+  - **Root Cause**: JavaScript was looking for `data.updated_ideas` but backend was returning `data.ideas`
+  - **Problem**: Status update polling would succeed but wouldn't update the UI because of response structure mismatch
+  - **Solution**: Updated JavaScript to correctly read `data.ideas` from status update responses
+
+### Removed
+- **All Automatic Retry Logic**: Completely removed all retry functionality throughout the system
+  - Removed `ajax_retry_generation` AJAX handler from Approved_Ideas_Controller_V2  
+  - Removed retry buttons from failed generation UI
+  - Removed `handleRetryGeneration()` JavaScript function
+  - Updated error messages to remove retry suggestions
+- **Background Retry**: Background processor no longer resets failed generations to "approved" status
+- **Queue Retry**: Generation queue does not attempt to retry failed generations
+
+### Changed
+- **Failed Generation Handling**: Failed generations now show clear error status with reason
+  - API Overloaded failures show as "Failed: API Overloaded"
+  - Timeout failures show as "Failed: Timeout" 
+  - Budget limit failures show as "Failed: Budget Limit"
+  - Daily limit failures show as "Failed: Daily Limit"
+- **User Experience**: Users must manually review failed generations and restart them individually if needed
+
+## [1.6.1] - 2025-01-17
+
+### Fixed
+- **CRITICAL: Real-time Status Updates Not Working in GUI**: Fixed generation status not updating in the Approved Ideas V2 page during blog generation
+  - **Root Cause**: JavaScript `refreshGeneratingIdeas()` function was designed to only update UI from cached data without making any AJAX calls to check for status updates from the server
+  - **Problem**: Status updates were never fetched from the backend, causing progress bars to remain static and users never seeing completion or progress updates  
+  - **Solution**: Complete rewrite of status update system:
+    - Modified `refreshGeneratingIdeas()` to properly call `ai_blog_v2_get_idea_status_updates` AJAX endpoint
+    - Added new `handleStatusUpdateResponse()` function to process status updates and update UI
+    - Implemented real-time notifications when generation completes or fails
+    - Added automatic fast refresh mode stopping when all generations complete
+    - Enhanced error handling for status update failures
+  - **Technical Details**:
+    - Now calls `ai_blog_v2_get_idea_status_updates` every 5 seconds for generating ideas
+    - Updates cached data and refreshes individual table rows with new status
+    - Shows success notifications when blog posts are generated
+    - Shows error notifications when generation fails with retry options
+    - Automatically stops intensive polling when no active generations remain
+  - **Result**: Users now see real-time progress updates including status changes from "Ready" → "Generating" → "Complete", with live progress bars and completion notifications
+
+### Technical Improvements
+- Enhanced AJAX status polling to only refresh generating ideas for optimal performance
+- Added comprehensive error handling for network failures during status checks
+- Improved caching system to maintain consistency between server data and UI state
+- Added automatic cleanup of UI refresh timers when generations complete
+
+### Files Modified
+- `admin/assets/js/approved-ideas-v2.js` - Complete rewrite of status update system with real AJAX calls
+- `changelog.md` - Documentation of critical status update fix
+
 ## [1.6.0] - 2025-06-17
 
 ### Added
@@ -3178,3 +3334,80 @@ foreach ($contexts as $context) {
 ---
 
 // ... existing code ...
+
+## [1.6.3] - 2025-01-17
+
+### Fixed
+- **CRITICAL: "Idea is already generating" Error on Failed Generations**: Fixed issue where failed generations would show as "Ready" in GUI but throw "Idea is already generating" error when user tried to retry
+  - **Root Cause**: Mismatch between frontend display logic and backend generation queue status tracking
+  - **Problem**: When generations failed, the active generations transient cache wasn't properly cleaned up, causing queue to think idea was still generating while frontend showed it as "Ready"
+  - **Solution**: Enhanced `is_idea_generating()` method to validate both transient cache AND database status for consistency, with automatic cleanup of stale entries
+  - **User Impact**: Failed generations now properly allow retry attempts without showing "already generating" error
+
+- **Status Display and Retry Logic Improvements**:
+  - **Failed Status Display**: Failed generations now show as "Failed: [Reason] (Retryable)" instead of just "Failed: [Reason]"
+  - **Retry Functionality**: Failed ideas now show "Retry" button with refresh icon instead of regular "Generate" button
+  - **Consistent Actions**: Both "approved" and "failed" status ideas now have identical action button sets (Generate/Retry, Deny, View Details)
+  - **Visual Styling**: Added new `status-retry` badge class with orange background and red border to distinguish retryable failed states
+  - **User Experience**: Clear visual indication that failed generations can be retried by the user
+
+- **Generation Queue Status Validation**:
+  - **Database Consistency**: Queue now validates transient cache against database status before making decisions
+  - **Automatic Cleanup**: Stale generation entries automatically removed when status mismatch detected
+  - **Error Handling**: Better error messages distinguishing between different failure types (API Overloaded vs other errors)
+  - **Status Updates**: Fixed mark_failed() method to properly set status to "failed" instead of incorrectly resetting to "approved"
+
+### Technical Details
+- Enhanced `Generation_Queue::is_idea_generating()` with dual validation (transient + database)
+- Updated `Generation_Queue::mark_failed()` to set proper "failed" status with clean error messages
+- Added CSS styles for new `status-retry` badge class and improved progress bar styling
+- Updated JavaScript `createActionButtons()` to treat failed status same as approved for retry capability
+- Added logging for generation status mismatches and cleanup operations
+
+## [1.6.5] - 2025-01-17
+
+### Fixed
+- **CRITICAL: Status Updates Not Displaying in GUI**: Fixed the root cause of status updates not appearing in the frontend during blog generation
+  - **Root Cause**: Field name mismatch between backend response and frontend expectations
+  - **Problem**: Backend `ajax_submit_for_generation` was returning `updated_ideas` field, but JavaScript `handleGenerationResponse` was looking for `ideas` field
+  - **Effect**: When generations were submitted, the frontend cached data was never updated with the "generating" status, causing `getGeneratingIdeaIds()` to return an empty array
+  - **Result**: Status polling system would find no generating ideas and show "✅ No generating ideas to refresh" instead of fetching actual status updates
+  - **Solution**: Changed backend response to use `ideas` field name (consistent with status update endpoint)
+  - **User Impact**: Real-time status updates now work correctly, showing progress bars and status changes during generation
+
+### Technical Details
+- **Files Modified**: 
+  - `controllers/class-approved-ideas-controller-v2.php`: Changed response field from `updated_ideas` to `ideas`
+  - JavaScript polling system now correctly identifies generating ideas and fetches status updates
+- **Status Flow**: Generation submission → Status cached → Progress bars displayed → Status polling active → Real-time updates shown
+
+## [1.6.6] - 2025-01-17
+
+### Major Improvement: Sequential Image Generation with Real-Time Progress Tracking
+- **BREAKING CHANGE**: Replaced batch image generation with sequential individual image generation to eliminate timeouts and failures
+  - **Old System**: Generated all images in a single batch call, prone to timeouts and complete failures
+  - **New System**: Generates images one by one with detailed progress tracking and status updates
+  - **User Experience**: Users now see real-time updates like "Generating image 1 of 3: [prompt preview]...", "Saving image 2 of 3 to media library...", etc.
+  - **Reliability**: If one image fails, others continue to generate successfully instead of the entire batch failing
+  - **Timeout Management**: Each image has individual timeout protection (3 minutes per image, 9 minutes total maximum)
+
+### Technical Implementation
+- **New Method**: `generate_images_sequentially()` in OpenAI Service with progress callback support
+- **Progress Tracking**: Real-time status updates showing current image number, progress percentage, and operation stage
+- **Detailed Logging**: Enhanced logging with image-specific information for debugging
+- **Error Handling**: Improved error handling with specific failure reasons (generation, save, exception)
+- **Rate Limiting**: 2-second delay between image requests to prevent API rate limiting
+- **Backward Compatibility**: Old `generate_batch_images()` method maintained as deprecated alias
+
+### Status Update Flow
+1. **"Generating image 1 of 3: [prompt preview]..."** - Shows which image is being generated
+2. **"Saving image 1 of 3 to media library..."** - Shows save progress
+3. **"Image 1 of 3 completed successfully!"** - Confirms completion
+4. **Process repeats for each image individually**
+5. **"Image generation completed: 2 successful, 1 failed"** - Final summary
+
+### Error Recovery
+- **Individual Failures**: If one image fails, remaining images continue to generate
+- **Detailed Error Messages**: Specific error messages for generation vs. save failures
+- **Timeout Protection**: Stops early if overall generation time exceeds 9 minutes
+- **No Automatic Retries**: Failed images require manual retry as per system design

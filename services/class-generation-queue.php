@@ -167,24 +167,16 @@ class Generation_Queue {
 	public function get_active_count() {
 		$active = get_transient( self::ACTIVE_GENERATIONS_KEY ) ?: [];
 		
-		// Clean up completed or timed out generations
-		$cleaned = [];
-		foreach ( $active as $idea_id => $data ) {
-			// Check if still generating (timeout after 30 minutes)
-			if ( isset( $data['started_at'] ) && ( time() - $data['started_at'] ) < 1800 ) {
-				// Also check database status
-				$idea = $this->ideas_model->get_idea( $idea_id );
-				if ( $idea && $idea['status'] === 'generating' ) {
-					$cleaned[ $idea_id ] = $data;
-				}
-			}
-		}
-
-		if ( count( $cleaned ) !== count( $active ) ) {
-			set_transient( self::ACTIVE_GENERATIONS_KEY, $cleaned, HOUR_IN_SECONDS );
-		}
-
-		return count( $cleaned );
+		// NO AUTOMATIC CLEANUP - Let stuck generations stay stuck to prevent automatic retries
+		// If a generation is truly stuck, it must be manually cancelled or marked as failed
+		// This prevents the automatic restart behavior that was causing duplicate generations
+		
+		Logger::debug( 'get_active_count', 'Active generations count (no cleanup)', [
+			'active_count' => count( $active ),
+			'active_idea_ids' => array_keys( $active )
+		] );
+		
+		return count( $active );
 	}
 
 	/**
@@ -194,8 +186,31 @@ class Generation_Queue {
 	 * @return bool
 	 */
 	public function is_idea_generating( $idea_id ) {
+		// First check the transient cache
 		$active = get_transient( self::ACTIVE_GENERATIONS_KEY ) ?: [];
-		return isset( $active[ $idea_id ] );
+		$in_transient = isset( $active[ $idea_id ] );
+		
+		// Also check the database status to ensure consistency
+		$idea = $this->ideas_model->get_idea( $idea_id );
+		$db_status_generating = $idea && $idea['status'] === 'generating';
+		
+		// If there's a mismatch, clean up the transient
+		if ( $in_transient && ! $db_status_generating ) {
+			Logger::debug( 'generation_status_mismatch', 'Cleaning up stale generation transient', [
+				'idea_id' => $idea_id,
+				'transient_status' => 'generating',
+				'db_status' => $idea['status'] ?? 'unknown'
+			] );
+			
+			// Remove from active generations transient
+			unset( $active[ $idea_id ] );
+			set_transient( self::ACTIVE_GENERATIONS_KEY, $active, HOUR_IN_SECONDS );
+			
+			return false;
+		}
+		
+		// Only consider it generating if BOTH transient and database agree
+		return $in_transient && $db_status_generating;
 	}
 
 	/**
@@ -433,8 +448,11 @@ class Generation_Queue {
 			'generation_completed_at' => current_time( 'mysql' )
 		] );
 
-		// Process queue to start next item
-		$this->process_queue();
+		// NO AUTOMATIC QUEUE PROCESSING - User must manually start next generations
+		
+		Logger::info( 'generation_cancelled_final', 'Generation cancelled - NO AUTO QUEUE PROCESSING', [
+			'idea_id' => $idea_id
+		] );
 
 		return true;
 	}
@@ -451,17 +469,31 @@ class Generation_Queue {
 			'error' => $error
 		] );
 
-		// Update idea status
+		// Clean error message for user display
+		$display_error = 'Failed: ' . $error;
+		if ( strpos( $error, 'HTTP 529' ) !== false ) {
+			$display_error = 'Failed: API Overloaded';
+		} elseif ( strpos( $error, 'Overloaded' ) !== false ) {
+			$display_error = 'Failed: API Overloaded';
+		} elseif ( strpos( $error, 'timeout' ) !== false || strpos( $error, 'Timeout' ) !== false ) {
+			$display_error = 'Failed: Image Timeout';
+		}
+
+		// Update idea status to failed - NO RETRY LOGIC
 		$this->ideas_model->update_idea( $idea_id, [
-			'status' => 'approved', // Reset to approved so it can be retried
+			'status' => 'failed',
 			'generation_status' => 'Failed',
-			'generation_error' => $error,
+			'generation_error' => $display_error,
 			'generation_completed_at' => current_time( 'mysql' )
 		] );
 
-		// Remove from active and process queue
+		// Remove from active generations - NO AUTOMATIC QUEUE PROCESSING
 		$this->remove_from_active( $idea_id );
-		$this->process_queue();
+		
+		Logger::info( 'generation_marked_failed', 'Generation marked as failed - NO RETRY, NO AUTO QUEUE PROCESSING', [
+			'idea_id' => $idea_id,
+			'error' => $display_error
+		] );
 	}
 
 	/**
@@ -482,9 +514,12 @@ class Generation_Queue {
 			'generation_completed_at' => current_time( 'mysql' )
 		] );
 
-		// Remove from active and process queue
+		// Remove from active - NO AUTOMATIC QUEUE PROCESSING
 		$this->remove_from_active( $idea_id );
-		$this->process_queue();
+		
+		Logger::info( 'generation_complete_final', 'Generation marked complete - NO AUTO QUEUE PROCESSING', [
+			'idea_id' => $idea_id
+		] );
 	}
 
 	/**

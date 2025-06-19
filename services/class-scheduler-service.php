@@ -140,7 +140,15 @@ class Scheduler_Service {
 	/**
 	 * Process approved ideas queue cron job.
 	 */
-	public function process_approved_ideas() {
+	public function process_approved_ideas_queue() {
+		Logger::info( 'cron_process_queue_disabled', 'Auto processing is DISABLED to prevent automatic retries' );
+		
+		// DISABLED: Auto processing completely disabled to prevent automatic generation retries
+		// Users must manually start generations from the GUI
+		return;
+		
+		// OLD CODE BELOW - DISABLED
+		/*
 		Logger::info( 'cron_process_queue_start', 'Starting approved ideas processing' );
 		
 		try {
@@ -225,6 +233,7 @@ class Scheduler_Service {
 				'trace' => $e->getTraceAsString(),
 			] );
 		}
+		*/
 	}
 
 	/**
@@ -433,7 +442,7 @@ class Scheduler_Service {
 		add_action( 'ai_blog_daily_ideas', [ $this, 'daily_idea_generation' ] );
 		
 		// Process approved ideas queue.
-		add_action( 'ai_blog_process_queue', [ $this, 'process_approved_ideas' ] );
+		add_action( 'ai_blog_process_queue', [ $this, 'process_approved_ideas_queue' ] );
 		
 		// Publish scheduled posts.
 		add_action( 'ai_blog_publish_scheduled', [ $this, 'publish_scheduled_posts' ] );
@@ -457,7 +466,7 @@ class Scheduler_Service {
 	public function unregister_cron_hooks() {
 		// Remove action hooks.
 		remove_action( 'ai_blog_daily_ideas', [ $this, 'daily_idea_generation' ] );
-		remove_action( 'ai_blog_process_queue', [ $this, 'process_approved_ideas' ] );
+		remove_action( 'ai_blog_process_queue', [ $this, 'process_approved_ideas_queue' ] );
 		remove_action( 'ai_blog_publish_scheduled', [ $this, 'publish_scheduled_posts' ] );
 		remove_action( 'ai_blog_cleanup_logs', [ $this, 'cleanup_old_data' ] );
 		remove_action( 'init', [ $this, 'check_missed_cron_events' ] );
@@ -665,7 +674,7 @@ class Scheduler_Service {
 					$this->daily_idea_generation();
 					break;
 				case 'ai_blog_process_queue':
-					$this->process_approved_ideas();
+					$this->process_approved_ideas_queue();
 					break;
 				case 'ai_blog_publish_scheduled':
 					$this->publish_scheduled_posts();

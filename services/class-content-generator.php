@@ -1072,9 +1072,9 @@ class Content_Generator {
 						$this->generation_logger->info( 'Starting image generation process' );
 					}
 					
-					// Add timeout protection for image generation (5 minutes max)
+					// Add timeout protection for image generation (3 minutes max - reduced)
 					$image_timeout_start = time();
-					$image_timeout_limit = 300; // 5 minutes (reduced from 10)
+					$image_timeout_limit = 180; // 3 minutes (reduced from 5 to prevent hangs)
 					
 					try {
 						$this->update_generation_status( $idea_id, 'images', 'Generating images...' );
@@ -1089,7 +1089,11 @@ class Content_Generator {
 						// Set a shorter execution time limit for image generation specifically
 						set_time_limit( $image_timeout_limit );
 						
-						// CRITICAL: Add error suppression and try-catch for image generation
+						// Check timeout before even starting
+						if ( ( time() - $image_timeout_start ) > $image_timeout_limit ) {
+							throw new \Exception( 'Image generation timeout before start' );
+						}
+						
 						try {
 							$this->log_info( 'image_generation_start', 'Starting image generation', [
 								'total_image_count' => count( $all_image_requirements ),
@@ -1103,70 +1107,93 @@ class Content_Generator {
 							}
 							$image_contexts = $this->compile_contexts_for_images();
 							
+							// Check timeout again
+							if ( ( time() - $image_timeout_start ) > $image_timeout_limit ) {
+								throw new \Exception( 'Image generation timeout during context compilation' );
+							}
+							
 							// Add seed images if available
 							if ( $this->generation_logger ) {
 								$this->generation_logger->debug( 'Adding seed images to requirements' );
 							}
 							$this->add_seed_images_to_requirements( $all_image_requirements, $idea, $image_contexts );
 							
+							// Final timeout check before API call
+							if ( ( time() - $image_timeout_start ) > $image_timeout_limit ) {
+								throw new \Exception( 'Image generation timeout before API call' );
+							}
+							
 							// Check if OpenAI service is valid before calling
 							if ( ! $this->openai_service || ! is_object( $this->openai_service ) ) {
 								throw new \Exception( 'OpenAI service is not available for image generation' );
 							}
 							
-							// Generate images in batch with timeout protection
+							// Generate images sequentially with progress tracking
 							if ( $this->generation_logger ) {
-								$this->generation_logger->info( 'Calling OpenAI image generation service', [
+								$this->generation_logger->info( 'Calling OpenAI sequential image generation service', [
 									'image_count' => count( $all_image_requirements )
 								] );
 							}
 							
-							$images = $this->openai_service->generate_batch_images( $all_image_requirements );
+							// Create progress callback for real-time status updates
+							$progress_callback = function( $progress_data ) use ( $idea_id ) {
+								if ( isset( $progress_data['message'] ) ) {
+									$this->update_generation_status( $idea_id, 'images', $progress_data['message'] );
+									
+									if ( $this->generation_logger ) {
+										$this->generation_logger->info( 'Image Generation Progress: ' . $progress_data['message'], [
+											'current_image' => $progress_data['current_image'] ?? 0,
+											'total_images' => $progress_data['total_images'] ?? 0,
+											'progress_percentage' => $progress_data['progress'] ?? 0,
+											'token' => $progress_data['token'] ?? 'unknown'
+										] );
+									}
+								}
+							};
 							
-							// Check if we've exceeded the timeout
+							$images = $this->openai_service->generate_images_sequentially( $all_image_requirements, $progress_callback );
+							
+							// CRITICAL: Final timeout check after API call
 							if ( ( time() - $image_timeout_start ) > $image_timeout_limit ) {
-								throw new \Exception( 'Image generation timeout exceeded' );
+								throw new \Exception( 'Image generation timeout after API call' );
 							}
 							
 						} catch ( \Exception $img_e ) {
-							$this->log_error( 'image_generation_error', 'Error during image generation', [
+							// CRITICAL: Any image generation error should FAIL the entire generation - NO RETRY
+							$this->log_error( 'image_generation_critical_error', 'Critical error during image generation - FAILING ENTIRE GENERATION', [
 								'error' => $img_e->getMessage(),
-								'elapsed_time' => time() - $image_timeout_start
+								'elapsed_time' => time() - $image_timeout_start,
+								'idea_id' => $idea_id
 							] );
 							
-							// Continue without images rather than failing
-							$images = [
-								'results' => [],
-								'summary' => [
-									'total' => count( $all_image_requirements ),
-									'successful' => 0,
-									'failed' => count( $all_image_requirements )
-								]
-							];
-							
 							if ( $this->generation_logger ) {
-								$this->generation_logger->log_phase( 'images', 80, [ 
-									'message' => 'Image generation failed or timed out, continuing without images',
+								$this->generation_logger->log_phase( 'images', 0, [ 
+									'message' => 'CRITICAL: Image generation failed - failing entire generation',
 									'error' => $img_e->getMessage()
 								] );
 							}
+							
+							// Mark the entire generation as failed and throw the error up
+							throw new \Exception( 'Image generation failed: ' . $img_e->getMessage() );
 						}
 						
 					} catch ( \Exception $timeout_e ) {
-						$this->log_error( 'image_generation_timeout', 'Image generation phase timeout', [
+						// CRITICAL: Image timeout should FAIL the entire generation - NO RETRY
+						$this->log_error( 'image_generation_timeout_critical', 'CRITICAL: Image generation timeout - FAILING ENTIRE GENERATION', [
 							'error' => $timeout_e->getMessage(),
-							'elapsed_time' => time() - $image_timeout_start
+							'elapsed_time' => time() - $image_timeout_start,
+							'idea_id' => $idea_id
 						] );
 						
-						// Continue without images
-						$images = [
-							'results' => [],
-							'summary' => [
-								'total' => count( $all_image_requirements ),
-								'successful' => 0,
-								'failed' => count( $all_image_requirements )
-							]
-						];
+						if ( $this->generation_logger ) {
+							$this->generation_logger->log_phase( 'images', 0, [ 
+								'message' => 'CRITICAL: Image generation timeout - failing entire generation',
+								'error' => $timeout_e->getMessage()
+							] );
+						}
+						
+						// Mark the entire generation as failed and throw the error up
+						throw new \Exception( 'Image generation timeout: ' . $timeout_e->getMessage() );
 					}
 					
 					// Restore normal execution time limit

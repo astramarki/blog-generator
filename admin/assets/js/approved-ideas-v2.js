@@ -118,7 +118,6 @@
         // Individual actions (delegated)
         $('#ideasTableBody').on('click', '.btn-generate', handleIndividualGenerate);
         $('#ideasTableBody').on('click', '.btn-deny', handleIndividualDeny);
-        $('#ideasTableBody').on('click', '.btn-retry', handleRetryGeneration);
         $('#ideasTableBody').on('click', '.btn-view-details', handleViewDetails);
         
         // Modal confirmations
@@ -341,9 +340,9 @@
         } else if (idea.status === 'denied') {
             return '<span class="badge status-error">Denied</span>';
         } else if (idea.status === 'failed') {
-            // Show failed status with error message if available
+            // Show failed status with error message but make it retryable
             const errorMsg = idea.generation_error ? ` - ${escapeHtml(idea.generation_error)}` : '';
-            return `<span class="badge status-error">Failed${errorMsg}</span>`;
+            return `<span class="badge status-retry">Failed${errorMsg} (Retryable)</span>`;
         } else {
             return `<span class="badge status-queue">${escapeHtml(idea.status)}</span>`;
         }
@@ -379,34 +378,22 @@
      * Create action buttons for an idea
      */
     function createActionButtons(idea) {
-        if (idea.status === 'approved') {
+        if (idea.status === 'approved' || idea.status === 'failed') {
+            // Both approved and failed ideas can be generated (failed = retry)
+            const buttonText = idea.status === 'failed' ? 'Retry' : 'Generate';
+            const buttonIcon = idea.status === 'failed' ? 'fa-redo' : 'fa-play';
+            
             return `
                 <div class="btn-group" role="group">
                     <button type="button" class="btn btn-success btn-sm btn-generate" 
                             data-idea-id="${idea.id}" data-idea-title="${escapeHtml(idea.title)}"
-                            title="Generate Blog Post">
-                        <i class="fas fa-play"></i>
+                            title="${buttonText} Blog Post">
+                        <i class="fas ${buttonIcon}"></i>
                     </button>
                     <button type="button" class="btn btn-danger btn-sm btn-deny" 
                             data-idea-id="${idea.id}"
                             title="Deny Idea">
                         <i class="fas fa-times"></i>
-                    </button>
-                    <button type="button" class="btn btn-outline-secondary btn-sm btn-view-details" 
-                            data-idea-id="${idea.id}"
-                            title="View Details">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                </div>
-            `;
-        } else if (idea.status === 'failed') {
-            // For failed generations, show retry button
-            return `
-                <div class="btn-group" role="group">
-                    <button type="button" class="btn btn-warning btn-sm btn-retry" 
-                            data-idea-id="${idea.id}" data-idea-title="${escapeHtml(idea.title)}"
-                            title="Retry Generation">
-                        <i class="fas fa-redo"></i>
                     </button>
                     <button type="button" class="btn btn-outline-secondary btn-sm btn-view-details" 
                             data-idea-id="${idea.id}"
@@ -536,11 +523,11 @@
     }
 
     /**
-     * Refresh only generating ideas for performance (targeted refresh)
+     * Refresh status for ideas that are currently generating
      */
     function refreshGeneratingIdeas() {
         if (window.ApprovedIdeasV2.isRefreshing) {
-            console.log('⏭️ Targeted refresh already in progress, skipping');
+            console.log('⏭️ Status refresh already in progress, skipping');
             return;
         }
         
@@ -552,24 +539,103 @@
             return;
         }
         
-        console.log(`🎯 Refreshing ${generatingIds.length} generating ideas from cached data: ${generatingIds.join(', ')}`);
+        console.log(`🎯 Fetching status updates for ${generatingIds.length} generating ideas: ${generatingIds.join(', ')}`);
         
-        // IMPORTANT: Only update UI from cached data, NO API calls
-        // The actual generation status will be updated by backend processes
-        // When user refreshes the page manually, they'll see the latest status
+        window.ApprovedIdeasV2.isRefreshing = true;
         
-        // Update UI for generating ideas based on cached data
-        generatingIds.forEach(function(ideaId) {
-            const cachedIdea = window.ApprovedIdeasV2.currentIdeas.find(idea => idea.id == ideaId);
-            if (cachedIdea) {
-                // Check if the cached idea has updated status info from transients
-                // This would have been loaded on initial page load
-                console.log(`📊 Updating UI for idea ${ideaId} from cached data`);
-                updateIdeaRow(cachedIdea);
+        const ajaxData = {
+            action: 'ai_blog_v2_get_idea_status_updates',
+            idea_ids: generatingIds,
+            nonce: ai_blog_admin.nonce
+        };
+
+        console.log('📤 Status Update AJAX Request:', ajaxData);
+
+        $.ajax({
+            url: ai_blog_admin.ajaxurl,
+            type: 'POST',
+            data: ajaxData,
+            timeout: 15000,
+            success: function(response) {
+                console.log('📥 Status Update AJAX Response:', response);
+                handleStatusUpdateResponse(response, generatingIds);
+            },
+            error: function(xhr, status, error) {
+                console.error('❌ Status Update AJAX Error:', {
+                    generatingIds: generatingIds,
+                    status: status,
+                    error: error,
+                    responseText: xhr.responseText
+                });
+                // Don't show error for status update failures as they're background operations
+            },
+            complete: function() {
+                window.ApprovedIdeasV2.isRefreshing = false;
             }
         });
+    }
+
+    /**
+     * Handle status update response
+     */
+    function handleStatusUpdateResponse(response, requestedIds) {
+        console.log('📥 Processing status update response...');
         
-        console.log('✅ UI refresh completed without API calls');
+        try {
+            let data = response;
+            if (typeof response === 'string') {
+                data = JSON.parse(response);
+            }
+
+            if (data.success && data.data.ideas) {
+                const updatedIdeas = data.data.ideas;
+                console.log(`📊 Received status updates for ${updatedIdeas.length} ideas`);
+                
+                let completedCount = 0;
+                let stillGeneratingCount = 0;
+                
+                // Update each idea
+                updatedIdeas.forEach(function(idea) {
+                    // Update cached data
+                    const cachedIndex = window.ApprovedIdeasV2.currentIdeas.findIndex(i => i.id == idea.id);
+                    if (cachedIndex !== -1) {
+                        const oldStatus = window.ApprovedIdeasV2.currentIdeas[cachedIndex].status;
+                        window.ApprovedIdeasV2.currentIdeas[cachedIndex] = idea;
+                        
+                        // Check if status changed to completed
+                        if (oldStatus === 'generating' && idea.status === 'generated') {
+                            completedCount++;
+                            showNotice(`Blog post "${idea.title}" has been generated successfully!`, 'success');
+                        } else if (oldStatus === 'generating' && idea.status === 'failed') {
+                            showNotice(`Generation failed for "${idea.title}". Check the error details in view mode.`, 'error');
+                        } else if (idea.status === 'generating') {
+                            stillGeneratingCount++;
+                        }
+                    }
+                    
+                    // Update the row
+                    updateIdeaRow(idea);
+                });
+                
+                // Update statistics if provided
+                if (data.data.statistics) {
+                    updateStatistics(data.data.statistics);
+                }
+                
+                console.log(`✅ Status update completed: ${completedCount} completed, ${stillGeneratingCount} still generating`);
+                
+                // If no ideas are still generating, stop fast refresh
+                if (stillGeneratingCount === 0 && window.ApprovedIdeasV2.fastRefreshTimer) {
+                    console.log('🛑 All generations completed, stopping fast refresh');
+                    stopFastRefresh();
+                }
+                
+            } else {
+                console.warn('⚠️ Status update response was not successful or had no data:', data);
+            }
+        } catch (e) {
+            console.error('❌ Error parsing status update response:', e);
+        }
     }
 
     /**
@@ -774,56 +840,15 @@
     }
 
     /**
-     * Handle retry generation for failed ideas
+     * Handle individual deny button
      */
-    function handleRetryGeneration() {
+    function handleIndividualDeny() {
         const ideaId = parseInt($(this).data('idea-id'));
-        const ideaTitle = $(this).data('idea-title');
+        console.log(`🚫 Individual deny triggered for idea ${ideaId}`);
         
-        console.log(`🔄 Retry generation triggered for idea ${ideaId}: ${ideaTitle}`);
-        
-        // Confirm retry
-        if (!confirm(`Are you sure you want to retry generation for "${ideaTitle}"?`)) {
-            return;
+        if (confirm('Are you sure you want to deny this idea?')) {
+            denyIdea(ideaId);
         }
-        
-        // Call retry endpoint
-        $.ajax({
-            url: ai_blog_admin.ajaxurl,
-            type: 'POST',
-            data: {
-                action: 'ai_blog_v2_retry_generation',
-                idea_id: ideaId,
-                nonce: ai_blog_admin.nonce
-            },
-            success: function(response) {
-                console.log('📥 Retry generation response:', response);
-                
-                if (response.success) {
-                    showNotice(response.data.message || 'Generation retry started', 'success');
-                    
-                    // Update the idea in cached data if provided
-                    if (response.data.updated_idea) {
-                        const cachedIndex = window.ApprovedIdeasV2.currentIdeas.findIndex(i => i.id == ideaId);
-                        if (cachedIndex !== -1) {
-                            window.ApprovedIdeasV2.currentIdeas[cachedIndex] = response.data.updated_idea;
-                        }
-                        updateIdeaRow(response.data.updated_idea);
-                    }
-                    
-                    // Update queue status if provided
-                    if (response.data.queue_status) {
-                        updateQueueStatusDisplay(response.data.queue_status);
-                    }
-                } else {
-                    showNotice(response.data || 'Failed to retry generation', 'error');
-                }
-            },
-            error: function(xhr, status, error) {
-                console.error('❌ Retry generation error:', error);
-                showNotice('Failed to retry generation', 'error');
-            }
-        });
     }
 
     /**
@@ -893,8 +918,8 @@
             }
             
             // Update all affected ideas
-            if (data.updated_ideas && data.updated_ideas.length > 0) {
-                data.updated_ideas.forEach(function(idea) {
+            if (data.ideas && data.ideas.length > 0) {
+                data.ideas.forEach(function(idea) {
                     // Update cached data
                     const cachedIndex = window.ApprovedIdeasV2.currentIdeas.findIndex(i => i.id == idea.id);
                     if (cachedIndex !== -1) {
@@ -904,7 +929,7 @@
                     // Update the row
                     updateIdeaRow(idea);
                 });
-                console.log(`✅ Updated ${data.updated_ideas.length} idea(s) in UI`);
+                console.log(`✅ Updated ${data.ideas.length} idea(s) in UI`);
             }
             
             // Start faster refresh for active generations
@@ -937,22 +962,6 @@
         
         // Add to submitting list
         window.ApprovedIdeasV2.submittingIdeas.push(ideaId);
-        
-        // Debug: Check what status the frontend thinks this idea has
-        const $row = $(`tr[data-idea-id="${ideaId}"]`);
-        const $statusCell = $row.find('td:nth-child(4)');
-        const statusHTML = $statusCell.html();
-        console.log(`🔍 Frontend Debug - Idea ${ideaId} status display:`, statusHTML);
-        
-        // Also check the cached idea data
-        if (window.ApprovedIdeasV2.currentIdeas) {
-            const cachedIdea = window.ApprovedIdeasV2.currentIdeas.find(idea => idea.id == ideaId);
-            if (cachedIdea) {
-                console.log(`🔍 Frontend Debug - Cached idea ${ideaId} data:`, cachedIdea);
-            } else {
-                console.log(`⚠️ Frontend Debug - Idea ${ideaId} not found in cached data`);
-            }
-        }
         
         const ajaxData = {
             action: 'ai_blog_v2_submit_for_generation',
@@ -1013,8 +1022,8 @@
             }
             
             // Update all affected ideas
-            if (data.updated_ideas && data.updated_ideas.length > 0) {
-                data.updated_ideas.forEach(function(idea) {
+            if (data.ideas && data.ideas.length > 0) {
+                data.ideas.forEach(function(idea) {
                     // Update cached data
                     const cachedIndex = window.ApprovedIdeasV2.currentIdeas.findIndex(i => i.id == idea.id);
                     if (cachedIndex !== -1) {
@@ -1024,7 +1033,7 @@
                     // Update the row
                     updateIdeaRow(idea);
                 });
-                console.log(`✅ Updated ${data.updated_ideas.length} idea(s) in UI`);
+                console.log(`✅ Updated ${data.ideas.length} idea(s) in UI`);
             }
             
             // Start faster refresh for active generations
@@ -1061,18 +1070,6 @@
             $('.idea-checkbox').prop('checked', false);
             updateBulkActionButtons();
             updateSelectAllCheckbox();
-        }
-    }
-
-    /**
-     * Handle individual deny button
-     */
-    function handleIndividualDeny() {
-        const ideaId = parseInt($(this).data('idea-id'));
-        console.log(`🚫 Individual deny triggered for idea ${ideaId}`);
-        
-        if (confirm('Are you sure you want to deny this idea?')) {
-            denyIdea(ideaId);
         }
     }
 
