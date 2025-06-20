@@ -223,7 +223,7 @@ class Generation_Queue {
 		Logger::info( 'generation_queue_start', 'Starting generation for idea', [
 			'idea_id' => $idea_id
 		] );
-
+			//$this->ideas_model = new Blog_Ideas_Model_V2();
 		// Update idea status to generating
 		$this->ideas_model->update_idea( $idea_id, [
 			'status' => 'generating',

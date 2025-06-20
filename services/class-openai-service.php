@@ -142,6 +142,7 @@ class OpenAI_Service {
 				'prompt' => $prompt,
 				'n' => 1,
 				'size' => '1024x1024', // Always use 1024x1024 as specified
+				'quality' => 'high',
 				// Note: quality parameter may not be supported by gpt-image-1, removed to avoid errors
 			];
 
@@ -152,7 +153,7 @@ class OpenAI_Service {
 			$request_data['size'] = '1024x1024';
 			
 			// Remove any parameters that gpt-image-1 doesn't support
-			unset( $request_data['quality'] );
+			//unset( $request_data['quality'] );
 			unset( $request_data['response_format'] );
 
 			Logger::info( 'openai_image_request', 'Generating image with OpenAI', [
@@ -873,7 +874,7 @@ class OpenAI_Service {
 			'total_images' => count( $image_requirements ),
 			'memory_usage' => memory_get_usage(),
 			'generation_start_time' => $generation_start_time,
-		] );
+			] );
 
 		// Track seed images used
 		$seed_image_used = null;
@@ -929,37 +930,37 @@ class OpenAI_Service {
 
 			try {
 				// Use seed image editing if we have a seed image
-				if ( $has_seed_images && $seed_image_used ) {
+			if ( $has_seed_images && $seed_image_used ) {
 					Logger::info( 'sequential_seed_image_edit', "Starting seed image edit for image {$image_number}", [
-						'token' => $token,
-						'seed_image_url' => $seed_image_used,
+					'token' => $token,
+					'seed_image_url' => $seed_image_used,
 						'prompt_preview' => substr( $prompt, 0, 100 ),
-					] );
-					
-					$image_result = $this->edit_image( $prompt, $seed_image_used );
-					
+				] );
+				
+				$image_result = $this->edit_image( $prompt, $seed_image_used );
+				
 					Logger::info( 'sequential_seed_edit_result', "Seed image edit completed for image {$image_number}", [
-						'token' => $token,
-						'success' => $image_result['success'] ?? false,
-						'error_message' => $image_result['message'] ?? 'none',
-					] );
-				} else {
+					'token' => $token,
+					'success' => $image_result['success'] ?? false,
+					'error_message' => $image_result['message'] ?? 'none',
+				] );
+			} else {
 					Logger::info( 'sequential_standard_generation', "Starting standard generation for image {$image_number}", [
-						'token' => $token,
+					'token' => $token,
 						'prompt_preview' => substr( $prompt, 0, 100 ),
-					] );
-					
-					$image_result = $this->generate_image( $prompt );
-					
+				] );
+				
+				$image_result = $this->generate_image( $prompt );
+				
 					Logger::info( 'sequential_standard_result', "Standard generation completed for image {$image_number}", [
-						'token' => $token,
-						'success' => $image_result['success'] ?? false,
-						'error_message' => $image_result['message'] ?? 'none',
-					] );
-				}
+					'token' => $token,
+					'success' => $image_result['success'] ?? false,
+					'error_message' => $image_result['message'] ?? 'none',
+				] );
+			}
 
-				if ( $image_result['success'] ) {
-					// Generate filename based on token and timestamp
+			if ( $image_result['success'] ) {
+				// Generate filename based on token and timestamp
 					$filename = 'ai-blog-image-' . sanitize_file_name( str_replace( [ '{{', '}}' ], '', $token ) ) . '-' . time() . '-' . $index;
 					
 					// Update progress: saving image
@@ -973,37 +974,37 @@ class OpenAI_Service {
 							'token' => $token
 						] );
 					}
-					
-					// Save to media library
-					$save_result = $this->save_to_media_library(
-						$image_result['image_data'],
-						$filename,
-						$alt_text,
-						$alt_text
-					);
+				
+				// Save to media library
+				$save_result = $this->save_to_media_library(
+					$image_result['image_data'],
+					$filename,
+					$alt_text,
+					$alt_text
+				);
 
-					if ( $save_result['success'] ) {
-						$results['results'][] = [
-							'success' => true,
-							'token' => $token,
-							'attachment_id' => $save_result['attachment_id'],
-							'url' => $save_result['url'],
-							'alt_text' => $alt_text,
-							'cost' => $image_result['cost'],
-							'method' => $image_result['method'],
+				if ( $save_result['success'] ) {
+					$results['results'][] = [
+						'success' => true,
+						'token' => $token,
+						'attachment_id' => $save_result['attachment_id'],
+						'url' => $save_result['url'],
+						'alt_text' => $alt_text,
+						'cost' => $image_result['cost'],
+						'method' => $image_result['method'],
 							'index' => $index,
-						];
-						
-						$results['summary']['successful']++;
-						$results['summary']['total_cost'] += $image_result['cost'];
-						
+					];
+					
+					$results['summary']['successful']++;
+					$results['summary']['total_cost'] += $image_result['cost'];
+					
 						$image_duration = microtime( true ) - $image_start;
 						
 						Logger::info( 'sequential_image_success', "Successfully generated and saved image {$image_number}", [
-							'token' => $token,
-							'attachment_id' => $save_result['attachment_id'],
-							'cost' => $image_result['cost'],
-							'method' => $image_result['method'],
+						'token' => $token,
+						'attachment_id' => $save_result['attachment_id'],
+						'cost' => $image_result['cost'],
+						'method' => $image_result['method'],
 							'duration_seconds' => $image_duration,
 						] );
 						
@@ -1017,23 +1018,23 @@ class OpenAI_Service {
 								'total_images' => $total_images,
 								'token' => $token,
 								'completed' => true
-							] );
+					] );
 						}
-					} else {
-						$results['results'][] = [
-							'success' => false,
-							'token' => $token,
-							'error' => $save_result['message'],
+				} else {
+					$results['results'][] = [
+						'success' => false,
+						'token' => $token,
+						'error' => $save_result['message'],
 							'stage' => 'save',
 							'index' => $index,
-						];
-						
-						$results['summary']['failed']++;
-						
+					];
+					
+					$results['summary']['failed']++;
+					
 						Logger::error( 'sequential_image_save_failed', "Failed to save image {$image_number}", [
-							'token' => $token,
-							'error' => $save_result['message'],
-						] );
+						'token' => $token,
+						'error' => $save_result['message'],
+					] );
 						
 						// Update progress: save failed
 						if ( $progress_callback ) {
@@ -1047,22 +1048,22 @@ class OpenAI_Service {
 								'failed' => true
 							] );
 						}
-					}
-				} else {
-					$results['results'][] = [
-						'success' => false,
-						'token' => $token,
-						'error' => $image_result['message'],
+				}
+			} else {
+				$results['results'][] = [
+					'success' => false,
+					'token' => $token,
+					'error' => $image_result['message'],
 						'stage' => 'generation',
 						'index' => $index,
-					];
-					
-					$results['summary']['failed']++;
-					
+				];
+				
+				$results['summary']['failed']++;
+				
 					Logger::error( 'sequential_image_generation_failed', "Failed to generate image {$image_number}", [
-						'token' => $token,
-						'error' => $image_result['message'],
-					] );
+					'token' => $token,
+					'error' => $image_result['message'],
+				] );
 					
 					// Update progress: generation failed
 					if ( $progress_callback ) {
@@ -1129,7 +1130,7 @@ class OpenAI_Service {
 						'message' => "Image generation timeout after processing " . ($index + 1) . " of {$total_images} images",
 						'progress' => round( ( ( $index + 1 ) / $total_images ) * 100 ),
 						'timeout' => true
-					] );
+				] );
 				}
 				break;
 			}

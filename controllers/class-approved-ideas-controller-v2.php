@@ -157,6 +157,33 @@ class Approved_Ideas_Controller_V2 {
 			// Combine all relevant ideas
 			$ideas = array_merge( $approved_ideas, $generating_ideas, $generated_ideas );
 			
+			// Remove duplicates (in case an idea appears in multiple status arrays)
+			$unique_ideas = [];
+			$seen_ids = [];
+			
+			foreach ( $ideas as $idea ) {
+				if ( ! in_array( $idea['id'], $seen_ids, true ) ) {
+					$seen_ids[] = $idea['id'];
+					$unique_ideas[] = $idea;
+				} else {
+					Logger::warning( 'ajax_duplicate_idea_in_initial_load', 'Removed duplicate idea from initial load', [
+						'idea_id' => $idea['id'],
+						'idea_title' => $idea['title'] ?? 'unknown',
+						'status' => $idea['status'] ?? 'unknown'
+					] );
+				}
+			}
+			
+			if ( count( $unique_ideas ) !== count( $ideas ) ) {
+				Logger::info( 'ajax_initial_ideas_deduplicated', 'Deduplicated initial ideas load', [
+					'original_count' => count( $ideas ),
+					'unique_count' => count( $unique_ideas ),
+					'removed_duplicates' => count( $ideas ) - count( $unique_ideas )
+				] );
+			}
+			
+			$ideas = $unique_ideas;
+			
 			// Sort by updated date (most recent first)
 			usort( $ideas, function( $a, $b ) {
 				return strtotime( $b['updated_at'] ) - strtotime( $a['updated_at'] );
@@ -477,9 +504,40 @@ class Approved_Ideas_Controller_V2 {
 				// Get fresh idea data
 				$idea = $this->ideas_model->get_idea( $idea_id );
 				if ( $idea ) {
+					Logger::debug( 'ajax_status_updates_requested', 'Idea Found For Refreshing', [
+						'idea' => $idea,
+						'idea_id' => $idea_id
+					] );
 					$updated_ideas[] = $idea;
 				}
 			}
+			
+			// Remove duplicates from updated_ideas (in case same ID was requested multiple times)
+			$unique_ideas = [];
+			$seen_ids = [];
+			
+			foreach ( $updated_ideas as $idea ) {
+				if ( ! in_array( $idea['id'], $seen_ids, true ) ) {
+					$seen_ids[] = $idea['id'];
+					$unique_ideas[] = $idea;
+				} else {
+					Logger::warning( 'ajax_duplicate_idea_removed', 'Removed duplicate idea from status update response', [
+						'idea_id' => $idea['id'],
+						'original_count' => count( $updated_ideas ),
+						'unique_count' => count( $unique_ideas )
+					] );
+				}
+			}
+			
+			if ( count( $unique_ideas ) !== count( $updated_ideas ) ) {
+				Logger::info( 'ajax_ideas_deduplicated', 'Deduplicated status update response', [
+					'original_count' => count( $updated_ideas ),
+					'unique_count' => count( $unique_ideas ),
+					'removed_duplicates' => count( $updated_ideas ) - count( $unique_ideas )
+				] );
+			}
+			
+			$updated_ideas = $unique_ideas;
 
 			// Only update statistics if we have generating ideas (since that's when they change)
 			$has_generating = false;
@@ -897,7 +955,7 @@ class Approved_Ideas_Controller_V2 {
 		// DISABLED: Automatic cleanup disabled to prevent automatic generation resets
 		// Users must manually cancel stuck generations if needed
 		// Old cleanup code removed to prevent automatic retry behavior
-		
+
 		// Enqueue scripts and styles
 		$this->enqueue_assets();
 

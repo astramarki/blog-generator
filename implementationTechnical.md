@@ -241,7 +241,7 @@ Location: `services/class-scheduler-service.php`
 
 **Cron Jobs:**
 - `daily_idea_generation()` - Runs at 6 AM daily
-- `process_approved_ideas()` - Runs hourly
+- `process_approved_ideas_queue()` - Runs hourly (currently disabled)
 - `publish_scheduled_posts()` - Runs every 15 minutes
 - `cleanup_old_data()` - Runs at 3 AM daily
 

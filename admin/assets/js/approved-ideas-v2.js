@@ -14,9 +14,12 @@
         autoRefreshEnabled: true,
         refreshTimer: null,
         refreshInterval: 5000, // 5 seconds
-        currentIdeas: {},
+        currentIdeas: [],
         selectedIdeas: [],
         isRefreshing: false,
+        logRefreshTimer: null,
+        fastRefreshTimer: null,
+        submittingIdeas: [],
         
         // Configuration
         config: {
@@ -38,6 +41,13 @@
 
     // Initialize when DOM is ready
     $(document).ready(function() {
+        // Prevent double initialization
+        
+        if (window.ApprovedIdeasV2 && window.ApprovedIdeasV2.initialized) {
+            console.log('⚠️ Approved Ideas V2 already initialized, skipping duplicate initialization');
+            return;
+        }
+        
         console.log('🚀 Initializing Approved Ideas V2...');
         initializeApprovedIdeas();
     });
@@ -46,6 +56,12 @@
      * Initialize the Approved Ideas interface
      */
     function initializeApprovedIdeas() {
+        // Prevent double initialization
+        if (window.ApprovedIdeasV2 && window.ApprovedIdeasV2.initialized) {
+            console.log('⚠️ Approved Ideas V2 already initialized, skipping');
+            return;
+        }
+        
         console.log('🔧 Starting Approved Ideas V2 initialization');
         
         // Verify required dependencies
@@ -98,45 +114,67 @@
      */
     function bindEventHandlers() {
         console.log('🔗 Binding event handlers...');
+        
+        // Unbind existing handlers first to prevent duplicates
+        $('#toggleAutoRefresh').off('click.approvedIdeasV2');
+        $('#refreshIdeas').off('click.approvedIdeasV2');
+        $('#selectAllCheckbox').off('change.approvedIdeasV2');
+        $('#ideasTableBody').off('change.approvedIdeasV2', '.idea-checkbox');
+        $('#bulkSubmitForGeneration').off('click.approvedIdeasV2');
+        $('#bulkDenySelected').off('click.approvedIdeasV2');
+        $('#ideasTableBody').off('click.approvedIdeasV2', '.btn-generate');
+        $('#ideasTableBody').off('click.approvedIdeasV2', '.btn-deny');
+        $('#ideasTableBody').off('click.approvedIdeasV2', '.btn-view-details');
+        $('#confirmGeneration').off('click.approvedIdeasV2');
+        $('#confirmBulkGeneration').off('click.approvedIdeasV2');
+        $('#editIdeaForm').off('submit.approvedIdeasV2');
+        $('#refreshLogBtn').off('click.approvedIdeasV2');
+        $('#cancelGenerationBtn').off('click.approvedIdeasV2');
+        $('#cancelAllGenerationsBtn').off('click.approvedIdeasV2');
+        $('#resetStuckGenerationsBtn').off('click.approvedIdeasV2');
+        $('#logViewerModal').off('hidden.bs.modal.approvedIdeasV2');
+        $(window).off('beforeunload.approvedIdeasV2');
+        $(window).off('focus.approvedIdeasV2');
+        $(window).off('blur.approvedIdeasV2');
 
         // Auto-refresh toggle
-        $('#toggleAutoRefresh').on('click', handleToggleAutoRefresh);
+        $('#toggleAutoRefresh').on('click.approvedIdeasV2', handleToggleAutoRefresh);
         
         // Manual refresh
-        $('#refreshIdeas').on('click', handleManualRefresh);
+        $('#refreshIdeas').on('click.approvedIdeasV2', handleManualRefresh);
         
         // Select all checkbox
-        $('#selectAllCheckbox').on('change', handleSelectAll);
+        $('#selectAllCheckbox').on('change.approvedIdeasV2', handleSelectAll);
         
         // Individual checkboxes (delegated)
-        $('#ideasTableBody').on('change', '.idea-checkbox', handleIndividualSelect);
+        $('#ideasTableBody').on('change.approvedIdeasV2', '.idea-checkbox', handleIndividualSelect);
         
         // Bulk actions
-        $('#bulkSubmitForGeneration').on('click', handleBulkSubmitForGeneration);
-        $('#bulkDenySelected').on('click', handleBulkDenySelected);
+        $('#bulkSubmitForGeneration').on('click.approvedIdeasV2', handleBulkSubmitForGeneration);
+        $('#bulkDenySelected').on('click.approvedIdeasV2', handleBulkDenySelected);
         
         // Individual actions (delegated)
-        $('#ideasTableBody').on('click', '.btn-generate', handleIndividualGenerate);
-        $('#ideasTableBody').on('click', '.btn-deny', handleIndividualDeny);
-        $('#ideasTableBody').on('click', '.btn-view-details', handleViewDetails);
+        $('#ideasTableBody').on('click.approvedIdeasV2', '.btn-generate', handleIndividualGenerate);
+        $('#ideasTableBody').on('click.approvedIdeasV2', '.btn-deny', handleIndividualDeny);
+        $('#ideasTableBody').on('click.approvedIdeasV2', '.btn-view-details', handleViewDetails);
         
         // Modal confirmations
-        $('#confirmGeneration').on('click', handleConfirmGeneration);
-        $('#confirmBulkGeneration').on('click', handleConfirmBulkGeneration);
+        $('#confirmGeneration').on('click.approvedIdeasV2', handleConfirmGeneration);
+        $('#confirmBulkGeneration').on('click.approvedIdeasV2', handleConfirmBulkGeneration);
         
         // Edit idea form
-        $('#editIdeaForm').on('submit', handleEditIdeaSubmit);
+        $('#editIdeaForm').on('submit.approvedIdeasV2', handleEditIdeaSubmit);
         
         // Log viewer actions
-        $('#refreshLogBtn').on('click', refreshGenerationLog);
-        $('#cancelGenerationBtn').on('click', handleCancelGeneration);
+        $('#refreshLogBtn').on('click.approvedIdeasV2', refreshGenerationLog);
+        $('#cancelGenerationBtn').on('click.approvedIdeasV2', handleCancelGeneration);
         
         // Generation management
-        $('#cancelAllGenerationsBtn').on('click', handleCancelAllGenerations);
-        $('#resetStuckGenerationsBtn').on('click', handleResetStuckGenerations);
+        $('#cancelAllGenerationsBtn').on('click.approvedIdeasV2', handleCancelAllGenerations);
+        $('#resetStuckGenerationsBtn').on('click.approvedIdeasV2', handleResetStuckGenerations);
         
         // Cleanup log refresh timer when log modal is hidden
-        $('#logViewerModal').on('hidden.bs.modal', function() {
+        $('#logViewerModal').on('hidden.bs.modal.approvedIdeasV2', function() {
             if (window.ApprovedIdeasV2.logRefreshTimer) {
                 clearInterval(window.ApprovedIdeasV2.logRefreshTimer);
                 window.ApprovedIdeasV2.logRefreshTimer = null;
@@ -145,9 +183,9 @@
         });
         
         // Window events
-        $(window).on('beforeunload', handleBeforeUnload);
-        $(window).on('focus', handleWindowFocus);
-        $(window).on('blur', handleWindowBlur);
+        $(window).on('beforeunload.approvedIdeasV2', handleBeforeUnload);
+        $(window).on('focus.approvedIdeasV2', handleWindowFocus);
+        $(window).on('blur.approvedIdeasV2', handleWindowBlur);
 
         console.log('✅ Event handlers bound successfully');
     }
@@ -261,15 +299,33 @@
 
         // Clear current content
         tbody.empty();
-
-        // Add each idea
+        
+        // Remove duplicates from ideas array based on ID
+        const uniqueIdeas = [];
+        const seenIds = new Set();
+        
         ideas.forEach(function(idea) {
+            if (!seenIds.has(idea.id)) {
+                seenIds.add(idea.id);
+                uniqueIdeas.push(idea);
+            } else {
+                console.warn(`⚠️ Duplicate idea found and removed: ID ${idea.id}`);
+            }
+        });
+        
+        console.log(`🔍 Filtered ${ideas.length} ideas to ${uniqueIdeas.length} unique ideas`);
+
+        // Add each unique idea
+        uniqueIdeas.forEach(function(idea) {
             const row = createIdeaRow(idea);
             tbody.append(row);
         });
 
-        // Update count
-        $('#approvedCount').text(ideas.length);
+        // Update count with unique ideas
+        $('#approvedCount').text(uniqueIdeas.length);
+        
+        // Store the deduplicated ideas in cache
+        window.ApprovedIdeasV2.currentIdeas = uniqueIdeas;
         
         // Show table and hide loading/empty states
         table.removeClass('d-none');
@@ -460,8 +516,18 @@
     function startAutoRefresh() {
         console.log('▶️ Starting targeted auto-refresh timer...');
         
+        // Clear any existing timer first to prevent duplicates
         if (window.ApprovedIdeasV2.refreshTimer) {
+            console.log('🔄 Clearing existing refresh timer before starting new one');
             clearInterval(window.ApprovedIdeasV2.refreshTimer);
+            window.ApprovedIdeasV2.refreshTimer = null;
+        }
+        
+        // Clear any existing fast refresh timer too
+        if (window.ApprovedIdeasV2.fastRefreshTimer) {
+            console.log('🔄 Clearing existing fast refresh timer');
+            clearInterval(window.ApprovedIdeasV2.fastRefreshTimer);
+            window.ApprovedIdeasV2.fastRefreshTimer = null;
         }
         
         window.ApprovedIdeasV2.autoRefreshEnabled = true;
@@ -527,7 +593,6 @@
      */
     function refreshGeneratingIdeas() {
         if (window.ApprovedIdeasV2.isRefreshing) {
-            console.log('⏭️ Status refresh already in progress, skipping');
             return;
         }
         
@@ -535,7 +600,6 @@
         const generatingIds = getGeneratingIdeaIds();
         
         if (generatingIds.length === 0) {
-            console.log('✅ No generating ideas to refresh');
             return;
         }
         
@@ -591,11 +655,26 @@
                 const updatedIdeas = data.data.ideas;
                 console.log(`📊 Received status updates for ${updatedIdeas.length} ideas`);
                 
+                // Remove duplicates from the response (just in case)
+                const uniqueUpdatedIdeas = [];
+                const processedIds = new Set();
+                
+                updatedIdeas.forEach(function(idea) {
+                    if (!processedIds.has(idea.id)) {
+                        processedIds.add(idea.id);
+                        uniqueUpdatedIdeas.push(idea);
+                    } else {
+                        console.warn(`⚠️ Duplicate idea in response, skipping: ${idea.id}`);
+                    }
+                });
+                
+                console.log(`🔍 Processing ${uniqueUpdatedIdeas.length} unique ideas from response`);
+                
                 let completedCount = 0;
                 let stillGeneratingCount = 0;
                 
-                // Update each idea
-                updatedIdeas.forEach(function(idea) {
+                // Update each unique idea
+                uniqueUpdatedIdeas.forEach(function(idea) {
                     // Update cached data
                     const cachedIndex = window.ApprovedIdeasV2.currentIdeas.findIndex(i => i.id == idea.id);
                     if (cachedIndex !== -1) {
@@ -643,26 +722,51 @@
      */
     function getGeneratingIdeaIds() {
         const generatingIds = [];
+        const seenIds = new Set();
         
-        // Check cached data for ideas with 'generating' status
+        console.log('🔍 Getting generating idea IDs...');
+        
+        // Primary source: Check cached data for ideas with 'generating' status
         if (window.ApprovedIdeasV2.currentIdeas && Array.isArray(window.ApprovedIdeasV2.currentIdeas)) {
             window.ApprovedIdeasV2.currentIdeas.forEach(function(idea) {
-                if (idea.status === 'generating') {
+                if (idea.status === 'generating' && !seenIds.has(idea.id)) {
+                    seenIds.add(idea.id);
                     generatingIds.push(idea.id);
+                    console.log(`✅ Found generating idea in cache: ${idea.id} (${idea.title})`);
                 }
             });
         }
         
-        // Also check DOM for any progress bars (in case cache is out of sync)
-        $('#ideasTableBody .generation-progress').each(function() {
-            const row = $(this).closest('tr');
-            const ideaId = row.data('idea-id');
-            if (ideaId && !generatingIds.includes(ideaId)) {
-                generatingIds.push(ideaId);
-            }
-        });
+        // Fallback: Check DOM for any progress bars (only if cache is empty or suspicious)
+        // This should rarely be needed if cache is working properly
+        const domProgressBars = $('#ideasTableBody .generation-progress');
+        console.log(`🔍 Found ${domProgressBars.length} progress bars in DOM`);
         
-        return generatingIds;
+        if (domProgressBars.length > 0) {
+            domProgressBars.each(function() {
+                const row = $(this).closest('tr');
+                const ideaId = parseInt(row.data('idea-id'));
+                
+                if (ideaId && !seenIds.has(ideaId)) {
+                    seenIds.add(ideaId);
+                    generatingIds.push(ideaId);
+                    console.log(`⚠️ Found generating idea in DOM (not in cache): ${ideaId}`);
+                } else if (ideaId && seenIds.has(ideaId)) {
+                    console.log(`🔄 Skipping duplicate idea from DOM: ${ideaId}`);
+                }
+            });
+        }
+        
+        // Final deduplication (just to be absolutely sure)
+        const uniqueIds = [...new Set(generatingIds)];
+        
+        if (uniqueIds.length !== generatingIds.length) {
+            console.warn(`⚠️ Removed ${generatingIds.length - uniqueIds.length} duplicate IDs from generating list`);
+        }
+        
+        console.log(`📊 Final generating IDs: [${uniqueIds.join(', ')}] (${uniqueIds.length} total)`);
+        
+        return uniqueIds;
     }
 
     /**

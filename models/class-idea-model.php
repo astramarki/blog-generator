@@ -499,10 +499,10 @@ class Idea_Model extends Model {
 		if ( isset( $data['status'] ) ) {
 			$valid_statuses = [ 'pending', 'approved', 'denied', 'generating', 'generated', 'failed' ];
 			if ( ! in_array( $data['status'], $valid_statuses, true ) ) {
-				$this->log_debug( 'validate', 'Status validation failed', [
-					'status' => $data['status'],
-					'valid_statuses' => $valid_statuses
-				] );
+					$this->log_debug( 'validate', 'Status validation failed', [
+						'status' => $data['status'],
+						'valid_statuses' => $valid_statuses
+					] );
 				return false;
 			}
 		}

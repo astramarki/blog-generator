@@ -621,14 +621,8 @@ class Admin_Manager {
 				'6.4.0'
 			);
 			
-			// Enqueue Approved Ideas V2 JavaScript
-			wp_enqueue_script(
-				'ai-approved-ideas-v2',
-				AI_BLOG_GENERATOR_PLUGIN_URL . 'admin/assets/js/approved-ideas-v2.js',
-				['jquery', 'bootstrap'],
-				$this->version,
-				true
-			);
+			// NOTE: Approved Ideas V2 JavaScript is now handled by the controller's enqueue_assets() method
+			// to prevent duplicate script loading. The controller handles its own asset management.
 		}
 
 		// Blog Ideas page - ApexCharts for potential data visualization

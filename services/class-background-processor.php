@@ -11,7 +11,7 @@
 namespace AI_Blog_Generator\Services;
 
 use AI_Blog_Generator\Utilities\Logger;
-use AI_Blog_Generator\Models\Idea_Model;
+use AI_Blog_Generator\Models\Blog_Ideas_Model_V2;
 use AI_Blog_Generator\Models\Blog_Model;
 use AI_Blog_Generator\Services\Content_Generator;
 use AI_Blog_Generator\Services\Budget_Manager;
@@ -24,6 +24,27 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Background Processor Class
  */
 class Background_Processor {
+
+    /**
+     * Blog Ideas Model V2 instance
+     *
+     * @var Blog_Ideas_Model_V2
+     */
+    private $idea_model;
+
+    /**
+     * Blog Model instance
+     *
+     * @var Blog_Model
+     */
+    private $blog_model;
+
+    /**
+     * Content Generator instance
+     *
+     * @var Content_Generator
+     */
+    private $content_generator;
 
     /**
      * Generation statuses
@@ -52,9 +73,21 @@ class Background_Processor {
     ];
 
     /**
+     * Process timeout in seconds (15 minutes).
+     *
+     * @var int
+     */
+    private $process_timeout = 900;
+
+    /**
      * Initialize the background processor
      */
     public function __construct() {
+        // Initialize required models and services
+        $this->idea_model = new Blog_Ideas_Model_V2();
+        $this->blog_model = new Blog_Model();
+        $this->content_generator = new Content_Generator();
+        
         // Register the background action
         add_action( 'ai_blog_background_generate', [ $this, 'process_generation' ] );
         
@@ -87,7 +120,7 @@ class Background_Processor {
         // Don't create lock here - let Content Generator handle all lock management
         // Just set initial status
         // $this->create_generation_lock( $idea_id );  // REMOVED: Content Generator handles locks
-        $this->update_generation_status( $idea_id, 'pending', 'Generation queued...' );
+        $this->update_generation_status( $idea_id, 'starting', 'Generation starting...' );
 
         // Log the generation start
         $debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
@@ -172,115 +205,132 @@ class Background_Processor {
      * @param int $idea_id The idea ID to process
      */
     public function process_generation( $idea_id ) {
-        $idea_id = absint( $idea_id );
+        $debug_log = __DIR__ . '/../debug-transaction.log';
+        $start_time = microtime( true );
         
-        // DEBUG: Log to debug-transaction.log
-        $debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
-        file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: process_generation CRON JOB STARTED for idea_id: $idea_id\n", FILE_APPEND );
+        file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: process_generation CRON JOB STARTED for idea_id: {$idea_id}\n", FILE_APPEND );
         
-        Logger::info( 'background_processor_processing', 'Starting background generation process', [
-            'idea_id' => $idea_id,
-            'memory_usage' => memory_get_usage( true ),
-            'memory_limit' => ini_get( 'memory_limit' )
-        ] );
-
         try {
-            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Starting try block for idea_id: $idea_id\n", FILE_APPEND );
+            // Set a process timeout
+            set_time_limit( $this->process_timeout );
             
-            // Load models
-            $idea_model = new Idea_Model();
-            $blog_model = new Blog_Model();
-
-            // Get the idea
-            $idea = $idea_model->get( $idea_id );
-            if ( ! $idea ) {
-                throw new \Exception( 'Idea not found: ' . $idea_id );
-            }
-
-            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Idea loaded successfully for idea_id: $idea_id\n", FILE_APPEND );
-
-            // Verify idea is approved or already generating (Content Generator may have updated status)
-            if ( ! in_array( $idea['status'], [ 'approved', 'generating' ], true ) ) {
-                throw new \Exception( 'Idea is not approved for generation: ' . $idea['status'] );
-            }
-
-            // Check budget and daily limits
-            $this->check_generation_constraints();
-
-            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Calling Content_Generator for idea_id: $idea_id\n", FILE_APPEND );
-
-            // Initialize content generator - it will handle all status updates
-            $generator = new Content_Generator();
-
-            // Generate the blog post - Content Generator will update status throughout
-            $result = $generator->generate_blog_post( $idea_id );
-
-            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Content_Generator returned result for idea_id: $idea_id\n", FILE_APPEND );
-
-            if ( is_wp_error( $result ) ) {
-                throw new \Exception( 'Generation failed: ' . $result->get_error_message() );
-            }
-
-            // Handle different result formats
-            $blog_id = null;
-            if ( is_array( $result ) ) {
-                if ( ! $result['success'] ) {
-                    throw new \Exception( 'Generation failed: ' . $result['message'] );
+            // Register emergency cleanup
+            register_shutdown_function( function() use ( $idea_id, $debug_log ) {
+                $error = error_get_last();
+                if ( $error && in_array( $error['type'], [ E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR ] ) ) {
+                    file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: FATAL ERROR detected for idea {$idea_id}: " . $error['message'] . "\n", FILE_APPEND );
+                    
+                    // Try to reset the idea status
+                    try {
+                        global $wpdb;
+                        $ideas_table = $wpdb->prefix . 'ai_blog_ideas';
+                        $wpdb->update(
+                            $ideas_table,
+                            [
+                                'status' => 'approved',
+                                'generation_status' => 'Fatal error during generation',
+                                'generation_error' => 'Fatal error: ' . $error['message'],
+                                'updated_at' => current_time( 'mysql' )
+                            ],
+                            [ 'id' => $idea_id ],
+                            [ '%s', '%s', '%s', '%s' ],
+                            [ '%d' ]
+                        );
+                        
+                        // Clear locks
+                        delete_transient( "ai_blog_generation_lock_{$idea_id}" );
+                        delete_transient( "ai_blog_generation_status_{$idea_id}" );
+                        
+                    } catch ( \Exception $cleanup_e ) {
+                        file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Emergency cleanup failed: " . $cleanup_e->getMessage() . "\n", FILE_APPEND );
+                    }
                 }
-                $blog_id = $result['blog_id'];
+            } );
+            
+            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Starting try block for idea_id: {$idea_id}\n", FILE_APPEND );
+            
+            // Check if idea exists and load it
+            $idea = $this->idea_model->get( $idea_id );
+            if ( ! $idea ) {
+                file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Idea not found for idea_id: {$idea_id}\n", FILE_APPEND );
+                Logger::error( 'background_processor_idea_not_found', 'Idea not found for processing', [ 'idea_id' => $idea_id ] );
+                return false;
+            }
+            
+            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Idea loaded successfully for idea_id: {$idea_id}\n", FILE_APPEND );
+            
+            // Check daily limit before proceeding
+            $daily_count = $this->blog_model->count_generated_today();
+            $daily_limit = (int) get_option( 'ai_blog_generator_daily_limit', 5 );
+            
+            if ( $daily_count >= $daily_limit ) {
+                file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Daily limit reached ({$daily_count}/{$daily_limit}) for idea_id: {$idea_id}\n", FILE_APPEND );
+                Logger::warning( 'background_processor_daily_limit', 'Daily generation limit reached', [
+                    'daily_count' => $daily_count,
+                    'daily_limit' => $daily_limit,
+                    'idea_id' => $idea_id
+                ] );
+                return false;
+            }
+            
+            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Calling Content_Generator for idea_id: {$idea_id}\n", FILE_APPEND );
+            
+            // Generate the blog post with timeout monitoring
+            $generation_start = microtime( true );
+            $result = $this->content_generator->generate_blog_post( $idea_id );
+            $generation_duration = microtime( true ) - $generation_start;
+            
+            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Content generation completed in {$generation_duration}s for idea_id: {$idea_id}\n", FILE_APPEND );
+            
+            if ( $result['success'] ) {
+                Logger::info( 'background_processor_success', 'Blog post generated successfully via cron', [
+                    'idea_id' => $idea_id,
+                    'post_id' => $result['post_id'] ?? null,
+                    'generation_duration' => $generation_duration,
+                    'total_duration' => microtime( true ) - $start_time
+                ] );
+                file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: SUCCESS for idea_id: {$idea_id}\n", FILE_APPEND );
             } else {
-                $blog_id = $result;
+                Logger::error( 'background_processor_failed', 'Blog post generation failed via cron', [
+                    'idea_id' => $idea_id,
+                    'error' => $result['message'] ?? 'Unknown error',
+                    'generation_duration' => $generation_duration,
+                    'total_duration' => microtime( true ) - $start_time
+                ] );
+                file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: FAILED for idea_id: {$idea_id} - " . ($result['message'] ?? 'Unknown error') . "\n", FILE_APPEND );
             }
-
-            // Clean up the generation lock (Content Generator sets completion status)
-            $this->remove_generation_lock( $idea_id );
-
-            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Generation COMPLETED successfully for idea_id: $idea_id, blog_id: $blog_id\n", FILE_APPEND );
-
-            Logger::info( 'background_processor_complete', 'Background generation completed successfully', [
-                'idea_id' => $idea_id,
-                'blog_id' => $blog_id,
-                'memory_peak' => memory_get_peak_usage( true )
-            ] );
-
+            
+            return $result['success'];
+            
         } catch ( \Exception $e ) {
-            $error_message = $e->getMessage();
+            $total_duration = microtime( true ) - $start_time;
+            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: EXCEPTION after {$total_duration}s for idea_id: {$idea_id} - " . $e->getMessage() . "\n", FILE_APPEND );
             
-            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: ERROR for idea_id: $idea_id - " . $error_message . "\n", FILE_APPEND );
-            
-            Logger::error( 'background_processor_error', 'Background generation failed', [
+            Logger::error( 'background_processor_exception', 'Exception during background processing', [
                 'idea_id' => $idea_id,
-                'error' => $error_message,
+                'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
-                'memory_peak' => memory_get_peak_usage( true )
+                'duration' => $total_duration
             ] );
-
-            // Clean up the generation lock
-            $this->remove_generation_lock( $idea_id );
-
-            // Set idea status to failed with error message - NO RETRY LOGIC
-            $idea_model = new Idea_Model();
-            $error_status = 'Failed: ' . $error_message;
             
-            // Handle specific error types with cleaner messages
-            if (strpos($error_message, 'Overloaded') !== false) {
-                $error_status = 'Failed: API Overloaded';
-            } elseif (strpos($error_message, 'timeout') !== false) {
-                $error_status = 'Failed: Timeout';
-            } elseif (strpos($error_message, 'Budget') !== false) {
-                $error_status = 'Failed: Budget Limit';
-            } elseif (strpos($error_message, 'Daily') !== false) {
-                $error_status = 'Failed: Daily Limit';
+            // Try to reset the idea status
+            try {
+                $this->idea_model->update( $idea_id, [
+                    'status' => 'approved',
+                    'generation_status' => 'Generation failed: ' . substr( $e->getMessage(), 0, 100 ),
+                    'generation_error' => $e->getMessage(),
+                    'updated_at' => current_time( 'mysql' )
+                ] );
+                
+                // Clear generation transients
+                delete_transient( "ai_blog_generation_lock_{$idea_id}" );
+                delete_transient( "ai_blog_generation_status_{$idea_id}" );
+                
+            } catch ( \Exception $cleanup_e ) {
+                file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Cleanup exception: " . $cleanup_e->getMessage() . "\n", FILE_APPEND );
             }
             
-            $idea_model->update( $idea_id, [ 
-                'status' => 'failed',
-                'generation_error' => $error_status,
-                'generation_completed_at' => current_time( 'mysql' )
-            ] );
-            
-            // Update generation status to show failure
-            $this->update_generation_status( $idea_id, self::STATUS_ERROR, $error_status );
+            return false;
         }
     }
 
@@ -343,12 +393,77 @@ class Background_Processor {
         // Store status for 1 hour
         set_transient( "ai_blog_generation_status_{$idea_id}", $status_data, HOUR_IN_SECONDS );
 
-        Logger::debug( 'background_processor_status_update', 'Generation status updated vv', [
-            'idea_id' => $idea_id,
-            'status' => $status,
-            'message' => $message,
-            'progress' => $status_data['progress']
-        ] );
+        // CRITICAL: Also update the database generation_status field
+        try {
+            $blog_ideas_model = new Blog_Ideas_Model_V2();
+            
+            // Log the update attempt
+            Logger::info( 'background_processor_status_update_attempt', 'Starting generation status update', [
+                'idea_id' => $idea_id,
+                'status' => $status,
+                'message' => $message,
+                'method' => 'Background_Processor::update_generation_status'
+            ] );
+            
+            $update_result = $blog_ideas_model->update_idea( $idea_id, [
+                'generation_status' => $message,
+                'updated_at' => current_time( 'mysql' )
+            ] );
+            
+            // Also log the raw SQL query for debugging
+            global $wpdb;
+            $last_query = $wpdb->last_query;
+            $last_error = $wpdb->last_error;
+            
+            // Log to debug file with safe data
+            $debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+            $safe_query = $last_query ? substr( preg_replace( '/[^\x20-\x7E]/', '?', $last_query ), 0, 200 ) . '...' : 'None';
+            $safe_error = $last_error ? preg_replace( '/[^\x20-\x7E]/', '?', $last_error ) : 'None';
+            $safe_message = preg_replace( '/[^\x20-\x7E]/', '?', $message );
+            
+            $log_entry = date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR STATUS UPDATE:\n";
+            $log_entry .= "  Idea ID: $idea_id\n";
+            $log_entry .= "  Status: $status\n";
+            $log_entry .= "  Message: $safe_message\n";
+            $log_entry .= "  Update Result: " . ($update_result ? 'SUCCESS' : 'FAILED') . "\n";
+            $log_entry .= "  Last SQL Query: $safe_query\n";
+            $log_entry .= "  Last SQL Error: $safe_error\n";
+            $log_entry .= "  Rows Affected: " . intval( $wpdb->rows_affected ) . "\n\n";
+            file_put_contents( $debug_log, $log_entry, FILE_APPEND );
+            
+            Logger::debug( 'background_processor_status_update', 'Generation status updated in database and transient', [
+                'idea_id' => $idea_id,
+                'status' => $status,
+                'message' => $message,
+                'progress' => $status_data['progress'],
+                'db_update_success' => $update_result,
+                'sql_query' => $last_query,
+                'sql_error' => $last_error,
+                'rows_affected' => $wpdb->rows_affected
+            ] );
+        } catch ( \Exception $e ) {
+            // Log exception details with safe data
+            $debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+            $safe_exception = preg_replace( '/[^\x20-\x7E]/', '?', $e->getMessage() );
+            $safe_trace = substr( preg_replace( '/[^\x20-\x7E]/', '?', $e->getTraceAsString() ), 0, 500 ) . '...';
+            $safe_message = preg_replace( '/[^\x20-\x7E]/', '?', $message );
+            
+            $log_entry = date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR STATUS UPDATE EXCEPTION:\n";
+            $log_entry .= "  Idea ID: $idea_id\n";
+            $log_entry .= "  Status: $status\n";
+            $log_entry .= "  Message: $safe_message\n";
+            $log_entry .= "  Exception: $safe_exception\n";
+            $log_entry .= "  Trace: $safe_trace\n\n";
+            file_put_contents( $debug_log, $log_entry, FILE_APPEND );
+            
+            Logger::error( 'background_processor_status_update_failed', 'Failed to update generation status in database', [
+                'idea_id' => $idea_id,
+                'status' => $status,
+                'message' => $message,
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString()
+            ] );
+        }
     }
 
     /**
@@ -516,5 +631,135 @@ class Background_Processor {
             'currently_running' => count( $running ),
             'running_details' => $running
         ];
+    }
+
+    /**
+     * Check for and clean up stuck generations.
+     *
+     * @return array Cleanup results.
+     */
+    public function cleanup_stuck_generations() {
+        $debug_log = __DIR__ . '/../debug-transaction.log';
+        file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Starting stuck generation cleanup\n", FILE_APPEND );
+        
+        $cleanup_results = [
+            'stuck_ideas_found' => 0,
+            'stuck_ideas_cleaned' => 0,
+            'expired_locks_cleared' => 0,
+            'stale_transients_cleared' => 0
+        ];
+        
+        try {
+            // Find ideas stuck in 'generating' status for more than the timeout period
+            global $wpdb;
+            $ideas_table = $wpdb->prefix . 'ai_blog_ideas';
+            
+            $stuck_ideas = $wpdb->get_results( $wpdb->prepare( "
+                SELECT id, title, generation_started_at, generation_status 
+                FROM {$ideas_table} 
+                WHERE status = 'generating' 
+                AND generation_started_at IS NOT NULL 
+                AND generation_started_at < %s
+            ", date( 'Y-m-d H:i:s', time() - $this->process_timeout ) ) );
+            
+            $cleanup_results['stuck_ideas_found'] = count( $stuck_ideas );
+            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Found {$cleanup_results['stuck_ideas_found']} stuck ideas\n", FILE_APPEND );
+            
+            foreach ( $stuck_ideas as $idea ) {
+                try {
+                    // Reset idea status
+                    $update_result = $wpdb->update(
+                        $ideas_table,
+                        [
+                            'status' => 'approved',
+                            'generation_status' => 'Generation timed out and was reset',
+                            'generation_error' => 'Process timeout after ' . $this->process_timeout . ' seconds',
+                            'updated_at' => current_time( 'mysql' )
+                        ],
+                        [ 'id' => $idea->id ],
+                        [ '%s', '%s', '%s', '%s' ],
+                        [ '%d' ]
+                    );
+                    
+                    if ( $update_result !== false ) {
+                        $cleanup_results['stuck_ideas_cleaned']++;
+                        file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Reset stuck idea {$idea->id}: {$idea->title}\n", FILE_APPEND );
+                        
+                        // Clear related transients
+                        delete_transient( "ai_blog_generation_status_{$idea->id}" );
+                        delete_transient( "ai_blog_generation_lock_{$idea->id}" );
+                        
+                        Logger::warning( 'stuck_generation_cleaned', 'Cleaned up stuck generation', [
+                            'idea_id' => $idea->id,
+                            'idea_title' => $idea->title,
+                            'stuck_since' => $idea->generation_started_at,
+                            'last_status' => $idea->generation_status
+                        ] );
+                    }
+                } catch ( \Exception $e ) {
+                    file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Error cleaning idea {$idea->id}: " . $e->getMessage() . "\n", FILE_APPEND );
+                }
+            }
+            
+            // Clear expired generation locks
+            $lock_pattern = 'ai_blog_generation_lock_*';
+            $expired_locks = 0;
+            
+            // Get all generation lock transients (WordPress doesn't have a native way to do this, so we'll check common IDs)
+            for ( $i = 1; $i <= 1000; $i++ ) { // Check first 1000 idea IDs
+                $lock_key = "ai_blog_generation_lock_{$i}";
+                $lock_value = get_transient( $lock_key );
+                
+                if ( $lock_value ) {
+                    $lock_timestamp = is_array( $lock_value ) ? 
+                        ( $lock_value['started_timestamp'] ?? time() ) : 
+                        $lock_value;
+                    
+                    $lock_age = time() - $lock_timestamp;
+                    
+                    if ( $lock_age > $this->process_timeout ) {
+                        delete_transient( $lock_key );
+                        $expired_locks++;
+                        file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Cleared expired lock for idea {$i} (age: {$lock_age}s)\n", FILE_APPEND );
+                    }
+                }
+            }
+            
+            $cleanup_results['expired_locks_cleared'] = $expired_locks;
+            
+            // Clear stale generation status transients
+            $stale_statuses = 0;
+            for ( $i = 1; $i <= 1000; $i++ ) { // Check first 1000 idea IDs
+                $status_key = "ai_blog_generation_status_{$i}";
+                $status_value = get_transient( $status_key );
+                
+                if ( $status_value && is_array( $status_value ) ) {
+                    $status_timestamp = $status_value['updated_timestamp'] ?? time();
+                    $status_age = time() - $status_timestamp;
+                    
+                    if ( $status_age > $this->process_timeout ) {
+                        delete_transient( $status_key );
+                        $stale_statuses++;
+                        file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Cleared stale status for idea {$i} (age: {$status_age}s)\n", FILE_APPEND );
+                    }
+                }
+            }
+            
+            $cleanup_results['stale_transients_cleared'] = $stale_statuses;
+            
+            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Cleanup completed - " . json_encode( $cleanup_results ) . "\n", FILE_APPEND );
+            
+            Logger::info( 'stuck_generation_cleanup', 'Completed stuck generation cleanup', $cleanup_results );
+            
+        } catch ( \Exception $e ) {
+            file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Cleanup exception: " . $e->getMessage() . "\n", FILE_APPEND );
+            
+            Logger::error( 'stuck_generation_cleanup_failed', 'Failed to complete stuck generation cleanup', [
+                'error' => $e->getMessage(),
+                'partial_results' => $cleanup_results
+            ] );
+        }
+        
+        return $cleanup_results;
     }
 } 

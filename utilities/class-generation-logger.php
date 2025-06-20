@@ -142,12 +142,7 @@ class Generation_Logger {
 
 		$formatted_entry = $this->format_log_entry( $log_entry );
 		
-		// Write to file with error handling
-		$bytes_written = file_put_contents( $this->log_file, $formatted_entry . "\n", FILE_APPEND | LOCK_EX );
-		if ( $bytes_written === false ) {
-			error_log( "AI Blog Generator: Failed to write to log file: " . $this->log_file );
-			error_log( "AI Blog Generator: Log entry that failed: " . $formatted_entry );
-		}
+		
 		
 		// Also log to main WordPress debug log if enabled
 		if ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {

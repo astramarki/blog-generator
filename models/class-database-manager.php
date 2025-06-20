@@ -50,6 +50,20 @@ class Database_Manager {
 	private $in_transaction = false;
 
 	/**
+	 * Transaction timeout in seconds.
+	 *
+	 * @var int
+	 */
+	private $transaction_timeout = 900; // 15 minutes
+
+	/**
+	 * Transaction start time.
+	 *
+	 * @var float
+	 */
+	private $transaction_start_time = null;
+
+	/**
 	 * Get single instance of the class.
 	 *
 	 * @return Database_Manager
@@ -1040,7 +1054,7 @@ class Database_Manager {
 	}
 
 	/**
-	 * Start database transaction.
+	 * Start database transaction with timeout protection.
 	 *
 	 * @return bool True on success, false on failure.
 	 */
@@ -1053,14 +1067,23 @@ class Database_Manager {
 			$debug_log = __DIR__ . '/../debug-transaction.log';
 			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - Entering start_transaction method\n", FILE_APPEND );
 			
+			// Check for stale transactions first
+			$this->cleanup_stale_transactions();
+			
 			// Check transaction state
 			error_log( 'AI_BLOG_DEBUG: Checking in_transaction state: ' . ( $this->in_transaction ? 'true' : 'false' ) );
 			
 			if ( $this->in_transaction ) {
-				error_log( 'AI_BLOG_DEBUG: Transaction already in progress, logging warning' );
-				Logger::warning( 'database_transaction', 'Transaction already in progress' );
-				error_log( 'AI_BLOG_DEBUG: Warning logged successfully, returning false' );
-				return false;
+				// Check if transaction has timed out
+				if ( $this->transaction_start_time && ( microtime( true ) - $this->transaction_start_time ) > $this->transaction_timeout ) {
+					error_log( 'AI_BLOG_DEBUG: Transaction timeout detected, forcing rollback' );
+					$this->force_rollback();
+				} else {
+					error_log( 'AI_BLOG_DEBUG: Transaction already in progress, logging warning' );
+					Logger::warning( 'database_transaction', 'Transaction already in progress' );
+					error_log( 'AI_BLOG_DEBUG: Warning logged successfully, returning false' );
+					return false;
+				}
 			}
 
 			// Check wpdb object
@@ -1110,6 +1133,10 @@ class Database_Manager {
 			error_log( 'AI_BLOG_DEBUG: Setting in_transaction to true' );
 			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - Setting in_transaction to true\n", FILE_APPEND );
 			$this->in_transaction = true;
+			$this->transaction_start_time = microtime( true );
+			
+			// Register shutdown function to handle unexpected termination
+			register_shutdown_function( [ $this, 'emergency_transaction_cleanup' ] );
 			
 			error_log( 'AI_BLOG_DEBUG: start_transaction completed successfully, returning true' );
 			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - start_transaction completed successfully, returning true\n", FILE_APPEND );
@@ -1127,24 +1154,41 @@ class Database_Manager {
 	}
 
 	/**
-	 * Commit database transaction.
+	 * Commit database transaction with timeout check.
 	 *
 	 * @return bool True on success, false on failure.
 	 */
 	public function commit() {
+		$debug_log = __DIR__ . '/../debug-transaction.log';
+		
 		if ( ! $this->in_transaction ) {
 			Logger::warning( 'database_transaction', 'No transaction to commit' );
+			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - COMMIT: No transaction to commit\n", FILE_APPEND );
 			return false;
 		}
 
+		// Check for transaction timeout
+		if ( $this->transaction_start_time && ( microtime( true ) - $this->transaction_start_time ) > $this->transaction_timeout ) {
+			error_log( 'AI_BLOG_DEBUG: Transaction timeout during commit, forcing rollback' );
+			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - COMMIT: Transaction timeout detected, forcing rollback\n", FILE_APPEND );
+			return $this->force_rollback();
+		}
+
+		$start_time = microtime( true );
 		$result = $this->wpdb->query( 'COMMIT' );
+		$duration = microtime( true ) - $start_time;
+		
+		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - COMMIT executed in {$duration} seconds, result: " . ($result !== false ? 'SUCCESS' : 'FAILED') . "\n", FILE_APPEND );
 		
 		if ( false === $result ) {
 			Logger::error( 'database_transaction', 'Failed to commit transaction', [ 'error' => $this->wpdb->last_error ] );
+			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - COMMIT failed with error: " . $this->wpdb->last_error . "\n", FILE_APPEND );
 			return false;
 		}
 
 		$this->in_transaction = false;
+		$this->transaction_start_time = null;
+		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - COMMIT successful, transaction flags cleared\n", FILE_APPEND );
 		return true;
 	}
 
@@ -1154,20 +1198,111 @@ class Database_Manager {
 	 * @return bool True on success, false on failure.
 	 */
 	public function rollback() {
+		$debug_log = __DIR__ . '/../debug-transaction.log';
+		
 		if ( ! $this->in_transaction ) {
 			Logger::warning( 'database_transaction', 'No transaction to rollback' );
+			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - ROLLBACK: No transaction to rollback\n", FILE_APPEND );
 			return false;
 		}
 
+		$start_time = microtime( true );
 		$result = $this->wpdb->query( 'ROLLBACK' );
+		$duration = microtime( true ) - $start_time;
+		
+		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - ROLLBACK executed in {$duration} seconds, result: " . ($result !== false ? 'SUCCESS' : 'FAILED') . "\n", FILE_APPEND );
 		
 		if ( false === $result ) {
 			Logger::error( 'database_transaction', 'Failed to rollback transaction', [ 'error' => $this->wpdb->last_error ] );
+			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - ROLLBACK failed with error: " . $this->wpdb->last_error . "\n", FILE_APPEND );
 			return false;
 		}
 
 		$this->in_transaction = false;
+		$this->transaction_start_time = null;
+		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - ROLLBACK successful, transaction flags cleared\n", FILE_APPEND );
 		return true;
+	}
+
+	/**
+	 * Force rollback for timed-out transactions.
+	 *
+	 * @return bool True on success, false on failure.
+	 */
+	private function force_rollback() {
+		$debug_log = __DIR__ . '/../debug-transaction.log';
+		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FORCE_ROLLBACK: Forcing rollback of timed-out transaction\n", FILE_APPEND );
+		
+		try {
+			$this->wpdb->query( 'ROLLBACK' );
+			$this->in_transaction = false;
+			$this->transaction_start_time = null;
+			
+			Logger::warning( 'database_transaction', 'Forced rollback of timed-out transaction' );
+			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FORCE_ROLLBACK: Completed successfully\n", FILE_APPEND );
+			return true;
+		} catch ( \Exception $e ) {
+			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FORCE_ROLLBACK: Exception - " . $e->getMessage() . "\n", FILE_APPEND );
+			return false;
+		}
+	}
+
+	/**
+	 * Emergency cleanup for unexpected process termination.
+	 */
+	public function emergency_transaction_cleanup() {
+		if ( $this->in_transaction ) {
+			$debug_log = __DIR__ . '/../debug-transaction.log';
+			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - EMERGENCY_CLEANUP: Process terminated with open transaction, attempting rollback\n", FILE_APPEND );
+			
+			try {
+				$this->wpdb->query( 'ROLLBACK' );
+				$this->in_transaction = false;
+				$this->transaction_start_time = null;
+				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - EMERGENCY_CLEANUP: Rollback completed\n", FILE_APPEND );
+			} catch ( \Exception $e ) {
+				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - EMERGENCY_CLEANUP: Exception during rollback - " . $e->getMessage() . "\n", FILE_APPEND );
+			}
+		}
+	}
+
+	/**
+	 * Cleanup stale transactions from previous runs.
+	 */
+	private function cleanup_stale_transactions() {
+		try {
+			// Kill any long-running transactions (MySQL level)
+			$long_running = $this->wpdb->get_results( "
+				SELECT id, time, info 
+				FROM information_schema.processlist 
+				WHERE command = 'Query' 
+				AND time > 900 
+				AND info LIKE '%ai_blog_%'
+			" );
+			
+			if ( ! empty( $long_running ) ) {
+				$debug_log = __DIR__ . '/../debug-transaction.log';
+				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CLEANUP: Found " . count( $long_running ) . " long-running queries\n", FILE_APPEND );
+				
+				foreach ( $long_running as $process ) {
+					$this->wpdb->query( "KILL {$process->id}" );
+					file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CLEANUP: Killed process {$process->id} (runtime: {$process->time}s)\n", FILE_APPEND );
+				}
+			}
+		} catch ( \Exception $e ) {
+			// Ignore errors in cleanup - it's not critical
+		}
+	}
+
+	/**
+	 * Check if transaction is timed out.
+	 *
+	 * @return bool True if timed out, false otherwise.
+	 */
+	public function is_transaction_timed_out() {
+		return $this->in_transaction && 
+		       $this->transaction_start_time && 
+		       ( microtime( true ) - $this->transaction_start_time ) > $this->transaction_timeout;
 	}
 
 	/**

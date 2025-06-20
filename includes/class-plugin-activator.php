@@ -115,7 +115,7 @@ class Plugin_Activator {
 		// Advanced Settings.
 		add_option( 'ai_blog_generator_max_retries', 3 );
 		add_option( 'ai_blog_generator_retry_delay', 5 );
-		add_option( 'ai_blog_generator_timeout', 30 );
+		add_option( 'ai_blog_generator_timeout', 300 );
 	}
 
 	/**

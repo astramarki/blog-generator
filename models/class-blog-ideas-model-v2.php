@@ -317,6 +317,14 @@ class Blog_Ideas_Model_V2 extends Model {
 			$format[] = '%s';
 		}
 		
+		// Log the update attempt with detailed information
+		$debug_log = __DIR__ . '/../debug-transaction.log';
+		$log_entry = date( 'Y-m-d H:i:s' ) . " - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:\n";
+		$log_entry .= "  Idea ID: $idea_id\n";
+		$log_entry .= "  Update Data: " . json_encode( $update_data, JSON_UNESCAPED_SLASHES ) . "\n";
+		$log_entry .= "  Format: " . json_encode( $format ) . "\n";
+		$log_entry .= "  Table: {$this->table_name}\n";
+		
 		$result = $wpdb->update(
 			$this->table_name,
 			$update_data,
@@ -325,11 +333,26 @@ class Blog_Ideas_Model_V2 extends Model {
 			[ '%d' ]
 		);
 		
+		// Log the SQL query and result with safe data
+		$last_query = $wpdb->last_query;
+		$last_error = $wpdb->last_error;
+		$safe_query = $last_query ? substr( preg_replace( '/[^\x20-\x7E]/', '?', $last_query ), 0, 200 ) . '...' : 'None';
+		$safe_error = $last_error ? preg_replace( '/[^\x20-\x7E]/', '?', $last_error ) : 'None';
+		
+		$log_entry .= "  SQL Query: $safe_query\n";
+		$log_entry .= "  SQL Error: $safe_error\n";
+		$log_entry .= "  Rows Affected: " . intval( $wpdb->rows_affected ) . "\n";
+		$log_entry .= "  Update Result: " . ($result !== false ? 'SUCCESS' : 'FAILED') . "\n";
+		$log_entry .= "  Result Value: " . intval( $result ) . "\n\n";
+		file_put_contents( $debug_log, $log_entry, FILE_APPEND );
+		
 		if ( false === $result ) {
 			$this->log_error( 'idea_update_failed', 'Failed to update idea', [
 				'idea_id' => $idea_id,
 				'data' => $update_data,
-				'error' => $wpdb->last_error
+				'error' => $wpdb->last_error,
+				'sql_query' => $last_query,
+				'rows_affected' => $wpdb->rows_affected
 			] );
 			return false;
 		}
@@ -337,7 +360,8 @@ class Blog_Ideas_Model_V2 extends Model {
 		$this->log_info( 'idea_updated', 'Idea updated successfully', [
 			'idea_id' => $idea_id,
 			'updated_fields' => array_keys( $update_data ),
-			'rows_affected' => $result
+			'rows_affected' => $result,
+			'sql_query' => $last_query
 		] );
 		
 		$this->log_function_exit( true );
@@ -683,5 +707,114 @@ class Blog_Ideas_Model_V2 extends Model {
 		$date = new \DateTime( $utc_time, new \DateTimeZone( 'UTC' ) );
 		$date->setTimezone( new \DateTimeZone( 'America/New_York' ) );
 		return $date->format( 'M j, Y g:i A T' );
+	}
+
+	/**
+	 * Compatibility method: Get idea by ID (alias for get_idea)
+	 *
+	 * @param int $idea_id The idea ID.
+	 * @return array|null Idea data or null if not found.
+	 */
+	public function get( $idea_id ) {
+		return $this->get_idea( $idea_id );
+	}
+
+	/**
+	 * Compatibility method: Update idea (alias for update_idea)
+	 *
+	 * @param int   $idea_id The idea ID.
+	 * @param array $data    The data to update.
+	 * @return bool Success status.
+	 */
+	public function update( $idea_id, $data ) {
+		return $this->update_idea( $idea_id, $data );
+	}
+
+	/**
+	 * Compatibility method: Create single idea
+	 *
+	 * @param array $idea_data The idea data.
+	 * @return int|false Idea ID on success, false on failure.
+	 */
+	public function create( $idea_data ) {
+		$this->log_function_entry( [ 'idea_data' => array_keys( $idea_data ) ] );
+		
+		global $wpdb;
+		
+		try {
+			// Insert the idea
+			$result = $wpdb->insert(
+				$this->table_name,
+				[
+					'title' => sanitize_text_field( $idea_data['title'] ),
+					'description' => sanitize_textarea_field( $idea_data['description'] ?? '' ),
+					'category_id' => isset( $idea_data['category_id'] ) ? absint( $idea_data['category_id'] ) : null,
+					'persona_id' => isset( $idea_data['persona_id'] ) ? absint( $idea_data['persona_id'] ) : null,
+					'status' => sanitize_text_field( $idea_data['status'] ?? 'pending' ),
+					'created_at' => current_time( 'mysql' ),
+					'updated_at' => current_time( 'mysql' )
+				],
+				[ '%s', '%s', '%d', '%d', '%s', '%s', '%s' ]
+			);
+			
+			if ( false === $result ) {
+				$this->log_error( 'idea_create_failed', 'Failed to create idea', [
+					'title' => $idea_data['title'],
+					'error' => $wpdb->last_error
+				] );
+				return false;
+			}
+			
+			$idea_id = $wpdb->insert_id;
+			
+			$this->log_info( 'idea_created', 'Idea created successfully', [
+				'idea_id' => $idea_id,
+				'title' => $idea_data['title']
+			] );
+			
+			$this->log_function_exit( $idea_id );
+			return $idea_id;
+			
+		} catch ( \Exception $e ) {
+			$this->log_error( 'idea_create_exception', 'Exception creating idea', [
+				'error' => $e->getMessage(),
+				'title' => $idea_data['title'] ?? 'unknown'
+			] );
+			return false;
+		}
+	}
+
+	/**
+	 * Check if a title already exists.
+	 *
+	 * @param string $title Title to check.
+	 * @return bool
+	 */
+	public function is_duplicate_title( $title ) {
+		$this->log_function_entry( [ 'title' => $title ] );
+		
+		global $wpdb;
+		
+		$sql = "SELECT COUNT(*) FROM {$this->table_name} WHERE title = %s";
+		$count = $wpdb->get_var( $wpdb->prepare( $sql, $title ) );
+		
+		if ( $wpdb->last_error ) {
+			$this->log_error( 'is_duplicate_title_error', 'Database error checking duplicate title', [
+				'error' => $wpdb->last_error,
+				'title' => $title
+			] );
+			return false;
+		}
+		
+		$is_duplicate = intval( $count ) > 0;
+		
+		$this->log_info( 'duplicate_title_checked', 'Duplicate title check completed', [
+			'title' => $title,
+			'is_duplicate' => $is_duplicate,
+			'count' => $count
+		] );
+		
+		$this->log_function_exit( $is_duplicate );
+		return $is_duplicate;
 	}
 } 

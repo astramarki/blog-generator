@@ -174,11 +174,13 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<td>
 						<select id="context-seed-image" name="seed_image_id">
 							<option value=""><?php esc_html_e( 'No seed image', 'ai-blog-generator' ); ?></option>
-							<?php foreach ( $seed_images as $image ) : ?>
-								<option value="<?php echo esc_attr( $image->ID ); ?>">
-									<?php echo esc_html( $image->post_title ); ?>
-								</option>
-							<?php endforeach; ?>
+							<?php if ( ! empty( $seed_images_data ) ) : ?>
+								<?php foreach ( $seed_images_data as $image ) : ?>
+									<option value="<?php echo esc_attr( $image->id ); ?>">
+										<?php echo esc_html( $image->product_name ); ?>
+									</option>
+								<?php endforeach; ?>
+							<?php endif; ?>
 						</select>
 					</td>
 				</tr>

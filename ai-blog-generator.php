@@ -205,9 +205,9 @@ class AI_Blog_Generator {
 		
 		// Only load admin UI functionality in admin area.
 		if ( is_admin() ) {
-			// Admin menu and pages.
-			$this->loader->add_action( 'admin_menu', $admin_manager, 'add_menu_pages' );
-			$this->loader->add_action( 'admin_enqueue_scripts', $admin_manager, 'enqueue_scripts' );
+		// Admin menu and pages.
+		$this->loader->add_action( 'admin_menu', $admin_manager, 'add_menu_pages' );
+		$this->loader->add_action( 'admin_enqueue_scripts', $admin_manager, 'enqueue_scripts' );
 		}
 		
 		// Always register AJAX handlers (needed for both admin and frontend AJAX requests).
@@ -258,7 +258,7 @@ class AI_Blog_Generator {
 		if ( isset( $scheduler ) ) {
 			try {
 				$this->loader->add_action( 'ai_blog_daily_ideas', $scheduler, 'daily_idea_generation' );
-				$this->loader->add_action( 'ai_blog_process_queue', $scheduler, 'process_approved_ideas' );
+				$this->loader->add_action( 'ai_blog_process_queue', $scheduler, 'process_approved_ideas_queue' );
 				$this->loader->add_action( 'ai_blog_publish_scheduled', $scheduler, 'publish_scheduled_posts' );
 			} catch ( \Exception $e ) {
 				// Log cron registration error
@@ -655,14 +655,38 @@ add_action( 'plugins_loaded', function() {
 	ai_blog_generator()->run();
 } );
 
-// SSL Fix for Local Development
-if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
+// SSL Fix for Local Development - Apply in all development environments
+// Check for common local development indicators
+$is_local = (
+	defined( 'WP_DEBUG' ) && WP_DEBUG ||
+	strpos( $_SERVER['SERVER_NAME'] ?? '', 'localhost' ) !== false ||
+	strpos( $_SERVER['SERVER_NAME'] ?? '', '127.0.0.1' ) !== false ||
+	strpos( $_SERVER['SERVER_NAME'] ?? '', '.local' ) !== false ||
+	isset( $_SERVER['HTTP_HOST'] ) && (
+		strpos( $_SERVER['HTTP_HOST'], 'localhost' ) !== false ||
+		strpos( $_SERVER['HTTP_HOST'], '127.0.0.1' ) !== false ||
+		strpos( $_SERVER['HTTP_HOST'], '.local' ) !== false
+	)
+);
+
+if ( $is_local ) {
 	// Disable SSL verification for local development
 	add_filter( 'https_ssl_verify', '__return_false' );
 	add_filter( 'https_local_ssl_verify', '__return_false' );
 	add_filter( 'http_request_args', function( $args ) {
 		$args['sslverify'] = false;
-		$args['timeout'] = 120; // Increase timeout to 2 minutes
+		$args['timeout'] = 600; // Increase timeout to 2 minutes
 		return $args;
 	} );
+	
+	// Log SSL fix application for debugging
+	if ( class_exists( 'AI_Blog_Generator\Utilities\Logger' ) ) {
+		add_action( 'init', function() {
+			AI_Blog_Generator\Utilities\Logger::info( 'ssl_fix_applied', 'SSL verification disabled for local development', [
+				'server_name' => $_SERVER['SERVER_NAME'] ?? 'unknown',
+				'http_host' => $_SERVER['HTTP_HOST'] ?? 'unknown',
+				'wp_debug' => defined( 'WP_DEBUG' ) ? WP_DEBUG : false
+			] );
+		} );
+	}
 } 
