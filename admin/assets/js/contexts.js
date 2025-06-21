@@ -451,7 +451,14 @@
                 
                 // Update card content
                 $card.find('h3').text(context.name);
-                $card.find('.context-type').text(context.type);
+                
+                // Get the display label for the context type
+                var typeLabel = context.type;
+                if (aiBlogAjax && aiBlogAjax.contextTypes && aiBlogAjax.contextTypes[context.type]) {
+                    typeLabel = aiBlogAjax.contextTypes[context.type];
+                }
+                $card.find('.context-type').text(typeLabel);
+                
                 $card.find('.context-content p').text(this.trimWords(context.content, 30));
                 
                 // Update badges

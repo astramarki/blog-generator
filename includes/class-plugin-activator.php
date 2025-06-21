@@ -49,6 +49,23 @@ class Plugin_Activator {
 		// Create default personas.
 		self::create_default_personas();
 		
+		// Create product seed images table
+		global $wpdb;
+		$charset_collate = $wpdb->get_charset_collate();
+		
+		$sql = "CREATE TABLE IF NOT EXISTS {$wpdb->prefix}ai_blog_generator_product_seed_images (
+			id BIGINT(20) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+			product_id BIGINT(20) UNSIGNED NOT NULL,
+			attachment_id BIGINT(20) UNSIGNED NOT NULL,
+			image_url VARCHAR(500) NOT NULL,
+			display_order INT DEFAULT 0,
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			KEY idx_product (product_id),
+			KEY idx_order (display_order)
+		) $charset_collate;";
+
+		$wpdb->query( $sql );
+		
 		// Clear any cached data.
 		self::clear_cache();
 		

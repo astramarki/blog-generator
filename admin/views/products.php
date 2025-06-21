@@ -97,6 +97,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<?php esc_html_e( 'Add Link', 'ai-blog-generator' ); ?>
 					</button>
 				</div>
+				
+				<!-- Seed Images Section -->
+				<div class="form-section">
+					<h3><?php esc_html_e( 'Seed Images for AI Generation', 'ai-blog-generator' ); ?></h3>
+					
+					<div class="seed-images-notice">
+						<span class="dashicons dashicons-info"></span>
+						<?php esc_html_e( 'Seed images are used when generating AI images for blog posts. Only PNG files are allowed.', 'ai-blog-generator' ); ?>
+					</div>
+					
+					<div class="product-seed-images-container" id="product-seed-images-container">
+						<!-- Seed images will be loaded here -->
+					</div>
+					
+					<button type="button" class="button" id="add-product-seed-image">
+						<span class="dashicons dashicons-format-image"></span>
+						<?php esc_html_e( 'Add Seed Image', 'ai-blog-generator' ); ?>
+					</button>
+				</div>
 			</div>
 			
 			<div class="ai-blog-modal-footer">

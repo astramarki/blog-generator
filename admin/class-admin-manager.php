@@ -179,6 +179,16 @@ class Admin_Manager {
 			[ $this, 'render_products_page' ]
 		);
 
+		// Brand Features submenu.
+		add_submenu_page(
+			$this->menu_slug,
+			__( 'Brand Features', 'ai-blog-generator' ),
+			__( 'Brand Features', 'ai-blog-generator' ),
+			$this->capability,
+			$this->menu_slug . '-brand-features',
+			[ $this, 'render_brand_features_page' ]
+		);
+
 		// Logs submenu.
 
 
@@ -322,12 +332,23 @@ class Admin_Manager {
 			], __CLASS__, __METHOD__ );
 		}
 
+		// Get context types
+		$context_types = [
+			'general'  => __( 'General Information', 'ai-blog-generator' ),
+			'products' => __( 'Product Details', 'ai-blog-generator' ),
+			'seo'      => __( 'SEO Guidelines', 'ai-blog-generator' ),
+			'keywords' => __( 'Keywords & Topics', 'ai-blog-generator' ),
+			'image'    => __( 'Image Guidelines', 'ai-blog-generator' ),
+			'layout'   => __( 'Layout Guidelines', 'ai-blog-generator' ),
+		];
+
 		$localized_data = [
 			'ajaxurl' => admin_url( 'admin-ajax.php' ),
 			'nonce' => wp_create_nonce( 'ai_blog_admin_nonce' ),
 			'adminUrl' => admin_url(),
 			'personas' => $personas,
 			'categories' => $categories,
+			'contextTypes' => $context_types,
 			'strings' => [
 				'confirm_approve' => __( 'Are you sure you want to approve this idea?', 'ai-blog-generator' ),
 				'confirm_deny' => __( 'Are you sure you want to deny this idea?', 'ai-blog-generator' ),
@@ -354,6 +375,7 @@ class Admin_Manager {
 		wp_localize_script( 'ai-blog-generator-contexts', 'aiBlogAjax', $localized_data );
 		wp_localize_script( 'ai-blog-generator-personas', 'aiBlogAjax', $localized_data );
 		wp_localize_script( 'ai-blog-generator-products', 'aiBlogAjax', $localized_data );
+		wp_localize_script( 'ai-blog-generator-brand-features', 'aiBlogAjax', $localized_data );
 
 		
 		// Debug Blog Ideas V2 script localization
@@ -503,6 +525,21 @@ class Admin_Manager {
 				'ai-blog-generator-products',
 				AI_BLOG_GENERATOR_PLUGIN_URL . 'admin/assets/js/products.js',
 				[ 'jquery', 'ai-blog-generator-admin', 'wp-media-utils' ],
+				$this->version,
+				true
+			);
+		}
+
+		// Brand Features page - brand-features.js for functionality.
+		if ( strpos( $hook, $this->menu_slug . '-brand-features' ) !== false ) {
+			// Enqueue underscore for debounce
+			wp_enqueue_script( 'underscore' );
+			
+			// Enqueue brand features-specific JavaScript
+			wp_enqueue_script(
+				'ai-blog-generator-brand-features',
+				AI_BLOG_GENERATOR_PLUGIN_URL . 'admin/assets/js/brand-features.js',
+				[ 'jquery', 'ai-blog-generator-admin', 'underscore' ],
 				$this->version,
 				true
 			);
@@ -1040,6 +1077,19 @@ class Admin_Manager {
 
 		// Load the view.
 		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'admin/views/products.php';
+	}
+
+	/**
+	 * Render the brand features page.
+	 */
+	public function render_brand_features_page() {
+		// Check user capabilities.
+		if ( ! current_user_can( $this->capability ) ) {
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'ai-blog-generator' ) );
+		}
+
+		// Load the view.
+		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'admin/views/brand-features.php';
 	}
 
 	/**

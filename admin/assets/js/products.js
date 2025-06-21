@@ -119,6 +119,16 @@
                 self.removeLink(linkId);
             });
 
+            // Seed image actions (delegated)
+            $(document).on('click', '#add-product-seed-image', function() {
+                self.selectSeedImage();
+            });
+
+            $(document).on('click', '.remove-seed-image', function() {
+                var attachmentId = $(this).data('attachment-id');
+                self.removeSeedImage(attachmentId);
+            });
+
             // WooCommerce import (delegated)
             $(document).on('click', '.import-wc-product', function() {
                 var wcProductId = $(this).data('product-id');
@@ -193,18 +203,24 @@
                         html += '<div class="product-description">' + product.product_description + '</div>';
                     }
                     
+                    html += '<div class="product-meta">';
                     if (product.images.length > 0) {
-                        html += '<div class="product-meta"><span class="dashicons dashicons-format-image"></span> ' + product.images.length + ' images</div>';
+                        html += '<div><span class="dashicons dashicons-format-image"></span> ' + product.images.length + ' images</div>';
                     }
                     
                     if (product.links.length > 0) {
-                        html += '<div class="product-meta"><span class="dashicons dashicons-admin-links"></span> ' + product.links.length + ' links</div>';
+                        html += '<div><span class="dashicons dashicons-admin-links"></span> ' + product.links.length + ' links</div>';
                     }
+                    html += '</div>';
                     
                     html += '</div>';
                     html += '<div class="product-actions">';
-                    html += '<button class="button edit-product" data-product-id="' + product.id + '">Edit</button>';
-                    html += '<button class="button delete-product" data-product-id="' + product.id + '" data-product-name="' + product.product_name + '">Delete</button>';
+                    html += '<a href="#" class="action-icon edit-product" data-product-id="' + product.id + '" title="Edit">';
+                    html += '<span class="dashicons dashicons-edit"></span>';
+                    html += '</a>';
+                    html += '<a href="#" class="action-icon delete-product" data-product-id="' + product.id + '" data-product-name="' + product.product_name + '" title="Delete">';
+                    html += '<span class="dashicons dashicons-trash"></span>';
+                    html += '</a>';
                     html += '</div>';
                     html += '</div>';
                 });
@@ -266,6 +282,7 @@
             $('#product-id').val('');
             $('#product-images-container').empty();
             $('#product-links-container').empty();
+            $('#product-seed-images-container').empty();
             
             // Update modal title
             $('#product-modal-title').text(product ? 'Edit Product' : 'Add New Product');
@@ -289,6 +306,14 @@
                 // Load links
                 if (product.links && product.links.length > 0) {
                     this.renderProductLinks(product.links);
+                }
+                
+                // Load seed images
+                if (product.seed_images && product.seed_images.length > 0) {
+                    console.log('Loading seed images:', product.seed_images);
+                    this.renderProductSeedImages(product.seed_images);
+                } else {
+                    console.log('No seed images found for product');
                 }
             }
             
@@ -622,11 +647,18 @@
         renderProductLinks: function(links) {
             var html = '';
             
+            var linkTypeLabels = {
+                'product_page': 'Product Page',
+                'purchase': 'Purchase',
+                'documentation': 'Documentation',
+                'other': 'Other'
+            };
+            
             links.forEach(function(link) {
                 html += '<div class="product-link-item">';
                 html += '<a href="' + link.link_url + '" target="_blank">' + (link.link_text || link.link_url) + '</a>';
-                html += '<span class="link-type">' + link.link_type + '</span>';
-                html += '<button type="button" class="button-link remove-product-link" data-link-id="' + link.id + '">Remove</button>';
+                html += '<span class="link-type ' + link.link_type + '">' + (linkTypeLabels[link.link_type] || link.link_type) + '</span>';
+                html += '<button type="button" class="button-link remove-product-link" data-link-id="' + link.id + '">×</button>';
                 html += '</div>';
             });
             
@@ -779,6 +811,120 @@
                     $('.import-wc-product[data-product-id="' + wcProductId + '"]')
                         .prop('disabled', false)
                         .text('Import');
+                }
+            });
+        },
+
+        /**
+         * Select seed image from media library
+         */
+        selectSeedImage: function() {
+            var self = this;
+            
+            if (!this.currentProduct || !this.currentProduct.id) {
+                alert('Please save the product first before adding seed images.');
+                return;
+            }
+            
+            var frame = wp.media({
+                title: 'Select Seed Image (PNG Only)',
+                button: {
+                    text: 'Add Seed Image'
+                },
+                library: {
+                    type: 'image/png'
+                },
+                multiple: true
+            });
+            
+            frame.on('select', function() {
+                var attachments = frame.state().get('selection').toJSON();
+                attachments.forEach(function(attachment) {
+                    if (attachment.mime === 'image/png') {
+                        self.addSeedImage(attachment.id);
+                    } else {
+                        self.showError('Only PNG images are allowed as seed images.');
+                    }
+                });
+            });
+            
+            frame.open();
+        },
+
+        /**
+         * Add seed image to product
+         */
+        addSeedImage: function(attachmentId) {
+            var self = this;
+            
+            $.ajax({
+                url: aiBlogAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'ai_blog_add_product_seed_image',
+                    nonce: aiBlogAjax.nonce,
+                    product_id: self.currentProduct.id,
+                    attachment_id: attachmentId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.renderProductSeedImages(response.data.seed_images);
+                    } else {
+                        self.showError(response.data.message || 'Failed to add seed image');
+                    }
+                },
+                error: function() {
+                    self.showError('Failed to add seed image');
+                }
+            });
+        },
+
+        /**
+         * Render product seed images
+         */
+        renderProductSeedImages: function(seedImages) {
+            var html = '';
+            
+            seedImages.forEach(function(image) {
+                html += '<div class="product-seed-image-item" data-attachment-id="' + image.attachment_id + '">';
+                html += '<img src="' + image.thumbnail_url + '" alt="" />';
+                html += '<div class="image-actions">';
+                html += '<button type="button" class="button-link remove-seed-image" data-attachment-id="' + image.attachment_id + '">Remove</button>';
+                html += '</div>';
+                html += '</div>';
+            });
+            
+            $('#product-seed-images-container').html(html);
+        },
+
+        /**
+         * Remove seed image
+         */
+        removeSeedImage: function(attachmentId) {
+            var self = this;
+            
+            if (!confirm('Are you sure you want to remove this seed image?')) {
+                return;
+            }
+            
+            $.ajax({
+                url: aiBlogAjax.ajaxurl,
+                type: 'POST',
+                data: {
+                    action: 'ai_blog_remove_product_seed_image',
+                    nonce: aiBlogAjax.nonce,
+                    product_id: self.currentProduct.id,
+                    attachment_id: attachmentId
+                },
+                success: function(response) {
+                    if (response.success) {
+                        self.renderProductSeedImages(response.data.seed_images);
+                    } else {
+                        self.showError(response.data.message || 'Failed to remove seed image');
+                    }
+                },
+                error: function() {
+                    self.showError('Failed to remove seed image');
                 }
             });
         },

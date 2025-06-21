@@ -200,11 +200,11 @@ class Persona_Model extends Model {
 			
 			if ( ! isset( $tone_mappings[ $single_tone ] ) ) {
 				continue; // Skip unmapped tones
-			}
+		}
 
 			foreach ( $tone_mappings[ $single_tone ] as $keyword ) {
-				if ( strpos( $idea_text, $keyword ) !== false ) {
-					return true;
+			if ( strpos( $idea_text, $keyword ) !== false ) {
+				return true;
 				}
 			}
 		}
@@ -333,12 +333,12 @@ class Persona_Model extends Model {
 				}
 			} else {
 				// Single tone validation
-				if ( ! in_array( $data['tone'], $valid_tones, true ) ) {
-					Logger::error( 'persona_validation_failed', 'Invalid tone value', [
-						'provided_tone' => $data['tone'],
-						'valid_tones' => $valid_tones,
-					] );
-					return false;
+			if ( ! in_array( $data['tone'], $valid_tones, true ) ) {
+				Logger::error( 'persona_validation_failed', 'Invalid tone value', [
+					'provided_tone' => $data['tone'],
+					'valid_tones' => $valid_tones,
+				] );
+				return false;
 				}
 			}
 		}

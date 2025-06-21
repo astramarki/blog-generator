@@ -346,6 +346,10 @@ class AI_Blog_Generator {
 		$product_controller = new AI_Blog_Generator\Controllers\Product_Controller();
 		$product_controller->register_ajax_handlers();
 		
+		// Brand Feature controller.
+		$brand_feature_controller = new AI_Blog_Generator\Controllers\Brand_Feature_Controller();
+		$brand_feature_controller->register_ajax_handlers();
+		
 		// Image controller.
 		$image_controller = new AI_Blog_Generator\Controllers\Image_Controller();
 		$image_controller->register_ajax_handlers();

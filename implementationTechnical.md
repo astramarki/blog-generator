@@ -191,6 +191,28 @@ link_url (varchar 500)
 created_at (datetime)
 ```
 
+### 11. Product Seed Images Table (`wp_ai_blog_generator_product_seed_images`)
+```sql
+id (bigint) PRIMARY KEY
+product_id (bigint) FOREIGN KEY
+attachment_id (bigint)
+image_url (varchar 500)
+display_order (int) DEFAULT 0
+created_at (datetime)
+```
+
+### 12. Brand Features Table (`wp_ai_blog_brand_features`)
+```sql
+id (bigint) PRIMARY KEY
+name (varchar 255)
+description (text)
+category (enum: informational_page, document, image, video) DEFAULT 'informational_page'
+url (varchar 500)
+active (tinyint) DEFAULT 1
+created_at (datetime)
+updated_at (datetime)
+```
+
 ## Key Classes and Implementation
 
 ### 1. Database Manager (Singleton)
@@ -1631,6 +1653,254 @@ Location: `admin/assets/js/approved-ideas-v2.js`
 This implementation provides a robust, scalable solution for managing concurrent blog generation with excellent user experience and system reliability.
 
 #### Status Updates
+
+## Brand Features Management System (v1.8.0)
+
+### Overview
+Version 1.8.0 introduces a brand features management system that allows users to catalog internal links for services, informational pages, documents, images, and videos. These features can be used by the AI during content generation for intelligent internal linking.
+
+### Database Schema
+
+#### Brand Features Table (`wp_ai_blog_brand_features`)
+```sql
+CREATE TABLE wp_ai_blog_brand_features (
+    id BIGINT(20) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    category ENUM('informational_page','document','image','video') DEFAULT 'informational_page',
+    url VARCHAR(500) NOT NULL,
+    active TINYINT(1) DEFAULT 1,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_active (active),
+    KEY idx_category (category),
+    KEY idx_name (name)
+);
+```
+
+### Model Implementation
+
+#### Brand_Feature_Model
+Location: `models/class-brand-feature-model.php`
+
+**Key Features:**
+- Extends base Model class
+- Full CRUD operations with validation
+- Category-based filtering
+- Active/inactive state management
+- Search functionality
+
+**Key Methods:**
+```php
+public function get_active_features($category = null) {
+    // Gets active features, optionally filtered by category
+}
+
+public function get_by_category($category) {
+    // Gets all features in a specific category
+}
+
+public function get_for_content_generation() {
+    // Returns formatted features for AI context
+}
+
+public function search($search) {
+    // Searches features by name or description
+}
+
+public function toggle_active($id) {
+    // Toggles active/inactive state
+}
+```
+
+### Controller Implementation
+
+#### Brand_Feature_Controller
+Location: `controllers/class-brand-feature-controller.php`
+
+**AJAX Handlers:**
+```php
+// Feature CRUD
+'wp_ajax_ai_blog_get_brand_features' => 'ajax_get_brand_features'
+'wp_ajax_ai_blog_get_brand_feature' => 'ajax_get_brand_feature'
+'wp_ajax_ai_blog_create_brand_feature' => 'ajax_create_brand_feature'
+'wp_ajax_ai_blog_update_brand_feature' => 'ajax_update_brand_feature'
+'wp_ajax_ai_blog_delete_brand_feature' => 'ajax_delete_brand_feature'
+'wp_ajax_ai_blog_toggle_brand_feature' => 'ajax_toggle_brand_feature'
+'wp_ajax_ai_blog_search_brand_features' => 'ajax_search_brand_features'
+```
+
+**Category Options:**
+- `informational_page` - Informational pages about services or topics
+- `document` - Downloadable documents or PDFs
+- `image` - Image resources
+- `video` - Video content
+
+### Frontend Implementation
+
+#### Admin View
+Location: `admin/views/brand-features.php`
+
+**Features:**
+- Grid layout with responsive cards
+- Search functionality with debouncing
+- Category filtering dropdown
+- Modal-based add/edit interface
+- Pagination support
+
+#### JavaScript Implementation
+Location: `admin/assets/js/brand-features.js`
+
+**Core Object Structure:**
+```javascript
+window.aiBlogBrandFeatures = {
+    currentPage: 1,
+    currentSearch: '',
+    currentCategory: '',
+    
+    // Core methods
+    init: function() { ... },
+    loadFeatures: function() { ... },
+    renderFeatures: function(features) { ... },
+    showModal: function(feature) { ... },
+    saveFeature: function() { ... },
+    deleteFeature: function(featureId, featureName) { ... },
+    toggleFeature: function(featureId) { ... }
+};
+```
+
+**Key Features:**
+1. **Real-time Search**
+   - Debounced search input (300ms delay)
+   - Searches across name and description
+   - Maintains pagination state
+
+2. **Category Filtering**
+   - Dropdown filter by category type
+   - Instant filtering without page reload
+   - Visual category badges
+
+3. **Modal Management**
+   - Add/Edit features in modal
+   - Form validation
+   - URL format validation
+   - Active state checkbox
+
+### CSS Styling
+
+**Key Styles:**
+- `.ai-blog-brand-features-grid`: Responsive grid layout
+- `.ai-blog-brand-feature-card`: Individual feature cards with hover effects
+- `.brand-feature-category`: Color-coded category badges
+- `.brand-feature-status`: Active/inactive status indicators
+- Gradient hover effect matching other admin pages
+
+**Category Color Scheme:**
+```css
+.category-informational-page { background: #dbeafe; color: #1e40af; }
+.category-document { background: #fce7f3; color: #be185d; }
+.category-image { background: #d1fae5; color: #065f46; }
+.category-video { background: #e9d5ff; color: #6b21a8; }
+```
+
+### Integration with Content Generation
+
+#### Context Inclusion
+Brand features can be included in content generation context:
+
+```php
+// In Content_Generator or similar service
+$brand_feature_controller = new Brand_Feature_Controller();
+$brand_features = $brand_feature_controller->get_features_for_generation();
+
+// Include in AI prompt
+$prompt .= "\n\nBRAND FEATURES FOR INTERNAL LINKING:\n";
+foreach ($brand_features as $feature) {
+    $prompt .= "- {$feature['name']} ({$feature['category']}): {$feature['url']}\n";
+    if ($feature['description']) {
+        $prompt .= "  Description: {$feature['description']}\n";
+    }
+}
+```
+
+#### AI Instructions
+The AI can be instructed to:
+- Use brand features for relevant internal linking
+- Prefer informational pages for educational content
+- Link to documents when referencing resources
+- Include image/video features when appropriate
+
+### Security Implementation
+
+1. **Access Control**
+   - Requires `manage_options` capability
+   - Admin-only functionality
+
+2. **Input Validation**
+   - Name and URL are required fields
+   - URL format validation
+   - Category enum validation
+   - Text sanitization
+
+3. **AJAX Security**
+   - Nonce verification on all requests
+   - Capability checking
+   - Sanitized inputs and outputs
+
+### Performance Considerations
+
+1. **Database Optimization**
+   - Indexed columns: active, category, name
+   - Efficient queries with proper WHERE clauses
+   - Pagination to limit results
+
+2. **Frontend Performance**
+   - Debounced search to reduce requests
+   - Client-side filtering where possible
+   - Lazy loading of feature data
+
+3. **Caching Strategy**
+   - Features cached in transients for content generation
+   - Cache invalidation on updates
+   - Minimal database queries
+
+### Error Handling
+
+1. **User-Friendly Messages**
+   - Clear validation errors
+   - Success confirmations
+   - Network error handling
+
+2. **Logging**
+   - All operations logged with context
+   - Error tracking for debugging
+   - Performance metrics
+
+3. **Graceful Degradation**
+   - Features optional for content generation
+   - Fallbacks for missing data
+   - Recovery mechanisms
+
+### Future Enhancements
+
+1. **Advanced Features**
+   - Bulk import/export
+   - Usage tracking (which features are linked most)
+   - Auto-discovery of internal links
+   - Link validation/checking
+
+2. **AI Integration**
+   - Smarter context-aware linking
+   - Link relevance scoring
+   - Automatic anchor text generation
+   - Link distribution optimization
+
+3. **Analytics**
+   - Track which features are used in generation
+   - Click-through rates on generated links
+   - Link effectiveness metrics
+
+This implementation provides a robust system for managing brand features that can be intelligently used by the AI during content generation, enhancing the internal linking structure of generated blog posts.
 - Generation status is stored in both database and transients for real-time updates
 - Database field: `generation_status` in `ai_blog_ideas` table
 - Transient key: `ai_blog_generation_status_{$idea_id}` (1 hour expiration)
@@ -1672,6 +1942,21 @@ CREATE TABLE wp_ai_blog_generator_product_images (
     KEY idx_product (product_id),
     KEY idx_primary (is_primary),
     KEY idx_order (display_order)
+);
+```
+
+#### Product Seed Images Table (`wp_ai_blog_generator_product_seed_images`)
+```sql
+CREATE TABLE wp_ai_blog_generator_product_seed_images (
+    id BIGINT(20) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT(20) UNSIGNED NOT NULL,
+    attachment_id BIGINT(20) UNSIGNED NOT NULL,
+    image_url VARCHAR(500) NOT NULL,
+    display_order INT DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_product (product_id),
+    KEY idx_order (display_order),
+    FOREIGN KEY (product_id) REFERENCES wp_ai_blog_generator_products(id) ON DELETE CASCADE
 );
 ```
 
@@ -1729,6 +2014,26 @@ public function get_product_images($product_id) {
 public function get_product_links($product_id) {
     // Gets all links for a product
 }
+
+public function get_product_seed_images($product_id) {
+    // Gets all seed images for a product ordered by display_order
+}
+
+public function add_seed_image($product_id, $attachment_id, $display_order = 0) {
+    // Adds PNG seed image to product with validation
+}
+
+public function remove_seed_image($product_id, $attachment_id) {
+    // Removes seed image from product
+}
+
+public function update_seed_image_order($product_id, $image_order) {
+    // Updates display order of seed images
+}
+
+public function get_all_seed_images() {
+    // Gets all seed images across all products with product details
+}
 ```
 
 ### Controller Implementation
@@ -1754,6 +2059,11 @@ Location: `controllers/class-product-controller.php`
 
 // Link management
 'wp_ajax_ai_blog_update_product_links' => 'ajax_update_product_links'
+
+// Seed image management
+'wp_ajax_ai_blog_add_product_seed_image' => 'ajax_add_product_seed_image'
+'wp_ajax_ai_blog_remove_product_seed_image' => 'ajax_remove_product_seed_image'
+'wp_ajax_ai_blog_update_seed_image_order' => 'ajax_update_seed_image_order'
 
 // WooCommerce integration
 'wp_ajax_ai_blog_get_woocommerce_products' => 'ajax_get_woocommerce_products'
@@ -1874,7 +2184,8 @@ window.aiBlogProducts = {
 #### With Content Generation
 - Products can be referenced in contexts
 - Product descriptions enhance AI understanding
-- Images can be used as seed images
+- Product images provide visual reference
+- Product seed images used for AI image generation
 - Links provide additional context
 
 #### With WordPress Core

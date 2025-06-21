@@ -292,6 +292,9 @@ class Product_Model extends Model {
 		// Get links
 		$product->links = $this->get_product_links( $id );
 		
+		// Get seed images
+		$product->seed_images = $this->get_product_seed_images( $id );
+		
 		return $product;
 	}
 
@@ -717,5 +720,187 @@ class Product_Model extends Model {
 			default:
 				return parent::sanitize_field( $field, $value );
 		}
+	}
+
+	/**
+	 * Get product seed images.
+	 *
+	 * @param int $product_id Product ID.
+	 * @return array Array of seed image objects.
+	 */
+	public function get_product_seed_images( $product_id ) {
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . 'ai_blog_generator_product_seed_images';
+		
+		$images = $wpdb->get_results( $wpdb->prepare(
+			"SELECT psi.*, p.guid as image_url, p.post_title as image_title
+			FROM {$table_name} psi
+			LEFT JOIN {$wpdb->posts} p ON psi.attachment_id = p.ID
+			WHERE psi.product_id = %d
+			ORDER BY psi.display_order ASC, psi.id ASC",
+			$product_id
+		) );
+		
+		// Add thumbnail URLs
+		foreach ( $images as $image ) {
+			if ( $image->attachment_id ) {
+				$image->thumbnail_url = wp_get_attachment_image_url( $image->attachment_id, 'thumbnail' );
+				$image->medium_url = wp_get_attachment_image_url( $image->attachment_id, 'medium' );
+				$image->full_url = wp_get_attachment_image_url( $image->attachment_id, 'full' );
+			}
+		}
+		
+		return $images;
+	}
+
+	/**
+	 * Add seed image to product.
+	 *
+	 * @param int  $product_id Product ID.
+	 * @param int  $attachment_id WordPress attachment ID.
+	 * @param int  $display_order Display order.
+	 * @return int|false Insert ID or false on failure.
+	 */
+	public function add_seed_image( $product_id, $attachment_id, $display_order = 0 ) {
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . 'ai_blog_generator_product_seed_images';
+		
+		// Verify it's a PNG file
+		$mime_type = get_post_mime_type( $attachment_id );
+		if ( $mime_type !== 'image/png' ) {
+			Logger::error( 'invalid_seed_image_format', 'Seed images must be PNG files', [
+				'attachment_id' => $attachment_id,
+				'mime_type' => $mime_type
+			] );
+			return false;
+		}
+		
+		// Get image URL
+		$image_url = wp_get_attachment_url( $attachment_id );
+		if ( ! $image_url ) {
+			Logger::error( 'seed_image_url_not_found', 'Could not get URL for attachment', [
+				'attachment_id' => $attachment_id
+			] );
+			return false;
+		}
+		
+		$result = $wpdb->insert(
+			$table_name,
+			[
+				'product_id' => $product_id,
+				'attachment_id' => $attachment_id,
+				'image_url' => $image_url,
+				'display_order' => $display_order,
+			],
+			[ '%d', '%d', '%s', '%d' ]
+		);
+		
+		if ( $result ) {
+			Logger::info( 'seed_image_added', 'Seed image added to product', [
+				'product_id' => $product_id,
+				'attachment_id' => $attachment_id
+			] );
+		}
+		
+		return $result ? $wpdb->insert_id : false;
+	}
+
+	/**
+	 * Remove seed image from product.
+	 *
+	 * @param int $product_id Product ID.
+	 * @param int $attachment_id Attachment ID.
+	 * @return bool Success status.
+	 */
+	public function remove_seed_image( $product_id, $attachment_id ) {
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . 'ai_blog_generator_product_seed_images';
+		
+		$result = $wpdb->delete(
+			$table_name,
+			[
+				'product_id' => $product_id,
+				'attachment_id' => $attachment_id,
+			],
+			[ '%d', '%d' ]
+		);
+		
+		if ( $result !== false ) {
+			Logger::info( 'seed_image_removed', 'Seed image removed from product', [
+				'product_id' => $product_id,
+				'attachment_id' => $attachment_id
+			] );
+		}
+		
+		return $result !== false;
+	}
+
+	/**
+	 * Update seed image order.
+	 *
+	 * @param int $product_id Product ID.
+	 * @param array $image_order Array of attachment IDs in desired order.
+	 * @return bool Success status.
+	 */
+	public function update_seed_image_order( $product_id, $image_order ) {
+		global $wpdb;
+		
+		$table_name = $wpdb->prefix . 'ai_blog_generator_product_seed_images';
+		
+		foreach ( $image_order as $order => $attachment_id ) {
+			$wpdb->update(
+				$table_name,
+				[ 'display_order' => $order ],
+				[
+					'product_id' => $product_id,
+					'attachment_id' => $attachment_id,
+				],
+				[ '%d' ],
+				[ '%d', '%d' ]
+			);
+		}
+		
+		Logger::info( 'seed_image_order_updated', 'Seed image order updated', [
+			'product_id' => $product_id,
+			'new_order' => $image_order
+		] );
+		
+		return true;
+	}
+
+	/**
+	 * Get all seed images with product information.
+	 *
+	 * @return array Array of seed images with product details.
+	 */
+	public function get_all_seed_images() {
+		global $wpdb;
+		
+		$seed_table = $wpdb->prefix . 'ai_blog_generator_product_seed_images';
+		$products_table = AI_BLOG_GENERATOR_TABLE_PRODUCTS;
+		
+		$sql = $wpdb->prepare(
+			"SELECT psi.*, p.product_name, p.product_description, att.guid as image_url
+			FROM {$seed_table} psi
+			LEFT JOIN {$products_table} p ON psi.product_id = p.id
+			LEFT JOIN {$wpdb->posts} att ON psi.attachment_id = att.ID
+			ORDER BY p.product_name ASC, psi.display_order ASC"
+		);
+		
+		$images = $wpdb->get_results( $sql );
+		
+		// Add thumbnail URLs
+		foreach ( $images as $image ) {
+			if ( $image->attachment_id ) {
+				$image->thumbnail_url = wp_get_attachment_image_url( $image->attachment_id, 'thumbnail' );
+				$image->medium_url = wp_get_attachment_image_url( $image->attachment_id, 'medium' );
+				$image->full_url = wp_get_attachment_image_url( $image->attachment_id, 'full' );
+			}
+		}
+		
+		return $images;
 	}
 } 

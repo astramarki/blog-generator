@@ -60,6 +60,11 @@ class Product_Controller {
 		add_action( 'wp_ajax_ai_blog_remove_product_link', [ $this, 'remove_product_link' ] );
 		add_action( 'wp_ajax_ai_blog_update_link_order', [ $this, 'update_link_order' ] );
 		
+		// Seed image management
+		add_action( 'wp_ajax_ai_blog_add_product_seed_image', [ $this, 'add_product_seed_image' ] );
+		add_action( 'wp_ajax_ai_blog_remove_product_seed_image', [ $this, 'remove_product_seed_image' ] );
+		add_action( 'wp_ajax_ai_blog_update_seed_image_order', [ $this, 'update_seed_image_order' ] );
+		
 		// WooCommerce import
 		add_action( 'wp_ajax_ai_blog_get_woocommerce_products', [ $this, 'get_woocommerce_products' ] );
 		add_action( 'wp_ajax_ai_blog_import_woocommerce_product', [ $this, 'import_woocommerce_product' ] );
@@ -612,6 +617,120 @@ class Product_Controller {
 		wp_send_json_success( [
 			'message' => __( 'Product imported successfully.', 'ai-blog-generator' ),
 			'product' => $product,
+		] );
+	}
+
+	/**
+	 * Add seed image to product.
+	 */
+	public function add_product_seed_image() {
+		if ( ! $this->verify_ajax_security() ) {
+			return;
+		}
+		
+		$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+		$attachment_id = isset( $_POST['attachment_id'] ) ? absint( $_POST['attachment_id'] ) : 0;
+		
+		if ( ! $product_id || ! $attachment_id ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid product or attachment ID.', 'ai-blog-generator' ) ] );
+		}
+		
+		// Verify attachment exists and is PNG
+		$mime_type = get_post_mime_type( $attachment_id );
+		if ( $mime_type !== 'image/png' ) {
+			wp_send_json_error( [ 'message' => __( 'Seed images must be PNG files.', 'ai-blog-generator' ) ] );
+		}
+		
+		// Get current seed images for display order
+		$current_images = $this->product_model->get_product_seed_images( $product_id );
+		$display_order = count( $current_images );
+		
+		// Add seed image
+		$image_id = $this->product_model->add_seed_image( $product_id, $attachment_id, $display_order );
+		
+		if ( ! $image_id ) {
+			wp_send_json_error( [ 'message' => __( 'Failed to add seed image.', 'ai-blog-generator' ) ] );
+		}
+		
+		Logger::info( 'product_seed_image_added', 'Seed image added to product', [
+			'product_id' => $product_id,
+			'attachment_id' => $attachment_id,
+		] );
+		
+		// Get updated seed images
+		$seed_images = $this->product_model->get_product_seed_images( $product_id );
+		
+		wp_send_json_success( [
+			'message' => __( 'Seed image added successfully.', 'ai-blog-generator' ),
+			'seed_images' => $seed_images,
+		] );
+	}
+
+	/**
+	 * Remove seed image from product.
+	 */
+	public function remove_product_seed_image() {
+		if ( ! $this->verify_ajax_security() ) {
+			return;
+		}
+		
+		$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+		$attachment_id = isset( $_POST['attachment_id'] ) ? absint( $_POST['attachment_id'] ) : 0;
+		
+		if ( ! $product_id || ! $attachment_id ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid product or attachment ID.', 'ai-blog-generator' ) ] );
+		}
+		
+		// Remove seed image
+		$result = $this->product_model->remove_seed_image( $product_id, $attachment_id );
+		
+		if ( ! $result ) {
+			wp_send_json_error( [ 'message' => __( 'Failed to remove seed image.', 'ai-blog-generator' ) ] );
+		}
+		
+		Logger::info( 'product_seed_image_removed', 'Seed image removed from product', [
+			'product_id' => $product_id,
+			'attachment_id' => $attachment_id,
+		] );
+		
+		// Get updated seed images
+		$seed_images = $this->product_model->get_product_seed_images( $product_id );
+		
+		wp_send_json_success( [
+			'message' => __( 'Seed image removed successfully.', 'ai-blog-generator' ),
+			'seed_images' => $seed_images,
+		] );
+	}
+
+	/**
+	 * Update seed image order.
+	 */
+	public function update_seed_image_order() {
+		if ( ! $this->verify_ajax_security() ) {
+			return;
+		}
+		
+		$product_id = isset( $_POST['product_id'] ) ? absint( $_POST['product_id'] ) : 0;
+		$image_order = isset( $_POST['image_order'] ) ? array_map( 'absint', $_POST['image_order'] ) : [];
+		
+		if ( ! $product_id || empty( $image_order ) ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid product ID or image order.', 'ai-blog-generator' ) ] );
+		}
+		
+		// Update order
+		$result = $this->product_model->update_seed_image_order( $product_id, $image_order );
+		
+		if ( ! $result ) {
+			wp_send_json_error( [ 'message' => __( 'Failed to update seed image order.', 'ai-blog-generator' ) ] );
+		}
+		
+		Logger::info( 'product_seed_image_order_updated', 'Seed image order updated', [
+			'product_id' => $product_id,
+			'new_order' => $image_order,
+		] );
+		
+		wp_send_json_success( [
+			'message' => __( 'Seed image order updated successfully.', 'ai-blog-generator' ),
 		] );
 	}
 } 

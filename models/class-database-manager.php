@@ -102,7 +102,7 @@ class Database_Manager {
 	 */
 	public function create_tables() {
 		$start_time = $this->start_timer();
-		$this->log_function_entry( [ 'tables_to_create' => 11 ] );
+		$this->log_function_entry( [ 'tables_to_create' => 12 ] );
 
 		$success = true;
 		$tables_created = [];
@@ -415,6 +415,61 @@ class Database_Manager {
 				$this->log_debug( 'table_creation_success', 'Blog idea categories table created successfully' );
 			}
 
+			// Product seed images table
+			$this->log_debug( 'table_creation', 'Creating product seed images table', [ 'table' => 'product_seed_images' ] );
+			$product_seed_images_table_sql = "CREATE TABLE " . $this->wpdb->prefix . "ai_blog_generator_product_seed_images (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				product_id bigint(20) unsigned NOT NULL,
+				attachment_id bigint(20) unsigned NOT NULL,
+				image_url varchar(500) NOT NULL,
+				display_order int DEFAULT 0,
+				created_at datetime DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY (id),
+				KEY idx_product (product_id),
+				KEY idx_order (display_order)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+			if ( ! $this->execute_query( $product_seed_images_table_sql ) ) {
+				$tables_failed[] = 'product_seed_images';
+				$this->log_error( 'table_creation_failed', 'Failed to create product seed images table', [ 
+					'table' => 'product_seed_images',
+					'error' => $this->wpdb->last_error 
+				] );
+				$success = false;
+			} else {
+				$tables_created[] = 'product_seed_images';
+				$this->log_debug( 'table_creation_success', 'Product seed images table created successfully' );
+			}
+
+			// Brand features table
+			$this->log_debug( 'table_creation', 'Creating brand features table', [ 'table' => 'brand_features' ] );
+			$brand_features_table_sql = "CREATE TABLE " . $this->wpdb->prefix . "ai_blog_brand_features (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				name varchar(255) NOT NULL,
+				description text,
+				category enum('informational_page','document','image','video') DEFAULT 'informational_page',
+				url varchar(500) NOT NULL,
+				active tinyint(1) DEFAULT 1,
+				created_at datetime DEFAULT CURRENT_TIMESTAMP,
+				updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+				PRIMARY KEY (id),
+				KEY idx_active (active),
+				KEY idx_category (category),
+				KEY idx_name (name)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+			if ( ! $this->execute_query( $brand_features_table_sql ) ) {
+				$tables_failed[] = 'brand_features';
+				$this->log_error( 'table_creation_failed', 'Failed to create brand features table', [ 
+					'table' => 'brand_features',
+					'error' => $this->wpdb->last_error 
+				] );
+				$success = false;
+			} else {
+				$tables_created[] = 'brand_features';
+				$this->log_debug( 'table_creation_success', 'Brand features table created successfully' );
+			}
+
 			// Run schema updates for any missing columns
 			$this->log_debug( 'schema_update', 'Running schema updates for missing columns' );
 			if ( ! $this->update_table_schemas() ) {
@@ -467,6 +522,8 @@ class Database_Manager {
 			AI_BLOG_GENERATOR_TABLE_PRODUCTS,
 			AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES,
 			AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS,
+			$this->wpdb->prefix . 'ai_blog_generator_product_seed_images',
+			$this->wpdb->prefix . 'ai_blog_brand_features',
 		];
 
 		$success = true;
@@ -717,7 +774,7 @@ class Database_Manager {
 
 		do {
 			$attempt++;
-			$result = $this->wpdb->insert( $table_name, $data );
+		$result = $this->wpdb->insert( $table_name, $data );
 
 			if ( false !== $result ) {
 				// Success, break out of retry loop.
@@ -742,7 +799,7 @@ class Database_Manager {
 			usleep( 100000 * $attempt );
 
 		} while ( $attempt < $max_attempts );
-
+		
 		if ( false === $result ) {
 			$this->log_error( 'database_insert_failed', 'Insert operation failed', [
 				'table'      => $table,
@@ -802,7 +859,7 @@ class Database_Manager {
 
 		do {
 			$attempt++;
-			$result = $this->wpdb->update( $table_name, $data, $where );
+		$result = $this->wpdb->update( $table_name, $data, $where );
 
 			if ( false !== $result ) {
 				break; // success
@@ -1467,6 +1524,8 @@ class Database_Manager {
 			'products'       => AI_BLOG_GENERATOR_TABLE_PRODUCTS,
 			'product_images' => AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES,
 			'product_links'  => AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS,
+			'product_seed_images' => $this->wpdb->prefix . 'ai_blog_generator_product_seed_images',
+			'ai_blog_brand_features' => $this->wpdb->prefix . 'ai_blog_brand_features',
 		];
 
 		return isset( $table_map[ $table ] ) ? $table_map[ $table ] : false;
@@ -1489,6 +1548,8 @@ class Database_Manager {
 			'products'       => AI_BLOG_GENERATOR_TABLE_PRODUCTS,
 			'product_images' => AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES,
 			'product_links'  => AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS,
+			'product_seed_images' => $this->wpdb->prefix . 'ai_blog_generator_product_seed_images',
+			'ai_blog_brand_features' => $this->wpdb->prefix . 'ai_blog_brand_features',
 		];
 	}
 
@@ -1510,6 +1571,8 @@ class Database_Manager {
 			'products' => [ 'id', 'name', 'description', 'ideal_uses', 'created_at', 'updated_at' ],
 			'product_images' => [ 'id', 'product_id', 'attachment_id', 'image_url', 'is_primary', 'display_order', 'created_at' ],
 			'product_links' => [ 'id', 'product_id', 'link_type', 'link_text', 'link_url', 'created_at' ],
+			'product_seed_images' => [ 'id', 'product_id', 'attachment_id', 'image_url', 'display_order', 'created_at' ],
+			'ai_blog_brand_features' => [ 'id', 'name', 'description', 'category', 'url', 'active', 'created_at', 'updated_at' ],
 		];
 
 		return $field_map[ $table ] ?? [];

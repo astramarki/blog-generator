@@ -5,6 +5,95 @@ All notable changes to the AI Blog Generator WordPress plugin will be documented
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Current Development]
+
+### Added
+- **Brand Features Management System**: Complete internal linking management with:
+  - New database table: `ai_blog_brand_features`
+  - Full CRUD operations for brand features (services, pages, documents, etc.)
+  - Four category types: informational_page, document, image, video
+  - Active/inactive state management for features
+  - Real-time search and category filtering
+  - Grid layout with modern card-based design
+  - Modal-based editing interface
+  - Integration ready for AI content generation
+  - Comprehensive error handling and logging
+
+### Fixed
+- **Brand Features Page Issues**: 
+  - Fixed loading message that never disappeared due to missing `self` reference in JavaScript
+  - Fixed save button not working due to incorrect nonce verification name
+  - Enhanced modal styling to match other admin modals with gradient header and proper form styling
+  - Added `ai-blog-form-control` class to all form inputs for consistent styling
+
+### UI/UX Improvements
+- **Product Modal Button Styling**: Fixed Save/Cancel buttons in product modal
+  - Added proper button styling with colors and hover effects
+  - Save button uses primary blue (#2271b1) with hover state
+  - Cancel button uses secondary gray (#f0f0f1) with hover state
+  - Added consistent padding, border radius, and transitions
+  
+- **Product Links Pill Design**: Enhanced product links display
+  - Added pill-style design with rounded borders and padding
+  - Colored type badges with specific colors for each link type
+  - Product Page links show green badge
+  - Purchase links show orange badge
+  - Documentation links show purple badge
+  - Other links show gray badge
+  - Added hover effects with shadow and transform
+  - Fixed link type labels to show proper text instead of database values
+
+### UI/UX Improvements
+- **Products Page Redesign**: Applied modern design style to products page matching personas page
+  - Enhanced product cards with gradient backgrounds and hover effects
+  - Improved search box styling with focus states
+  - Modernized product modal with better form styling and section dividers
+  - Updated image and link management UI with better visual hierarchy
+  - Added colored badges for link types (product page, purchase, documentation)
+  - Improved pagination styling with better hover states
+  - Enhanced responsive design for mobile devices
+
+- **Contexts Page Redesign**: Applied consistent modern design style to contexts page
+  - Enhanced context cards with improved shadows and hover effects
+  - Added gradient backgrounds to context type badges
+  - Improved badge styling for usage categories and always-include indicators
+  - Modernized context edit modal with better form controls
+  - Enhanced seed images section with better card design
+  - Updated seed image upload modal to match personas modal styling
+  - Improved button styling with hover effects and better spacing
+  - Added responsive design improvements for mobile devices
+
+- **Layout Consistency**: Made all admin pages full-width
+  - Removed max-width restrictions from contexts and products pages
+  - All pages now use 100% width like the personas page
+  - Consistent layout across all admin sections
+
+- **Icon-Based Actions**: Replaced text buttons with icons on contexts page
+  - Changed Edit, Deactivate/Activate, and Delete buttons to icon buttons
+  - Consistent icon style matching personas page design
+  - Applied same icon treatment to seed images section
+  - Better visual hierarchy and cleaner interface
+
+### Fixed
+- **Context Type Saving**: Fixed "Layout Guidelines" type not saving correctly
+  - Added 'layout' as a valid enum option in the database
+  - Fixed JavaScript to display type labels instead of database values
+  - Added context type labels to JavaScript localization data
+  - Context cards now show "Layout Guidelines" instead of "layout" after saving
+
+### Enhanced
+- **Context Card Hover Effect**: Added gradient line hover effect to context cards
+  - Matches the persona cards' gradient line that appears on hover
+  - Uses the same blue-purple-pink gradient for consistency
+  - Provides visual feedback when hovering over context cards
+
+- **Product Cards Redesign**: Updated product cards to match personas and contexts style
+  - Replaced text buttons with icon buttons (edit and delete)
+  - Added gradient line hover effect matching other admin cards
+  - Improved typography and spacing consistency
+  - Updated color scheme to match modern design language
+  - Better visual hierarchy with icon-based actions
+
 ## [1.7.0] - 2024-12-18
 
 ### Added
@@ -3725,3 +3814,25 @@ foreach ($contexts as $context) {
 - Fixed Product_Model table name: changed from `$table_name` to `$table` property to match base Model class, and use the correct table constant AI_BLOG_GENERATOR_TABLE_PRODUCTS
 - Fixed Product_Model database operations: overrode create(), update(), delete(), get(), get_all(), and count() methods to use direct wpdb queries since Database_Manager doesn't include products tables in its table map
 - Fixed method signature compatibility: updated get_all() and count() methods to match parent Model class signatures, added get_all_with_args() for custom query arguments
+
+## [1.7.1] - 2024-01-XX
+
+### Added
+- Product seed images management system
+  - New database table `wp_ai_blog_generator_product_seed_images` for storing product-specific seed images
+  - Seed images must be PNG files (enforced validation)
+  - Support for multiple seed images per product with drag-and-drop ordering
+  - AJAX handlers for adding, removing, and reordering seed images
+  - Integration with WordPress media library
+  - Automatic thumbnail generation for seed images
+
+### Changed
+- Updated Product_Model with seed image management methods
+- Enhanced Product_Controller with seed image AJAX handlers
+- Modified plugin activator to create seed images table on activation
+
+### Technical
+- Added `get_product_seed_images()`, `add_seed_image()`, `remove_seed_image()`, and `update_seed_image_order()` methods to Product_Model
+- Added `get_all_seed_images()` method for retrieving all seed images across products
+- Implemented PNG file validation at both model and controller levels
+- Added proper logging for all seed image operations

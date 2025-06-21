@@ -2193,3 +2193,992 @@
 2025-06-21 15:30:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
 2025-06-21 15:31:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
 2025-06-21 15:32:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:33:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:34:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:34:33 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 15:34:33 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:34:33 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 15:34:43 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:34:44 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 15:34:44 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 15:34:44 - WORDPRESS_USER_CREATED [INFO]: WordPress user created for persona - Context: {"persona_name":"Ginny","user_id":7,"username":"ginny"}
+2025-06-21 15:34:44 - PERSONA_UPDATED [INFO]: Persona updated - Context: {"persona_id":2,"name":"Ginny"}
+2025-06-21 15:34:44 - AJAX_SUCCESS_UPDATE_PERSONA [INFO]: Persona updated successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona_id"],"response_size":1}
+2025-06-21 15:34:45 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:34:45 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100314304}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 15:34:45 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 15:34:45 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 15:34:45 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 15:34:45 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 15:34:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:34:47 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:34:47 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 15:34:47 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":2}
+2025-06-21 15:34:47 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 15:35:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:36:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:37:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:37:47 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:38:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:39:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:39:46 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 15:40:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:41:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:42:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:43:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:44:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:45:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:45:46 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 15:46:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:47:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:47:47 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:48:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:49:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:49:47 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:49:47 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 15:50:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:51:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:51:47 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 15:52:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:53:42 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:53:43 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100318400}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 15:53:43 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 15:53:43 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 15:53:43 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 15:53:43 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 15:53:43 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:53:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:53:49 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:53:49 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100256536}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 15:53:49 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 15:53:49 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 15:53:49 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 15:53:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 15:53:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:53:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:53:53 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:53:54 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 15:53:54 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":1}
+2025-06-21 15:53:54 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 15:54:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:56:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:56:50 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 15:58:01 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:58:02 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:58:03 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100269728}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 15:58:03 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 15:58:03 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 15:58:03 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 15:58:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 15:58:03 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:58:16 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:58:16 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 15:58:16 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":2}
+2025-06-21 15:58:16 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 15:58:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:58:27 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 15:58:27 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":1}
+2025-06-21 15:58:27 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 15:58:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:58:47 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 15:58:47 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 15:58:47 - PERSONA_STATUS_TOGGLED [INFO]: Persona active status toggled - Context: {"persona_id":4,"new_status":false}
+2025-06-21 15:58:47 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 15:58:47 - PERSONA_STATUS_TOGGLED [INFO]: Persona status toggled - Context: {"persona_id":4,"new_status":"inactive"}
+2025-06-21 15:58:47 - AJAX_SUCCESS_TOGGLE_PERSONA [INFO]: Persona deactivated successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona_id","active","status_text"],"response_size":3}
+2025-06-21 15:58:47 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:58:47 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100270096}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 15:58:47 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 15:58:47 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 15:58:47 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 15:58:47 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 15:58:48 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:58:52 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:58:52 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 15:58:52 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 15:58:52 - PERSONA_STATUS_TOGGLED [INFO]: Persona active status toggled - Context: {"persona_id":4,"new_status":true}
+2025-06-21 15:58:52 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 15:58:52 - PERSONA_STATUS_TOGGLED [INFO]: Persona status toggled - Context: {"persona_id":4,"new_status":"active"}
+2025-06-21 15:58:52 - AJAX_SUCCESS_TOGGLE_PERSONA [INFO]: Persona activated successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona_id","active","status_text"],"response_size":3}
+2025-06-21 15:58:53 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:58:53 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100270096}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 15:58:53 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 15:58:53 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 15:58:53 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 15:58:53 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 15:58:53 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:59:15 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:59:15 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:59:16 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:59:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:00:16 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:01:23 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:01:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:01:25 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100671288}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 16:01:25 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 16:01:25 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 16:01:25 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 16:01:25 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 16:01:53 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:01:53 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 16:01:53 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:02:02 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:02:02 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 16:02:54 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:03:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:03:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:03:47 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:03:47 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:03:51 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:03:53 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:03:54 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:03:54 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:03:54 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:03:54 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:06:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:08:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:08:28 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 16:08:29 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:08:29 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 16:09:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:10:22 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:10:22 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:10:35 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:10:36 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100269936}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 16:10:36 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 16:10:36 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 16:10:36 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 16:10:36 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 16:10:49 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:10:49 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:11:49 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:12:49 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:13:05 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:13:08 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:13:09 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:13:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:13:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:13:21 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:13:21 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100269568}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 16:13:21 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 16:13:21 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 16:13:21 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 16:13:21 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 16:13:36 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:13:36 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 16:13:37 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 16:13:55 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:13:56 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":1,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 16:13:56 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 16:13:56 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":1,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"General Business Information","new_name":"General Business Information"}
+2025-06-21 16:13:56 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 16:13:56 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:14:04 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:14:04 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:14:05 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:14:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:14:10 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 16:14:15 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:14:15 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":2,"fields_to_update":["context_id","name","type","usage_flags","content","always_include_content"],"user_id":2}
+2025-06-21 16:14:15 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 16:14:15 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":2,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Products and Services","new_name":"Products and Services"}
+2025-06-21 16:14:15 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 16:14:15 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:14:17 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:14:17 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:14:18 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:14:22 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:15:07 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:15:07 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 16:15:14 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:15:14 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":1,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 16:15:14 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 16:15:14 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":1,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"General Business Information","new_name":"General Business Information"}
+2025-06-21 16:15:14 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 16:15:14 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:15:18 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:15:19 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:15:20 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 16:15:23 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:15:23 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":2,"fields_to_update":["context_id","name","type","usage_flags","content","always_include_content"],"user_id":2}
+2025-06-21 16:15:23 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 16:15:23 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":2,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Products and Services","new_name":"Products and Services"}
+2025-06-21 16:15:23 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 16:15:23 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:16:18 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:16:23 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:16:30 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:16:31 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 16:16:35 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:16:35 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 16:16:35 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 16:16:35 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Image Generation Guidelines","new_name":"Image Generation Guidelines"}
+2025-06-21 16:16:35 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 16:16:35 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:16:39 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:16:40 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 16:16:45 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:16:45 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 16:16:45 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 16:16:45 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Image Generation Guidelines","new_name":"Image Generation Guidelines"}
+2025-06-21 16:16:45 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 16:16:45 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:16:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:16:50 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:01 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:02 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 16:17:02 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:02 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Layout Guidelines","new_name":"Layout Guidelines"}
+2025-06-21 16:17:02 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:02 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:17:05 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:06 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:17:06 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:11 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:11 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:15 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:16 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 16:17:16 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:16 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Layout Guidelines","new_name":"Layout Guidelines"}
+2025-06-21 16:17:16 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:16 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:17:18 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:19 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:17:19 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:23 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:23 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:27 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 16:17:27 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:27 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Layout Guidelines","new_name":"Layout Guidelines"}
+2025-06-21 16:17:27 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:27 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:17:31 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:31 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 16:17:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:37 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:38 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:42 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:43 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 16:17:43 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:43 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Layout Guidelines","new_name":"Layout Guidelines"}
+2025-06-21 16:17:43 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:43 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:17:47 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:48 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 16:17:52 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:17:52 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 16:18:00 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:18:00 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":4,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 16:18:00 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 16:18:00 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":4,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Target Keywords","new_name":"Target Keywords"}
+2025-06-21 16:18:00 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 16:18:00 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:18:05 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:18:06 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 16:18:10 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:18:10 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":4,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 16:18:10 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 16:18:10 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":4,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Target Keywords","new_name":"Target Keywords"}
+2025-06-21 16:18:10 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 16:18:10 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 16:18:24 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:18:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:19:02 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:19:03 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 16:19:03 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 16:19:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:19:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:19:33 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 16:20:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:20:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:22:26 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:22:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:24:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:24:32 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 16:26:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 16:28:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:14 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:14 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 21:18:14 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:15 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 21:18:15 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 21:18:16 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:16 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:18:17 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:28 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 21:18:33 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:34 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":4,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 21:18:34 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 21:18:34 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":4,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Target Keywords","new_name":"Target Keywords"}
+2025-06-21 21:18:34 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 21:18:34 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 21:18:38 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:38 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 21:18:42 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:42 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 21:18:42 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 21:18:42 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Layout Guidelines","new_name":"Layout Guidelines"}
+2025-06-21 21:18:42 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 21:18:42 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 21:18:45 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:45 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:18:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:55 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:18:56 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100272160}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 21:18:56 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 21:18:56 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 21:18:56 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"layout"}
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 21:18:56 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["seo","keywords","image","layout"],"total_groups":4}
+2025-06-21 21:19:04 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:19:04 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:20:05 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:20:06 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:20:06 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 21:20:42 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:20:42 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100272160}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 21:20:42 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 21:20:42 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 21:20:42 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"layout"}
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 21:20:42 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["seo","keywords","image","layout"],"total_groups":4}
+2025-06-21 21:21:22 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:21:22 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:21:26 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:21:29 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:21:29 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:21:30 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:21:30 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:21:36 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:21:37 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:21:37 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:22:37 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:22:38 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:23:37 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:23:37 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 21:24:06 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:24:06 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:24:15 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:24:16 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:24:16 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-21 21:24:16 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:24:17 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-21 21:24:17 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-21 21:24:17 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 21:24:17 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":36}
+2025-06-21 21:24:17 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 21:24:17 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":35}
+2025-06-21 21:24:17 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":36,"generating_count":0,"generated_count":35,"approved_ids":["69","62","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":[],"generated_ids":["26","65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-21 21:24:17 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":36,"generating_count":0,"generated_count":35}
+2025-06-21 21:24:24 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:24:24 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:24:35 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:24:35 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 21:24:51 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:24:52 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":3,"fields_to_update":["context_id","name","type","usage_flags","content"],"user_id":2}
+2025-06-21 21:24:52 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 21:24:52 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":3,"updated_fields":["name","type","content","usage_flags","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"SEO Guidelines","new_name":"SEO Guidelines"}
+2025-06-21 21:24:52 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 21:24:52 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 21:24:54 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:24:54 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 21:25:00 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:25:00 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:25:01 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:25:04 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:25:08 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:25:08 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:25:08 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:25:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:25:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:25:18 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:26:08 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:28:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:29:49 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:29:50 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 21:30:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:31:30 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:31:49 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:32:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:33:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:34:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:34:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:34:51 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 21:34:51 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 21:35:12 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:35:12 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:35:12 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:35:12 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:35:14 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:36:12 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:38:13 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:38:14 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:40:14 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:40:14 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 21:41:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:42:13 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:42:14 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:42:14 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:42:15 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:42:17 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:42:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:42:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:42:28 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:42:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:42:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:42:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:42:31 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:43:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:44:14 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:44:15 - PRODUCT_UPDATED [INFO]: Product updated successfully - Context: {"product_id":1}
+2025-06-21 21:44:15 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:44:16 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:44:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:44:34 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:45:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:45:29 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 21:46:17 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:46:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:46:36 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:46:36 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:46:36 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:46:37 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:46:39 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:47:00 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:47:01 - PRODUCT_LINK_ADDED [INFO]: Link added to product - Context: {"product_id":1,"link_url":"https:\/\/GOOGLE.COM","link_type":"other"}
+2025-06-21 21:47:05 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:47:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:47:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:47:15 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:47:16 - SEED_IMAGE_ADDED [INFO]: Seed image added to product - Context: {"product_id":1,"attachment_id":153}
+2025-06-21 21:47:16 - PRODUCT_SEED_IMAGE_ADDED [INFO]: Seed image added to product - Context: {"product_id":1,"attachment_id":153}
+2025-06-21 21:47:36 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:47:42 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:48:18 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:48:36 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:50:19 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:50:20 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:50:20 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 21:50:36 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:50:37 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 21:50:47 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:50:49 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:50:50 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:50:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:50:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:50:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:50:54 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:51:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:52:20 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:52:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:53:51 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:54:21 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:55:07 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:55:21 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:55:21 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:55:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:55:27 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 21:55:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:55:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:55:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:55:31 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:55:52 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:55:52 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 21:56:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:57:53 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:58:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 21:59:54 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:00:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:01:55 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:01:56 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 22:02:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:03:33 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:03:34 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:03:35 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:03:35 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:03:35 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:04:35 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:04:36 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:04:36 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 22:05:35 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:06:35 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:07:35 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:07:36 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 22:07:36 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:07:36 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 22:08:04 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:08:05 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:08:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:08:11 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:08:11 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:08:11 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:09:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:09:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:09:56 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:10:56 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:10:57 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:11:08 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:11:09 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:11:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:11:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:11:13 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:11:13 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:11:13 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:11:45 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:11:55 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:12:01 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:12:01 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:12:02 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:12:02 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:13:02 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:13:02 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 22:15:02 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:17:02 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:17:35 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:17:37 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:17:38 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:17:38 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:17:38 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:17:38 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:17:58 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:17:59 - BRAND_FEATURE_CREATED [INFO]: Brand feature created successfully - Context: {"id":1}
+2025-06-21 22:17:59 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"ai_blog_brand_features","where_conditions":1,"sql_length":64,"raw_sql":"SELECT * FROM psec_ai_blog_brand_features WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 22:17:59 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:18:06 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:18:07 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 22:18:07 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"ai_blog_brand_features","where_conditions":1,"sql_length":64,"raw_sql":"SELECT * FROM psec_ai_blog_brand_features WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 22:18:18 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:18:18 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:18:18 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-21 22:18:19 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:18:19 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-21 22:18:19 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-21 22:18:19 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 22:18:19 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":36}
+2025-06-21 22:18:19 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 22:18:19 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":35}
+2025-06-21 22:18:19 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":36,"generating_count":0,"generated_count":35,"approved_ids":["69","62","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":[],"generated_ids":["26","65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-21 22:18:19 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":36,"generating_count":0,"generated_count":35}
+2025-06-21 22:18:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:18:27 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:18:29 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:18:29 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:19:30 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:19:30 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:19:31 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 22:20:30 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:21:30 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:22:10 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:22:10 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:22:10 - IDEA_MODEL::get_with_category - Method called
+2025-06-21 22:22:10 - IDEA_MODEL::get_with_category - DATA: {"filters":{"status":"approved"},"order_by":"created_at ASC","memory_usage":100224176}
+2025-06-21 22:22:10 - IDEA_MODEL::get_with_category - Starting method execution
+2025-06-21 22:22:10 - IDEA_MODEL::get_with_category - Tables resolved
+2025-06-21 22:22:10 - IDEA_MODEL::get_with_category - DATA: {"ideas_table":"psec_ai_blog_ideas","categories_table":"psec_terms","term_taxonomy_table":"psec_term_taxonomy","personas_table":"psec_ai_blog_personas"}
+2025-06-21 22:22:10 - IDEA_MODEL::get_with_category - SQL query built
+2025-06-21 22:22:10 - IDEA_MODEL::get_with_category - DATA: {"sql":"SELECT i.*, t.name as category_name, t.slug as category_slug, p.name as persona_name, p.tone as pers...[truncated]","where_values":["approved"]}
+2025-06-21 22:22:10 - IDEA_MODEL::get_with_category - Query executed
+2025-06-21 22:22:10 - IDEA_MODEL::get_with_category - DATA: {"results_count":36,"wpdb_last_error":""}
+2025-06-21 22:22:10 - BLOG_MODEL::count_generated_today - Method called
+2025-06-21 22:22:10 - BLOG_MODEL::count_generated_today - DATA: {"memory_usage":100293952}
+2025-06-21 22:22:10 - BLOG_MODEL::count_generated_today - Date calculated
+2025-06-21 22:22:10 - BLOG_MODEL::count_generated_today - DATA: {"today":"2025-06-21"}
+2025-06-21 22:22:10 - BLOG_MODEL::count_generated_today - Table name resolved
+2025-06-21 22:22:10 - BLOG_MODEL::count_generated_today - DATA: {"table":"psec_ai_blog_generated_posts"}
+2025-06-21 22:22:10 - BLOG_MODEL::count_generated_today - SQL query prepared
+2025-06-21 22:22:10 - BLOG_MODEL::count_generated_today - DATA: {"sql":"SELECT COUNT(*) FROM psec_ai_blog_generated_posts WHERE DATE(created_at) = '2025-06-21'","today_param":"2025-06-21"}
+2025-06-21 22:22:10 - BLOG_MODEL::count_generated_today - Query executed
+2025-06-21 22:22:10 - BLOG_MODEL::count_generated_today - DATA: {"count":0,"count_type":"integer","wpdb_last_error":""}
+2025-06-21 22:22:10 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:22:11 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:22:11 - GET_APPROVED_IDEAS_START [INFO]: Getting approved ideas for admin page (AI_Blog_Generator\Admin\Admin_Manager::ajax_get_approved_ideas) - Context: {"user_id":2}
+2025-06-21 22:22:11 - IDEA_MODEL::get_with_category - Method called
+2025-06-21 22:22:11 - IDEA_MODEL::get_with_category - DATA: {"filters":{"status":"approved"},"order_by":"created_at ASC","memory_usage":104577720}
+2025-06-21 22:22:11 - IDEA_MODEL::get_with_category - Starting method execution
+2025-06-21 22:22:11 - IDEA_MODEL::get_with_category - Tables resolved
+2025-06-21 22:22:11 - IDEA_MODEL::get_with_category - DATA: {"ideas_table":"psec_ai_blog_ideas","categories_table":"psec_terms","term_taxonomy_table":"psec_term_taxonomy","personas_table":"psec_ai_blog_personas"}
+2025-06-21 22:22:11 - IDEA_MODEL::get_with_category - SQL query built
+2025-06-21 22:22:11 - IDEA_MODEL::get_with_category - DATA: {"sql":"SELECT i.*, t.name as category_name, t.slug as category_slug, p.name as persona_name, p.tone as pers...[truncated]","where_values":["approved"]}
+2025-06-21 22:22:11 - IDEA_MODEL::get_with_category - Query executed
+2025-06-21 22:22:11 - IDEA_MODEL::get_with_category - DATA: {"results_count":36,"wpdb_last_error":""}
+2025-06-21 22:22:11 - MODEL_LOADED [INFO]: Model Loaded (AI_Blog_Generator\Admin\Admin_Manager::ajax_get_approved_ideas) - Context: {"user_id":2,"ideas_count":36}
+2025-06-21 22:22:11 - GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully (AI_Blog_Generator\Admin\Admin_Manager::ajax_get_approved_ideas) - Context: {"ideas_count":36}
+2025-06-21 22:22:11 - AJAX_SUCCESS_GET_APPROVED_IDEAS [INFO]: Approved ideas loaded successfully. (AI_Blog_Generator\Admin\Admin_Manager::send_ajax_success) - Context: {"data_keys":["ideas","generation_statuses","total_count"],"response_size":3}
+2025-06-21 22:22:22 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:22:23 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:22:23 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-21 22:22:23 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:22:24 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-21 22:22:24 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-21 22:22:24 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 22:22:24 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":36}
+2025-06-21 22:22:24 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 22:22:24 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":35}
+2025-06-21 22:22:24 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":36,"generating_count":0,"generated_count":35,"approved_ids":["69","62","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":[],"generated_ids":["26","65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-21 22:22:24 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":36,"generating_count":0,"generated_count":35}
+2025-06-21 22:22:24 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:22:25 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:22:25 - IDEA_MODEL::get_with_category - Method called
+2025-06-21 22:22:25 - IDEA_MODEL::get_with_category - DATA: {"filters":{"status":"approved"},"order_by":"created_at ASC","memory_usage":100224224}
+2025-06-21 22:22:25 - IDEA_MODEL::get_with_category - Starting method execution
+2025-06-21 22:22:25 - IDEA_MODEL::get_with_category - Tables resolved
+2025-06-21 22:22:25 - IDEA_MODEL::get_with_category - DATA: {"ideas_table":"psec_ai_blog_ideas","categories_table":"psec_terms","term_taxonomy_table":"psec_term_taxonomy","personas_table":"psec_ai_blog_personas"}
+2025-06-21 22:22:25 - IDEA_MODEL::get_with_category - SQL query built
+2025-06-21 22:22:25 - IDEA_MODEL::get_with_category - DATA: {"sql":"SELECT i.*, t.name as category_name, t.slug as category_slug, p.name as persona_name, p.tone as pers...[truncated]","where_values":["approved"]}
+2025-06-21 22:22:25 - IDEA_MODEL::get_with_category - Query executed
+2025-06-21 22:22:25 - IDEA_MODEL::get_with_category - DATA: {"results_count":36,"wpdb_last_error":""}
+2025-06-21 22:22:25 - BLOG_MODEL::count_generated_today - Method called
+2025-06-21 22:22:25 - BLOG_MODEL::count_generated_today - DATA: {"memory_usage":100294000}
+2025-06-21 22:22:25 - BLOG_MODEL::count_generated_today - Date calculated
+2025-06-21 22:22:25 - BLOG_MODEL::count_generated_today - DATA: {"today":"2025-06-21"}
+2025-06-21 22:22:25 - BLOG_MODEL::count_generated_today - Table name resolved
+2025-06-21 22:22:25 - BLOG_MODEL::count_generated_today - DATA: {"table":"psec_ai_blog_generated_posts"}
+2025-06-21 22:22:25 - BLOG_MODEL::count_generated_today - SQL query prepared
+2025-06-21 22:22:25 - BLOG_MODEL::count_generated_today - DATA: {"sql":"SELECT COUNT(*) FROM psec_ai_blog_generated_posts WHERE DATE(created_at) = '2025-06-21'","today_param":"2025-06-21"}
+2025-06-21 22:22:25 - BLOG_MODEL::count_generated_today - Query executed
+2025-06-21 22:22:25 - BLOG_MODEL::count_generated_today - DATA: {"count":0,"count_type":"integer","wpdb_last_error":""}
+2025-06-21 22:22:25 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 22:22:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 22:22:26 - GET_APPROVED_IDEAS_START [INFO]: Getting approved ideas for admin page (AI_Blog_Generator\Admin\Admin_Manager::ajax_get_approved_ideas) - Context: {"user_id":2}
+2025-06-21 22:22:26 - IDEA_MODEL::get_with_category - Method called
+2025-06-21 22:22:26 - IDEA_MODEL::get_with_category - DATA: {"filters":{"status":"approved"},"order_by":"created_at ASC","memory_usage":104577720}
+2025-06-21 22:22:26 - IDEA_MODEL::get_with_category - Starting method execution
+2025-06-21 22:22:26 - IDEA_MODEL::get_with_category - Tables resolved
+2025-06-21 22:22:26 - IDEA_MODEL::get_with_category - DATA: {"ideas_table":"psec_ai_blog_ideas","categories_table":"psec_terms","term_taxonomy_table":"psec_term_taxonomy","personas_table":"psec_ai_blog_personas"}
+2025-06-21 22:22:26 - IDEA_MODEL::get_with_category - SQL query built
+2025-06-21 22:22:26 - IDEA_MODEL::get_with_category - DATA: {"sql":"SELECT i.*, t.name as category_name, t.slug as category_slug, p.name as persona_name, p.tone as pers...[truncated]","where_values":["approved"]}
+2025-06-21 22:22:26 - IDEA_MODEL::get_with_category - Query executed
+2025-06-21 22:22:26 - IDEA_MODEL::get_with_category - DATA: {"results_count":36,"wpdb_last_error":""}
+2025-06-21 22:22:26 - MODEL_LOADED [INFO]: Model Loaded (AI_Blog_Generator\Admin\Admin_Manager::ajax_get_approved_ideas) - Context: {"user_id":2,"ideas_count":36}
+2025-06-21 22:22:26 - GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully (AI_Blog_Generator\Admin\Admin_Manager::ajax_get_approved_ideas) - Context: {"ideas_count":36}
+2025-06-21 22:22:26 - AJAX_SUCCESS_GET_APPROVED_IDEAS [INFO]: Approved ideas loaded successfully. (AI_Blog_Generator\Admin\Admin_Manager::send_ajax_success) - Context: {"data_keys":["ideas","generation_statuses","total_count"],"response_size":3}
