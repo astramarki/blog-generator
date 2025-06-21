@@ -22,6 +22,10 @@ $users = get_users( [
 
 // Get tone options
 $tone_options = $persona_model->get_tone_options();
+
+// Get contexts
+$context_model = new \AI_Blog_Generator\Models\Context_Model();
+$contexts = $context_model->get_active();
 ?>
 
 <div class="wrap">
@@ -209,6 +213,71 @@ $tone_options = $persona_model->get_tone_options();
 										<?php esc_html_e( 'Active', 'ai-blog-generator' ); ?>
 									</label>
 									<p class="description"><?php esc_html_e( 'Only active personas can be used for content generation.', 'ai-blog-generator' ); ?></p>
+								</td>
+							</tr>
+							
+							<tr>
+								<th scope="row">
+									<label><?php esc_html_e( 'Image Settings', 'ai-blog-generator' ); ?></label>
+								</th>
+								<td>
+									<fieldset>
+										<label style="display: block; margin-bottom: 10px;">
+											<input type="checkbox" id="persona-uses-seed-images" name="uses_seed_mages" value="1">
+											<?php esc_html_e( 'Use seed images for generation', 'ai-blog-generator' ); ?>
+										</label>
+										<label style="display: block; margin-bottom: 10px;">
+											<?php esc_html_e( 'Number of images:', 'ai-blog-generator' ); ?>
+											<input type="number" id="persona-number-of-images" name="number_of_images" min="0" max="10" style="width: 60px; margin-left: 10px;">
+										</label>
+										<label style="display: block; margin-bottom: 10px;">
+											<input type="checkbox" id="persona-uses-charts" name="uses_charts" value="1">
+											<?php esc_html_e( 'Include charts and graphs', 'ai-blog-generator' ); ?>
+										</label>
+									</fieldset>
+								</td>
+							</tr>
+							
+							<tr>
+								<th scope="row">
+									<label><?php esc_html_e( 'Layout Settings', 'ai-blog-generator' ); ?></label>
+								</th>
+								<td>
+									<fieldset>
+										<label style="display: block; margin-bottom: 10px;">
+											<input type="checkbox" id="persona-uses-avada-layouts" name="uses_avada_layouts" value="1">
+											<?php esc_html_e( 'Use Avada layouts', 'ai-blog-generator' ); ?>
+										</label>
+										<label style="display: block; margin-bottom: 10px;">
+											<input type="checkbox" id="persona-uses-plain-html" name="uses_plain_html" value="1">
+											<?php esc_html_e( 'Use plain HTML (no page builder)', 'ai-blog-generator' ); ?>
+										</label>
+									</fieldset>
+								</td>
+							</tr>
+							
+							<tr>
+								<th scope="row">
+									<label><?php esc_html_e( 'Include Contexts', 'ai-blog-generator' ); ?></label>
+								</th>
+								<td>
+									<fieldset>
+										<legend class="screen-reader-text"><?php esc_html_e( 'Select Contexts', 'ai-blog-generator' ); ?></legend>
+										<?php if ( ! empty( $contexts ) ) : ?>
+											<?php foreach ( $contexts as $context ) : ?>
+												<label style="display: block; margin-bottom: 8px;">
+													<input type="checkbox" name="contexts[]" value="<?php echo esc_attr( $context->id ); ?>" class="persona-context-checkbox">
+													<?php echo esc_html( $context->name ); ?>
+													<?php if ( ! empty( $context->description ) ) : ?>
+														<span style="color: #646970; font-size: 12px;">(<?php echo esc_html( $context->description ); ?>)</span>
+													<?php endif; ?>
+												</label>
+											<?php endforeach; ?>
+										<?php else : ?>
+											<p class="description"><?php esc_html_e( 'No contexts available. Create contexts first.', 'ai-blog-generator' ); ?></p>
+										<?php endif; ?>
+									</fieldset>
+									<p class="description"><?php esc_html_e( 'Select which contexts should be included when this persona generates content.', 'ai-blog-generator' ); ?></p>
 								</td>
 							</tr>
 						</table>
@@ -726,9 +795,11 @@ jQuery(document).ready(function($) {
 		$form.find('input, textarea, select').each(function() {
 			const $field = $(this);
 			const name = $field.attr('name');
-			if (name && name !== 'tones[]') {
+			if (name && name !== 'tones[]' && name !== 'contexts[]') {
 				if ($field.attr('type') === 'checkbox') {
 					formData[name] = $field.is(':checked') ? 1 : 0;
+				} else if ($field.attr('type') === 'number') {
+					formData[name] = $field.val() || null;
 				} else {
 					formData[name] = $field.val();
 				}
@@ -741,6 +812,13 @@ jQuery(document).ready(function($) {
 			selectedTones.push($(this).val());
 		});
 		formData.tone = selectedTones.join(',');
+		
+		// Collect selected contexts
+		const selectedContexts = [];
+		$('.persona-context-checkbox:checked').each(function() {
+			selectedContexts.push($(this).val());
+		});
+		formData.include_contexts = selectedContexts.join(',');
 		
 		$.post(ajaxurl, formData)
 		.done(function(response) {
@@ -831,6 +909,22 @@ jQuery(document).ready(function($) {
 					$('#persona-layout-rules').val(persona.layout_rules || '');
 					$('#persona-wordpress-user').val(persona.wordpress_user_id || '');
 					$('#persona-active').prop('checked', persona.active);
+					
+					// Set new fields
+					$('#persona-uses-seed-images').prop('checked', persona.uses_seed_mages);
+					$('#persona-number-of-images').val(persona.number_of_images || '');
+					$('#persona-uses-charts').prop('checked', persona.uses_charts);
+					$('#persona-uses-avada-layouts').prop('checked', persona.uses_avada_layouts);
+					$('#persona-uses-plain-html').prop('checked', persona.uses_plain_html);
+					
+					// Handle contexts
+					$('.persona-context-checkbox').prop('checked', false);
+					if (persona.include_contexts) {
+						const contexts = persona.include_contexts.split(',').map(c => c.trim());
+						contexts.forEach(function(contextId) {
+							$(`.persona-context-checkbox[value="${contextId}"]`).prop('checked', true);
+						});
+					}
 					// Force show the modal
 					$modal.show();
 					$modal.css({

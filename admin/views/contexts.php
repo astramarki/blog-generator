@@ -31,9 +31,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 					data-context-id="<?php echo esc_attr( $context->id ); ?>">
 					<div class="context-header">
 						<h3><?php echo esc_html( $context->name ); ?></h3>
-						<span class="context-type badge badge-<?php echo esc_attr( $context->type ); ?>">
-							<?php echo esc_html( $context_types[ $context->type ] ?? $context->type ); ?>
-						</span>
+						<div class="context-badges">
+							<span class="context-type badge badge-<?php echo esc_attr( $context->type ); ?>">
+								<?php echo esc_html( $context_types[ $context->type ] ?? $context->type ); ?>
+							</span>
+							<?php 
+							$usage_labels = [
+								'ideas' => __( 'Ideas', 'ai-blog-generator' ),
+								'content' => __( 'Content', 'ai-blog-generator' ),
+								'images' => __( 'Images', 'ai-blog-generator' ),
+							];
+							$usage = ! empty( $context->usage_flags ) ? $context->usage_flags : 'content';
+							?>
+							<span class="badge badge-usage badge-usage-<?php echo esc_attr( $usage ); ?>" title="<?php esc_attr_e( 'Usage Category', 'ai-blog-generator' ); ?>">
+								<?php echo esc_html( $usage_labels[$usage] ?? $usage ); ?>
+							</span>
+							<?php if ( ! empty( $context->always_include_content ) ) : ?>
+								<span class="badge badge-always-content" title="<?php esc_attr_e( 'Always included in content generation', 'ai-blog-generator' ); ?>">
+									<span class="dashicons dashicons-edit"></span>
+								</span>
+							<?php endif; ?>
+							<?php if ( ! empty( $context->always_include_images ) ) : ?>
+								<span class="badge badge-always-images" title="<?php esc_attr_e( 'Always included in image generation', 'ai-blog-generator' ); ?>">
+									<span class="dashicons dashicons-format-image"></span>
+								</span>
+							<?php endif; ?>
+						</div>
 					</div>
 					
 					<div class="context-content">
@@ -55,11 +78,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</button>
 					</div>
 					
-					<?php if ( $context->type === 'products' && ! empty( $context->seed_image_id ) ) : ?>
-						<div class="context-seed-image">
-							<?php echo wp_get_attachment_image( $context->seed_image_id, 'thumbnail' ); ?>
-						</div>
-					<?php endif; ?>
+
 				</div>
 			<?php endforeach; ?>
 		</div>
@@ -158,6 +177,21 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</tr>
 				<tr>
 					<th scope="row">
+						<label for="context-usage"><?php esc_html_e( 'Usage Category', 'ai-blog-generator' ); ?></label>
+					</th>
+					<td>
+						<select id="context-usage" name="usage_flags" required>
+							<option value="ideas"><?php esc_html_e( 'Idea Generation', 'ai-blog-generator' ); ?></option>
+							<option value="content"><?php esc_html_e( 'Content Generation', 'ai-blog-generator' ); ?></option>
+							<option value="images"><?php esc_html_e( 'Image Generation', 'ai-blog-generator' ); ?></option>
+						</select>
+						<p class="description">
+							<?php esc_html_e( 'Select which generation process this context will be used for. Contexts are specific to their usage category.', 'ai-blog-generator' ); ?>
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
 						<label for="context-content"><?php esc_html_e( 'Content', 'ai-blog-generator' ); ?></label>
 					</th>
 					<td>
@@ -167,21 +201,33 @@ if ( ! defined( 'ABSPATH' ) ) {
 						</p>
 					</td>
 				</tr>
-				<tr id="seed-image-row" style="display: none;">
+
+				<tr>
 					<th scope="row">
-						<label for="context-seed-image"><?php esc_html_e( 'Seed Image', 'ai-blog-generator' ); ?></label>
+						<label for="context-always-content"><?php esc_html_e( 'Always Include', 'ai-blog-generator' ); ?></label>
 					</th>
 					<td>
-						<select id="context-seed-image" name="seed_image_id">
-							<option value=""><?php esc_html_e( 'No seed image', 'ai-blog-generator' ); ?></option>
-							<?php if ( ! empty( $seed_images_data ) ) : ?>
-								<?php foreach ( $seed_images_data as $image ) : ?>
-									<option value="<?php echo esc_attr( $image->id ); ?>">
-										<?php echo esc_html( $image->product_name ); ?>
-									</option>
-								<?php endforeach; ?>
-							<?php endif; ?>
-						</select>
+						<label>
+							<input type="checkbox" id="context-always-content" name="always_include_content" value="1">
+							<?php esc_html_e( 'Always include this context in content generation', 'ai-blog-generator' ); ?>
+						</label>
+						<p class="description">
+							<?php esc_html_e( 'When checked, this context will be included in all content generation, regardless of persona selection.', 'ai-blog-generator' ); ?>
+						</p>
+					</td>
+				</tr>
+				<tr>
+					<th scope="row">
+						<label for="context-always-images"><?php esc_html_e( 'Always Include', 'ai-blog-generator' ); ?></label>
+					</th>
+					<td>
+						<label>
+							<input type="checkbox" id="context-always-images" name="always_include_images" value="1">
+							<?php esc_html_e( 'Always include this context in image generation', 'ai-blog-generator' ); ?>
+						</label>
+						<p class="description">
+							<?php esc_html_e( 'When checked, this context will be included in all image generation, regardless of persona selection.', 'ai-blog-generator' ); ?>
+						</p>
 					</td>
 				</tr>
 			</table>
@@ -327,6 +373,23 @@ if ( ! defined( 'ABSPATH' ) ) {
 .badge-keywords { background-color: #826eb4; }
 .badge-image { background-color: #ffb900; }
 .badge-layout { background-color: #e91e63; }
+.badge-always-content { background-color: #2271b1; }
+.badge-always-images { background-color: #f0b849; }
+.badge-usage { font-weight: bold; }
+.badge-usage-ideas { background-color: #9b59b6; }
+.badge-usage-content { background-color: #3498db; }
+.badge-usage-images { background-color: #e74c3c; }
+.context-badges {
+	display: flex;
+	gap: 5px;
+	align-items: center;
+}
+.badge .dashicons {
+	font-size: 14px;
+	width: 14px;
+	height: 14px;
+	line-height: 1;
+}
 .context-seed-image {
 	margin-top: 15px;
 	text-align: center;

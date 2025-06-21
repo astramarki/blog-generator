@@ -102,7 +102,7 @@ class Database_Manager {
 	 */
 	public function create_tables() {
 		$start_time = $this->start_timer();
-		$this->log_function_entry( [ 'tables_to_create' => 8 ] );
+		$this->log_function_entry( [ 'tables_to_create' => 11 ] );
 
 		$success = true;
 		$tables_created = [];
@@ -315,6 +315,85 @@ class Database_Manager {
 				$this->log_debug( 'table_creation_success', 'Personas table created successfully' );
 			}
 
+			// Products table
+			$this->log_debug( 'table_creation', 'Creating products table', [ 'table' => 'products' ] );
+			$products_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_PRODUCTS . " (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				name varchar(255) NOT NULL,
+				description text,
+				ideal_uses text,
+				created_at datetime DEFAULT CURRENT_TIMESTAMP,
+				updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+				PRIMARY KEY (id),
+				KEY idx_name (name)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+			if ( ! $this->execute_query( $products_table_sql ) ) {
+				$tables_failed[] = 'products';
+				$this->log_error( 'table_creation_failed', 'Failed to create products table', [ 
+					'table' => 'products',
+					'error' => $this->wpdb->last_error 
+				] );
+				$success = false;
+			} else {
+				$tables_created[] = 'products';
+				$this->log_debug( 'table_creation_success', 'Products table created successfully' );
+			}
+
+			// Product images table
+			$this->log_debug( 'table_creation', 'Creating product images table', [ 'table' => 'product_images' ] );
+			$product_images_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES . " (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				product_id bigint(20) unsigned NOT NULL,
+				attachment_id bigint(20) unsigned NOT NULL,
+				image_url varchar(500) NOT NULL,
+				is_primary tinyint(1) DEFAULT 0,
+				display_order int DEFAULT 0,
+				created_at datetime DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY (id),
+				KEY idx_product (product_id),
+				KEY idx_primary (is_primary),
+				KEY idx_order (display_order)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+			if ( ! $this->execute_query( $product_images_table_sql ) ) {
+				$tables_failed[] = 'product_images';
+				$this->log_error( 'table_creation_failed', 'Failed to create product images table', [ 
+					'table' => 'product_images',
+					'error' => $this->wpdb->last_error 
+				] );
+				$success = false;
+			} else {
+				$tables_created[] = 'product_images';
+				$this->log_debug( 'table_creation_success', 'Product images table created successfully' );
+			}
+
+			// Product links table
+			$this->log_debug( 'table_creation', 'Creating product links table', [ 'table' => 'product_links' ] );
+			$product_links_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS . " (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				product_id bigint(20) unsigned NOT NULL,
+				link_type enum('product_page','purchase','documentation','other') DEFAULT 'other',
+				link_text varchar(255) NOT NULL,
+				link_url varchar(500) NOT NULL,
+				created_at datetime DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY (id),
+				KEY idx_product (product_id),
+				KEY idx_type (link_type)
+			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+
+			if ( ! $this->execute_query( $product_links_table_sql ) ) {
+				$tables_failed[] = 'product_links';
+				$this->log_error( 'table_creation_failed', 'Failed to create product links table', [ 
+					'table' => 'product_links',
+					'error' => $this->wpdb->last_error 
+				] );
+				$success = false;
+			} else {
+				$tables_created[] = 'product_links';
+				$this->log_debug( 'table_creation_success', 'Product links table created successfully' );
+			}
+
 			// Blog idea categories connector table
 			$this->log_debug( 'table_creation', 'Creating blog idea categories table', [ 'table' => 'blog_idea_categories' ] );
 			$idea_categories_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_IDEA_CATEGORIES . " (
@@ -385,6 +464,9 @@ class Database_Manager {
 			AI_BLOG_GENERATOR_TABLE_COSTS,
 			AI_BLOG_GENERATOR_TABLE_SEED_IMAGES,
 			AI_BLOG_GENERATOR_TABLE_IDEA_CATEGORIES,
+			AI_BLOG_GENERATOR_TABLE_PRODUCTS,
+			AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES,
+			AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS,
 		];
 
 		$success = true;
@@ -536,6 +618,40 @@ class Database_Manager {
 				Logger::error( 'schema_update', 'Failed to remove keywords column from ideas table', [ 'error' => $this->wpdb->last_error ] );
 			} else {
 				Logger::info( 'schema_update', 'Removed keywords column from ideas table - keywords will be generated during blog creation instead' );
+			}
+		}
+
+		// Check if always_include_content column exists in contexts table
+		$always_content_exists = $this->wpdb->get_results( $this->wpdb->prepare(
+			"SHOW COLUMNS FROM $table_name LIKE %s",
+			'always_include_content'
+		) );
+
+		if ( empty( $always_content_exists ) ) {
+			// Add always_include_content column to contexts table
+			$sql = "ALTER TABLE $table_name ADD COLUMN always_include_content TINYINT(1) DEFAULT 0 AFTER usage_flags";
+			if ( ! $this->execute_query( $sql ) ) {
+				$success = false;
+				Logger::error( 'schema_update', 'Failed to add always_include_content column to contexts table', [ 'error' => $this->wpdb->last_error ] );
+			} else {
+				Logger::info( 'schema_update', 'Added always_include_content column to contexts table' );
+			}
+		}
+
+		// Check if always_include_images column exists in contexts table
+		$always_images_exists = $this->wpdb->get_results( $this->wpdb->prepare(
+			"SHOW COLUMNS FROM $table_name LIKE %s",
+			'always_include_images'
+		) );
+
+		if ( empty( $always_images_exists ) ) {
+			// Add always_include_images column to contexts table
+			$sql = "ALTER TABLE $table_name ADD COLUMN always_include_images TINYINT(1) DEFAULT 0 AFTER always_include_content";
+			if ( ! $this->execute_query( $sql ) ) {
+				$success = false;
+				Logger::error( 'schema_update', 'Failed to add always_include_images column to contexts table', [ 'error' => $this->wpdb->last_error ] );
+			} else {
+				Logger::info( 'schema_update', 'Added always_include_images column to contexts table' );
 			}
 		}
 
@@ -826,7 +942,7 @@ class Database_Manager {
 			'fields' => $fields
 		] );
 
-		$result = $this->wpdb->get_row( $sql, ARRAY_A );
+		$result = $this->wpdb->get_row( $sql );
 		
 		if ( $this->wpdb->last_error ) {
 			$this->log_error( 'database_get_failed', 'Get query failed', [
@@ -845,7 +961,7 @@ class Database_Manager {
 			'record_found' => $found_record,
 			'raw_sql' => $sql,
 			'result_type' => gettype( $result ),
-			'result_data' => $found_record ? 'ARRAY[' . implode(', ', array_keys($result)) . ']' : 'NULL'
+			'result_data' => $found_record ? 'OBJECT[' . implode(', ', array_keys((array)$result)) . ']' : 'NULL'
 		] );
 
 		$this->end_timer( $start_time, 'database_get', [ 'table' => $table, 'found' => $found_record ] );
@@ -1348,6 +1464,9 @@ class Database_Manager {
 			'logs'           => AI_BLOG_GENERATOR_TABLE_LOGS,
 			'cost_analytics' => AI_BLOG_GENERATOR_TABLE_COSTS,
 			'seed_images'    => AI_BLOG_GENERATOR_TABLE_SEED_IMAGES,
+			'products'       => AI_BLOG_GENERATOR_TABLE_PRODUCTS,
+			'product_images' => AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES,
+			'product_links'  => AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS,
 		];
 
 		return isset( $table_map[ $table ] ) ? $table_map[ $table ] : false;
@@ -1367,6 +1486,9 @@ class Database_Manager {
 			'logs'           => AI_BLOG_GENERATOR_TABLE_LOGS,
 			'cost_analytics' => AI_BLOG_GENERATOR_TABLE_COSTS,
 			'seed_images'    => AI_BLOG_GENERATOR_TABLE_SEED_IMAGES,
+			'products'       => AI_BLOG_GENERATOR_TABLE_PRODUCTS,
+			'product_images' => AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES,
+			'product_links'  => AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS,
 		];
 	}
 
@@ -1385,6 +1507,9 @@ class Database_Manager {
 			'logs' => [ 'id', 'action', 'message', 'level', 'context', 'created_at' ],
 			'cost_analytics' => [ 'id', 'service', 'action', 'cost', 'tokens_used', 'created_at' ],
 			'seed_images' => [ 'id', 'product_name', 'image_url', 'context_id', 'created_at' ],
+			'products' => [ 'id', 'name', 'description', 'ideal_uses', 'created_at', 'updated_at' ],
+			'product_images' => [ 'id', 'product_id', 'attachment_id', 'image_url', 'is_primary', 'display_order', 'created_at' ],
+			'product_links' => [ 'id', 'product_id', 'link_type', 'link_text', 'link_url', 'created_at' ],
 		];
 
 		return $field_map[ $table ] ?? [];

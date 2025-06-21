@@ -69,6 +69,9 @@ define( 'AI_BLOG_GENERATOR_TABLE_LOGS', $wpdb->prefix . 'ai_blog_logs' );
 define( 'AI_BLOG_GENERATOR_TABLE_COSTS', $wpdb->prefix . 'ai_blog_cost_analytics' );
 define( 'AI_BLOG_GENERATOR_TABLE_SEED_IMAGES', $wpdb->prefix . 'ai_blog_seed_images' );
 define( 'AI_BLOG_GENERATOR_TABLE_IDEA_CATEGORIES', $wpdb->prefix . 'ai_blog_idea_categories' );
+define( 'AI_BLOG_GENERATOR_TABLE_PRODUCTS', $wpdb->prefix . 'ai_blog_generator_products' );
+define( 'AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES', $wpdb->prefix . 'ai_blog_generator_product_images' );
+define( 'AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS', $wpdb->prefix . 'ai_blog_generator_product_links' );
 
 /**
  * Autoloader for plugin classes.
@@ -338,6 +341,10 @@ class AI_Blog_Generator {
 		// Persona controller.
 		$persona_controller = new AI_Blog_Generator\Controllers\Persona_Controller();
 		$persona_controller->register_ajax_handlers();
+		
+		// Product controller.
+		$product_controller = new AI_Blog_Generator\Controllers\Product_Controller();
+		$product_controller->register_ajax_handlers();
 		
 		// Image controller.
 		$image_controller = new AI_Blog_Generator\Controllers\Image_Controller();

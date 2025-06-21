@@ -618,6 +618,7 @@ class Content_Generator {
 					$contexts = $this->compile_contexts_enhanced( 'content', [
 						'max_contexts_per_type' => 5,
 						'priority_threshold' => 0,
+						'persona_id' => ! empty( $idea['persona_id'] ) ? $idea['persona_id'] : null,
 					] );
 					$this->log_info( 'compiling_contexts_success', 'Context compilation successful', [ 
 						'idea_id' => $idea_id,
@@ -1047,7 +1048,9 @@ class Content_Generator {
 							if ( $this->generation_logger ) {
 								$this->generation_logger->debug( 'Compiling image contexts' );
 							}
-							$image_contexts = $this->compile_contexts_for_images();
+							$image_contexts = $this->compile_contexts_for_images([
+								'persona_id' => ! empty( $idea['persona_id'] ) ? $idea['persona_id'] : null,
+							]);
 							
 							// Check timeout again
 							if ( ( time() - $image_timeout_start ) > $image_timeout_limit ) {
@@ -1679,6 +1682,7 @@ class Content_Generator {
 				'priority_threshold' => 0,
 				'type_filters' => [],
 				'include_metadata' => false,
+				'persona_id' => null,
 			];
 
 			$options = array_merge( $defaults, $options );
@@ -1688,27 +1692,124 @@ class Content_Generator {
 				'merged_options' => $options
 			] );
 			
-			// Get contexts optimized for the specific usage
-			$this->log_info( 'calling_context_model', 'Calling context model get_for_prompt', [
-				'usage' => $usage,
-				'context_model_class' => get_class( $this->context_model )
-			] );
+			// Check if we have a persona_id to get persona-specific contexts
+			$persona_id = $options['persona_id'];
 			
-			try {
-				$contexts = $this->context_model->get_for_prompt( $usage, $options );
-				$this->log_info( 'context_model_success', 'Context model returned successfully', [
+			if ( $persona_id ) {
+				// Get contexts for specific persona (includes always-include contexts)
+				$this->log_info( 'calling_context_model_persona', 'Getting contexts for persona', [
 					'usage' => $usage,
-					'contexts_returned' => is_array( $contexts ) ? count( $contexts ) : 'not_array',
-					'contexts_keys' => is_array( $contexts ) ? array_keys( $contexts ) : 'not_array'
+					'persona_id' => $persona_id,
+					'context_model_class' => get_class( $this->context_model )
 				] );
-			} catch ( \Exception $e ) {
-				$this->log_error( 'context_model_failed', 'Context model get_for_prompt failed', [
+				
+				try {
+					$contexts_array = $this->context_model->get_contexts_for_persona( $persona_id, $usage );
+					
+					// Convert array format to grouped format expected by the rest of the method
+					$contexts = [];
+					foreach ( $contexts_array as $context ) {
+						$type = $context['type'];
+						if ( ! isset( $contexts[ $type ] ) ) {
+							$contexts[ $type ] = [
+								'contexts' => [],
+								'content' => ''
+							];
+						}
+						$contexts[ $type ]['contexts'][] = $context;
+						// Append content with separator if multiple contexts of same type
+						if ( ! empty( $contexts[ $type ]['content'] ) ) {
+							$contexts[ $type ]['content'] .= "\n\n";
+						}
+						$contexts[ $type ]['content'] .= $context['content'];
+					}
+					
+					// Add metadata
+					foreach ( $contexts as $type => &$data ) {
+						$data['context_count'] = count( $data['contexts'] );
+					}
+					
+					$this->log_info( 'context_model_persona_success', 'Persona contexts retrieved successfully', [
+						'usage' => $usage,
+						'persona_id' => $persona_id,
+						'contexts_returned' => count( $contexts_array ),
+						'contexts_types' => array_keys( $contexts )
+					] );
+					
+				} catch ( \Exception $e ) {
+					$this->log_error( 'context_model_persona_failed', 'Context model get_contexts_for_persona failed', [
+						'usage' => $usage,
+						'persona_id' => $persona_id,
+						'error' => $e->getMessage(),
+						'trace' => $e->getTraceAsString()
+					] );
+					throw new \Exception( 'Context model failed: ' . $e->getMessage() );
+				}
+			} else {
+				// Get contexts based on always-include flags only
+				$this->log_info( 'calling_context_model_always', 'Getting always-include contexts', [
 					'usage' => $usage,
-					'error' => $e->getMessage(),
-					'trace' => $e->getTraceAsString()
+					'context_model_class' => get_class( $this->context_model )
 				] );
-				throw new \Exception( 'Context model failed: ' . $e->getMessage() );
+				
+				try {
+					// Get contexts that should always be included
+					if ( $usage === 'content' ) {
+						$contexts_array = $this->context_model->get_always_include_content();
+					} else if ( $usage === 'images' ) {
+						$contexts_array = $this->context_model->get_always_include_images();
+					} else {
+						// Fallback to original method for other usages
+						$contexts = $this->context_model->get_for_prompt( $usage, $options );
+					}
+					
+					// Convert array format to grouped format if we got an array
+					if ( isset( $contexts_array ) ) {
+						$contexts = [];
+						foreach ( $contexts_array as $context ) {
+							$type = $context['type'];
+							if ( ! isset( $contexts[ $type ] ) ) {
+								$contexts[ $type ] = [
+									'contexts' => [],
+									'content' => ''
+								];
+							}
+							$contexts[ $type ]['contexts'][] = $context;
+							// Append content with separator if multiple contexts of same type
+							if ( ! empty( $contexts[ $type ]['content'] ) ) {
+								$contexts[ $type ]['content'] .= "\n\n";
+							}
+							$contexts[ $type ]['content'] .= $context['content'];
+						}
+						
+						// Add metadata
+						foreach ( $contexts as $type => &$data ) {
+							$data['context_count'] = count( $data['contexts'] );
+						}
+					}
+					
+					$this->log_info( 'context_model_always_success', 'Always-include contexts retrieved successfully', [
+						'usage' => $usage,
+						'contexts_returned' => isset( $contexts_array ) ? count( $contexts_array ) : 'using_original',
+						'contexts_types' => array_keys( $contexts )
+					] );
+					
+				} catch ( \Exception $e ) {
+					$this->log_error( 'context_model_always_failed', 'Context model get_always_include failed', [
+						'usage' => $usage,
+						'error' => $e->getMessage(),
+						'trace' => $e->getTraceAsString()
+					] );
+					throw new \Exception( 'Context model failed: ' . $e->getMessage() );
+				}
 			}
+			
+			$this->log_info( 'contexts_compiled_enhanced', 'Enhanced contexts compilation completed', [
+				'usage' => $usage,
+				'types_included' => array_keys( $contexts ),
+				'total_context_types' => count( $contexts ),
+				'options' => $options,
+			] );
 			
 			// Convert to simple string format for backward compatibility with prompts
 			$this->log_info( 'converting_contexts', 'Converting contexts to simple format', [
@@ -1747,13 +1848,6 @@ class Content_Generator {
 				] );
 				throw new \Exception( 'Context conversion failed: ' . $e->getMessage() );
 			}
-			
-			$this->log_info( 'contexts_compiled_enhanced', 'Enhanced contexts compilation completed', [
-				'usage' => $usage,
-				'types_included' => array_keys( $simple_contexts ),
-				'total_context_types' => count( $simple_contexts ),
-				'options' => $options,
-			] );
 			
 			return $simple_contexts;
 			

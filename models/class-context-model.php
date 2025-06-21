@@ -43,7 +43,9 @@ class Context_Model extends Model {
 		'content',
 		'priority',
 		'usage_flags',
-		'seed_image_id',
+		'always_include_content',
+		'always_include_images',
+
 		'active',
 	];
 
@@ -788,12 +790,16 @@ class Context_Model extends Model {
 				return absint( $value );
 			
 			case 'usage_flags':
-				return sanitize_text_field( $value );
+				// Ensure single usage category
+				$valid_usage = ['ideas', 'content', 'images'];
+				$value = sanitize_text_field( $value );
+				return in_array( $value, $valid_usage, true ) ? $value : 'content';
 			
-			case 'seed_image_id':
-				return absint( $value );
+
 			
 			case 'active':
+			case 'always_include_content':
+			case 'always_include_images':
 				return (int) (bool) $value;
 			
 			default:
@@ -810,8 +816,14 @@ class Context_Model extends Model {
 	public function format( $record ) {
 		$formatted = parent::format( $record );
 		
-		if ( $formatted && isset( $formatted['active'] ) ) {
-			$formatted['active'] = (bool) $formatted['active'];
+		if ( $formatted ) {
+			// Format boolean fields
+			$boolean_fields = ['active', 'always_include_content', 'always_include_images'];
+			foreach ( $boolean_fields as $field ) {
+				if ( isset( $formatted[ $field ] ) ) {
+					$formatted[ $field ] = (bool) $formatted[ $field ];
+				}
+			}
 		}
 
 		return $formatted;
@@ -834,6 +846,96 @@ class Context_Model extends Model {
 				$results[] = (object) $context;
 			}
 		}
+		
+		return $results;
+	}
+
+	/**
+	 * Get contexts that should always be included for content generation.
+	 *
+	 * @return array
+	 */
+	public function get_always_include_content() {
+		global $wpdb;
+		
+		$sql = "SELECT * FROM " . AI_BLOG_GENERATOR_TABLE_CONTEXTS . " 
+				WHERE active = 1 AND always_include_content = 1 
+				ORDER BY type ASC, priority DESC, name ASC";
+		
+		$results = $wpdb->get_results( $sql, ARRAY_A );
+		
+		Logger::info( 'always_include_content_retrieved', 'Retrieved always-include content contexts', [
+			'count' => count( $results ),
+		] );
+		
+		return $results;
+	}
+
+	/**
+	 * Get contexts that should always be included for image generation.
+	 *
+	 * @return array
+	 */
+	public function get_always_include_images() {
+		global $wpdb;
+		
+		$sql = "SELECT * FROM " . AI_BLOG_GENERATOR_TABLE_CONTEXTS . " 
+				WHERE active = 1 AND always_include_images = 1 
+				ORDER BY type ASC, priority DESC, name ASC";
+		
+		$results = $wpdb->get_results( $sql, ARRAY_A );
+		
+		Logger::info( 'always_include_images_retrieved', 'Retrieved always-include image contexts', [
+			'count' => count( $results ),
+		] );
+		
+		return $results;
+	}
+
+	/**
+	 * Get contexts for a specific persona including always-include contexts.
+	 *
+	 * @param int    $persona_id Persona ID.
+	 * @param string $usage      Usage type ('content' or 'images').
+	 * @return array
+	 */
+	public function get_contexts_for_persona( $persona_id, $usage = 'content' ) {
+		global $wpdb;
+		
+		// Get persona-specific contexts
+		$persona_model = new \AI_Blog_Generator\Models\Persona_Model();
+		$persona = $persona_model->find( $persona_id );
+		
+		$context_ids = [];
+		if ( $persona && ! empty( $persona->include_contexts ) ) {
+			$context_ids = array_map( 'intval', explode( ',', $persona->include_contexts ) );
+		}
+		
+		// Build query to get all relevant contexts
+		$sql = "SELECT * FROM " . AI_BLOG_GENERATOR_TABLE_CONTEXTS . " WHERE active = 1 AND (";
+		
+		// Always include contexts based on usage
+		if ( $usage === 'content' ) {
+			$sql .= "always_include_content = 1";
+		} else {
+			$sql .= "always_include_images = 1";
+		}
+		
+		// Add persona-specific contexts
+		if ( ! empty( $context_ids ) ) {
+			$sql .= " OR id IN (" . implode( ',', $context_ids ) . ")";
+		}
+		
+		$sql .= ") ORDER BY type ASC, priority DESC, name ASC";
+		
+		$results = $wpdb->get_results( $sql, ARRAY_A );
+		
+		Logger::info( 'persona_contexts_retrieved', 'Retrieved contexts for persona', [
+			'persona_id' => $persona_id,
+			'usage' => $usage,
+			'count' => count( $results ),
+			'persona_specific_ids' => $context_ids,
+		] );
 		
 		return $results;
 	}

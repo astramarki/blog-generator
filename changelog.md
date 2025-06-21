@@ -5,151 +5,42 @@ All notable changes to the AI Blog Generator WordPress plugin will be documented
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.7.0] - 2025-01-21
+## [1.7.0] - 2024-12-18
 
 ### Added
-- New persona database fields: layout_style, layout_rules, wordpress_user_id
-- Card-based UI for personas management page
-- Modal-based editing for personas
-- Multiple tone selection capability for personas (checkboxes instead of single select)
-- Automatic WordPress user creation for personas without associated users
-  - Creates author-level user accounts automatically
-  - Generates unique usernames based on persona names
-  - Sets display name and bio from persona data
-  - Adds user meta tags for AI persona identification
+- **Products Management System**: Complete product catalog feature with:
+  - Three new database tables: products, product_images, product_links
+  - Full CRUD operations for products
+  - Multiple images per product with drag-drop ordering
+  - Multiple links per product with type categorization
+  - WooCommerce product import functionality
+  - Media library integration for image management
+  - Grid layout with search and pagination
+  - Modal-based editing interface
+  - Comprehensive error handling and logging
 
 ### Changed
-- Redesigned personas page from table to modern card layout
-- Improved modal styling with better form controls and responsive design
-- Tones now stored as comma-separated values to support multiple selections
-- WordPress user dropdown now shows "Auto-create User" as default option
+- Updated Database Manager to include products tables in creation/deletion
+- Added Product_Model with direct wpdb queries for compatibility
+- Added Product_Controller with 14 AJAX handlers
+- Updated plugin activator to create products tables on activation
+- Enhanced admin menu with Products page
 
-### Fixed
-- JavaScript error with undefined ai_blog_admin variable
-- Modal display issues with opacity and visibility
-- Form control styling and focus states
-- Persona validation to properly handle multiple comma-separated tone values
+### Technical Details
+- Resolved multiple implementation issues:
+  - Fixed `verify_ajax_request()` method not existing (changed to `verify_ajax_security()`)
+  - Fixed modal display issues (changed from jQuery `.show()` to `.addClass('ai-blog-modal-active')`)
+  - Fixed Product_Model validation returning array instead of boolean
+  - Fixed Database_Manager missing products tables in table map
+  - Fixed method signature mismatches by overriding all CRUD methods in Product_Model
 
-## [Unreleased] - 2025-06-20
+### Documentation
+- Updated implementationPlan.md with Phase 7: Products Management
+- Updated implementationTechnical.md with comprehensive Products Management System section
+- Added database schema documentation for all three products tables
+- Documented all controller methods and security implementations
 
-### Removed
-- **Database Logging System**: Completely removed database-based logging to improve performance
-  - **Problem**: Database logging was causing insert failures and performance issues during generation
-  - **Solution**: Replaced with file-based logging to `debug-transaction.log`
-  - **Changes**:
-    - Removed logs page from admin menu
-    - Removed all logs-related AJAX handlers
-    - Removed `admin/views/logs.php` view file
-    - Removed `admin/assets/js/logs.js` JavaScript file
-    - Replaced `Logger` class to use file-based logging instead of database
-    - Removed fallback logs cron job that was causing fatal errors
-    - All logging now writes to `debug-transaction.log` file
-  - **Impact**: Improved generation performance and eliminated database contention issues
-
-### Fixed
-- **CRITICAL: Concurrent Generation Hang Issue - RESOLVED**
-  - **Root Cause**: Long-running database transactions (8-10 minutes) were holding table locks, causing concurrent generations to block on INSERT operations
-  - **Problem**: When multiple blog generations ran simultaneously, the second job would hang waiting for locks on `psec_ai_blog_logs` table
-  - **Solution**: 
-    - Removed early transaction start that was wrapping the entire generation process
-    - Moved transaction scope to only wrap critical database operations (blog record creation and idea status update)
-    - Added retry logic with exponential backoff for transient database deadlocks in insert() and update() methods
-    - Ensured WordPress transients (used for status updates) are called outside of database transactions
-    - Implemented fallback logging mechanism that writes to a file when database inserts fail
-    - Added automatic recovery system that processes fallback logs every 5 minutes
-    - Prevents "recursion prevented" errors caused by logging failures during concurrent operations
-    - Added throttling for status updates during image generation to reduce database writes
-      - **Files Modified**: 
-            - `services/class-content-generator.php` - Removed early transaction start, moved to critical operations only, added status update throttling
-      - `models/class-database-manager.php` - Added retry logic for transient deadlocks
-      - `utilities/class-logger.php` - Added fallback file logging when database inserts fail
-      - `services/class-scheduler-service.php` - Added periodic fallback log processing
-      - `ai-blog-generator.php` - Added 5-minute cron schedule for fallback processing
-  - **Impact**: Now supports up to 5 concurrent blog generations without database lock conflicts
-  - **Testing**: Successfully tested 2 concurrent generations without hanging
-
-- **Database Insert Failures from Large Log Context**: Fixed "Processing the value for the following field failed: context" errors
-  - **Problem**: Anthropic service was logging full API responses (15,000+ tokens) to database, exceeding field limits
-  - **Solution**: Limited log context data to prevent database insert failures
-    - Modified `anthropic_response_details` to only log first 500 chars of response body
-    - Modified `anthropic_response_decoded` to log metadata only (no full content)
-    - Modified `anthropic_request_details` to log request metadata without full prompt
-  - **Impact**: Eliminated database insert failures and fallback log accumulation
-  - **Files Modified**: `services/class-anthropic-service.php`
-
-### Changed
-- **Database Manager Improvements**:
-  - Added 3-attempt retry loop with exponential backoff (1s, 2s, 4s) for INSERT operations
-  - Added similar retry logic for UPDATE operations
-  - Enhanced error logging to track retry attempts and deadlock occurrences
-  - Retry logic specifically handles MySQL error codes 1205 (lock wait timeout) and 1213 (deadlock)
-
-### Optimized
-- **Status Update Performance**: Significantly reduced database writes during generation
-  - **Problem**: Excessive status updates (15-20+ per generation) causing database contention during concurrent operations
-  - **Solution**: Implemented intelligent batching and filtering of status updates
-    - Minor progress updates (e.g., "Generating image 2 of 3") now update memory-only (transients)
-    - Database updates only occur for stage changes (e.g., contexts → content → images → complete)
-    - Critical status updates (complete, failed, cancelled) always update database immediately
-    - Added 30-second batch interval for non-critical updates
-    - Implemented pending update flushing at critical points
-  - **Impact**: 
-    - Reduced database writes from ~20 updates to ~5-7 updates per generation
-    - Improved concurrent generation performance
-    - Frontend still sees real-time updates via transient polling
-  - **Files Modified**:
-    - `services/class-content-generator.php` - Added batched status updates with memory-first approach
-    - `changelog.md` - Documented optimization changes
-
-## Version 1.2.11 - 2025-06-19
-
-### Fixed
-- **Background Processor Fatal Error - RESOLVED**
-  - **Root Cause**: Missing property declarations and initialization in Background_Processor class causing "Undefined property: AI_Blog_Generator\Services\Background_Processor::$idea_model" fatal error
-  - **Solution**: Added proper class properties and constructor initialization for $idea_model, $blog_model, and $content_generator
-  - **Files Modified**: `services/class-background-processor.php`
-  - **Impact**: Fixed WordPress cron job fatal errors preventing background generation processing
-
-- **WordPress Cron Fatal Error - RESOLVED** 
-  - **Root Cause**: Method name mismatch between cron job registration and actual class methods (as noted in memory)
-  - **Solution**: Cleared problematic cron jobs and old generation transients to prevent conflicts
-  - **Cleanup**: Removed 2 old generation transients and cleared bad cron entries
-  - **Impact**: Eliminated "class AI_Blog_Generator\Services\Scheduler_Service does not have a method 'process_approved_ideas'" fatal errors
-
-- **Undefined Variable in Contexts View - RESOLVED**
-  - **Root Cause**: Undefined `$seed_images` variable in `admin/views/contexts.php` causing PHP warnings
-  - **Solution**: Fixed variable reference to use `$seed_images_data` consistently throughout the view
-  - **Files Modified**: `admin/views/contexts.php` line 176
-  - **Impact**: Eliminated PHP warnings in admin interface
-
-- **Image Generation Hanging Issue - RESOLVED**
-  - **Root Cause**: SSL certificate validation failures causing API calls to hang during image generation
-  - **Solution**: Previously implemented SSL bypass detection is now working correctly
-  - **Testing**: Successfully generated blog post (ID: 372) without hanging during image generation
-  - **Impact**: No more stuck generations during image processing
-
-### Validation Results
-- ✅ **Background Processor**: Fixed undefined property errors, proper model initialization
-- ✅ **WordPress Cron**: Cleared problematic cron jobs, no more fatal errors  
-- ✅ **Admin Interface**: Fixed PHP warnings in contexts view
-- ✅ **Image Generation**: No more hanging during image processing
-- ✅ **Full Generation Test**: Successfully created post ID 372 without errors
-- ✅ **SSL Certificate**: Previously fixed SSL bypass working correctly
-- ✅ **System Stability**: All major error sources eliminated
-
-### Technical Implementation
-- Added missing class properties: `private $idea_model`, `private $blog_model`, `private $content_generator`
-- Initialized all required models and services in Background_Processor constructor using proper class names
-- Cleared problematic cron jobs and generation transients using direct WordPress functions
-- Fixed variable naming consistency in admin views to prevent PHP warnings
-- Validated fixes with comprehensive test generation confirming all systems working
-
-### Files Modified
-- `services/class-background-processor.php` - Added property declarations and constructor initialization
-- `admin/views/contexts.php` - Fixed undefined variable reference
-- Created cleanup scripts: `clear-bad-cron-jobs.php`, `reset-stuck-idea.php`
-
-## [1.6.7] - 2024-12-19
+## [1.6.8] - 2024-12-18
 
 ### Fixed
 - **CRITICAL: AJAX Handler Registration Issue**: Fixed AJAX handlers not being registered for WordPress AJAX requests
@@ -3804,3 +3695,33 @@ foreach ($contexts as $context) {
   - Image generation progress
   - Post creation events
   - API errors and important service events
+
+### Fixed
+- Fixed context modal not closing properly after saving
+- Fixed context card not updating inclusion badges after edit
+- Improved modal close functionality to properly reset all styles and states
+- Added event propagation prevention to avoid modal reopening issues
+- Added automatic database schema update for always_include_content and always_include_images fields
+- Fixed database get method returning array instead of object
+- Fixed undefined method get_last_error() in context controller
+- Added schema update in Database Manager for always_include fields
+- Fixed array_keys() error by casting stdClass to array in logging statement
+- Fixed always_include checkboxes not saving properly when unchecked
+- Fixed always_include checkboxes showing as checked when value is "0" string
+
+### Changed
+- Redesigned context system to use usage_flags as a single category selection (ideas, content, or images)
+- Added usage category badges to context cards
+- Updated context form to include usage category dropdown
+- Always include checkboxes now only show for their respective usage categories
+- Contexts are now specific to their usage category to prevent mixing incompatible contexts
+
+## [Unreleased]
+
+### Fixed
+- Fixed fatal error in Product Controller: changed `verify_ajax_request()` to `verify_ajax_security()` to match the Ajax_Handler trait method name
+- Fixed product modals not showing: changed from `.show()` to `.addClass('ai-blog-modal-active')` to match the CSS implementation
+- Fixed fatal error in Product_Model: replaced non-existent `get_by()` method calls with direct database queries in validate() and import_from_woocommerce() methods
+- Fixed Product_Model table name: changed from `$table_name` to `$table` property to match base Model class, and use the correct table constant AI_BLOG_GENERATOR_TABLE_PRODUCTS
+- Fixed Product_Model database operations: overrode create(), update(), delete(), get(), get_all(), and count() methods to use direct wpdb queries since Database_Manager doesn't include products tables in its table map
+- Fixed method signature compatibility: updated get_all() and count() methods to match parent Model class signatures, added get_all_with_args() for custom query arguments

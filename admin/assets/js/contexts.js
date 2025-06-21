@@ -71,30 +71,39 @@
                 self.deleteContext(contextId);
             });
 
-            // Context form submission
+            // Handle form submission
             $(document).on('submit', '#context-form', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 console.log('Context form submitted');
                 self.saveContext();
             });
 
-            // Modal close handlers
+            // Handle modal close
             $(document).on('click', '.ai-blog-modal-close, .cancel-edit', function(e) {
                 e.preventDefault();
+                e.stopPropagation();
                 console.log('Modal close button clicked');
                 self.closeModal();
             });
 
-            // Context type change handler (for seed image field visibility)
+            // Handle context type change
             $(document).on('change', '#context-type', function() {
-                var type = $(this).val();
-                console.log('Context type changed to:', type);
-                self.toggleSeedImageField(type);
+                console.log('Context type changed to:', $(this).val());
             });
 
-            // Close modal when clicking outside
-            $(document).on('click', '.ai-blog-modal', function(e) {
-                if (e.target === this) {
+            // Handle usage category change
+            $(document).on('change', '#context-usage', function() {
+                var usage = $(this).val();
+                console.log('Context usage changed to:', usage);
+                self.toggleInclusionOptions(usage);
+            });
+
+            // Handle modal backdrop click
+            $(document).on('click', '#context-modal', function(e) {
+                if ($(e.target).is('#context-modal')) {
+                    e.preventDefault();
+                    e.stopPropagation();
                     console.log('Modal backdrop clicked');
                     self.closeModal();
                 }
@@ -102,7 +111,7 @@
 
             // Escape key to close modal
             $(document).on('keydown', function(e) {
-                if (e.keyCode === 27 && $('.ai-blog-modal:visible').length) {
+                if (e.keyCode === 27 && $('#context-modal:visible').length) {
                     console.log('Escape key pressed, closing modal');
                     self.closeModal();
                 }
@@ -338,8 +347,11 @@
             var formData = {
                 name: $('#context-name').val(),
                 type: $('#context-type').val(),
+                usage_flags: $('#context-usage').val(),
                 content: $('#context-content').val(),
-                seed_image_id: $('#context-seed-image').val() || 0
+
+                always_include_content: $('#context-always-content').is(':checked') ? 1 : 0,
+                always_include_images: $('#context-always-images').is(':checked') ? 1 : 0
             };
             
             if (isEdit) {
@@ -389,6 +401,10 @@
          */
         populateModal: function(context, mode) {
             console.log('AI Blog Contexts: Populating modal, mode:', mode, 'context:', context);
+            if (context) {
+                console.log('Context always_include_content value:', context.always_include_content, 'type:', typeof context.always_include_content);
+                console.log('Context always_include_images value:', context.always_include_images, 'type:', typeof context.always_include_images);
+            }
             
             var $modal = $('#context-modal');
             var $title = $modal.find('#modal-title');
@@ -398,38 +414,31 @@
                 $('#context-id').val(context.id);
                 $('#context-name').val(context.name);
                 $('#context-type').val(context.type);
+                $('#context-usage').val(context.usage_flags || 'content');
                 $('#context-content').val(context.content);
-                $('#context-seed-image').val(context.seed_image_id || '');
+
+                $('#context-always-content').prop('checked', parseInt(context.always_include_content) === 1);
+                $('#context-always-images').prop('checked', parseInt(context.always_include_images) === 1);
             } else {
                 $title.text('Add New Context');
                 $('#context-id').val('');
                 $('#context-name').val('');
                 $('#context-type').val('general');
+                $('#context-usage').val('content');
                 $('#context-content').val('');
-                $('#context-seed-image').val('');
+                $('#context-always-content').prop('checked', false);
+                $('#context-always-images').prop('checked', false);
             }
             
-            // Show/hide seed image field based on type
-            this.toggleSeedImageField($('#context-type').val());
+
+            
+            // Show/hide inclusion options based on usage category
+            this.toggleInclusionOptions($('#context-usage').val());
             
             console.log('Modal populated successfully');
         },
 
-        /**
-         * Show/hide seed image field based on context type
-         */
-        toggleSeedImageField: function(type) {
-            var $seedImageRow = $('#seed-image-row');
-            
-            if (type === 'products' || type === 'image') {
-                $seedImageRow.show();
-                console.log('Seed image field shown for type:', type);
-            } else {
-                $seedImageRow.hide();
-                $('#context-seed-image').val('');
-                console.log('Seed image field hidden for type:', type);
-            }
-        },
+
 
         /**
          * Update context card in UI
@@ -444,6 +453,21 @@
                 $card.find('h3').text(context.name);
                 $card.find('.context-type').text(context.type);
                 $card.find('.context-content p').text(this.trimWords(context.content, 30));
+                
+                // Update badges
+                var $badges = $card.find('.context-badges');
+                
+                // Remove existing inclusion badges
+                $badges.find('.badge-always-content, .badge-always-images').remove();
+                
+                // Add inclusion badges if needed
+                if (context.always_include_content == 1) {
+                    $badges.append('<span class="badge badge-always-content" title="Always included in content generation"><i class="dashicons dashicons-edit"></i></span>');
+                }
+                
+                if (context.always_include_images == 1) {
+                    $badges.append('<span class="badge badge-always-images" title="Always included in image generation"><i class="dashicons dashicons-format-image"></i></span>');
+                }
                 
                 // Update active status
                 if (context.active) {
@@ -566,12 +590,28 @@
          */
         closeModal: function() {
             console.log('AI Blog Contexts: Closing modal');
-            $('#context-modal').fadeOut(300);
+            
+            var $modal = $('#context-modal');
+            
+            // Remove all modal classes
+            $modal.removeClass('ai-blog-modal-show force-visible');
+            
+            // Reset all inline styles that might have been added
+            $modal.removeAttr('style');
+            
+            // Hide the modal
+            $modal.hide();
+            
+            // Remove body class
             $('body').removeClass('ai-blog-modal-open');
             
             // Clear form
             $('#context-form')[0].reset();
             $('#context-form').find('.error').removeClass('error');
+            
+            // Reset any checkboxes to their default state
+            $('#context-always-content').prop('checked', false);
+            $('#context-always-images').prop('checked', false);
         },
 
         /**
@@ -1113,6 +1153,33 @@
                 $('#image-preview').show();
             };
             reader.readAsDataURL(file);
+        },
+
+        /**
+         * Toggle inclusion options based on usage category
+         */
+        toggleInclusionOptions: function(usage) {
+            console.log('Toggling inclusion options for usage:', usage);
+            
+            var $contentRow = $('#context-always-content').closest('tr');
+            var $imagesRow = $('#context-always-images').closest('tr');
+            
+            // Hide both by default
+            $contentRow.hide();
+            $imagesRow.hide();
+            
+            // Show appropriate checkbox based on usage category
+            if (usage === 'content') {
+                $contentRow.show();
+                $imagesRow.hide();
+            } else if (usage === 'images') {
+                $contentRow.hide();
+                $imagesRow.show();
+            } else if (usage === 'ideas') {
+                // Ideas don't use always_include options
+                $contentRow.hide();
+                $imagesRow.hide();
+            }
         }
     };
 

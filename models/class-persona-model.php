@@ -46,6 +46,12 @@ class Persona_Model extends Model {
 		'layout_rules',
 		'wordpress_user_id',
 		'active',
+		'uses_seed_mages',
+		'number_of_images',
+		'uses_charts',
+		'uses_avada_layouts',
+		'uses_plain_html',
+		'include_contexts',
 	];
 
 	/**
@@ -351,6 +357,7 @@ class Persona_Model extends Model {
 		switch ( $field ) {
 			case 'name':
 			case 'layout_rules':
+			case 'include_contexts':
 				return sanitize_text_field( $value );
 				
 			case 'bio':
@@ -369,9 +376,14 @@ class Persona_Model extends Model {
 				return sanitize_key( $value );
 				
 			case 'wordpress_user_id':
+			case 'number_of_images':
 				return $value ? absint( $value ) : null;
 				
 			case 'active':
+			case 'uses_seed_mages':
+			case 'uses_charts':
+			case 'uses_avada_layouts':
+			case 'uses_plain_html':
 				return (int) (bool) $value;
 				
 			default:
@@ -393,8 +405,11 @@ class Persona_Model extends Model {
 		$formatted = parent::format( $record );
 		
 		// Ensure boolean fields are properly formatted
-		if ( isset( $formatted['active'] ) ) {
-			$formatted['active'] = (bool) $formatted['active'];
+		$boolean_fields = ['active', 'uses_seed_mages', 'uses_charts', 'uses_avada_layouts', 'uses_plain_html'];
+		foreach ( $boolean_fields as $field ) {
+			if ( isset( $formatted[ $field ] ) ) {
+				$formatted[ $field ] = (bool) $formatted[ $field ];
+			}
 		}
 
 		return $formatted;

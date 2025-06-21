@@ -889,3 +889,1307 @@
 2025-06-21 02:19:27 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":6}
 2025-06-21 02:19:27 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
 2025-06-21 02:21:24 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:25:54 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 02:25:54 - GET_STATISTICS_REQUEST [INFO]: Processing request for idea statistics
+2025-06-21 02:25:54 - STATISTICS_RETRIEVED [INFO]: Retrieved idea statistics (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_statistics) - Context: {"total_generated":"71","approved":"37","denied":"0","generated":"34","pending":"0"}
+2025-06-21 02:25:54 - AJAX_SUCCESS_GET_STATISTICS [INFO]: Statistics retrieved successfully (AI_Blog_Generator\Controllers\Blog_Ideas_Controller_V2::send_ajax_success) - Context: {"data_keys":["total_generated","approved","denied","generated","pending"],"response_size":5}
+2025-06-21 02:25:55 - GET_PENDING_IDEAS_REQUEST [INFO]: Processing request for pending ideas
+2025-06-21 02:25:55 - PENDING_IDEAS_RETRIEVED [INFO]: Retrieved pending ideas (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_pending_ideas) - Context: {"count":0}
+2025-06-21 02:25:55 - AJAX_SUCCESS_GET_PENDING_IDEAS [INFO]: Pending ideas retrieved successfully (AI_Blog_Generator\Controllers\Blog_Ideas_Controller_V2::send_ajax_success) - Context: {"data_keys":["ideas","count"],"response_size":2}
+2025-06-21 02:26:00 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 02:26:00 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-21 02:26:01 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-21 02:26:01 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-21 02:26:01 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 02:26:01 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":37}
+2025-06-21 02:26:01 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 02:26:01 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":34}
+2025-06-21 02:26:01 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":37,"generating_count":0,"generated_count":34,"approved_ids":["26","69","62","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":[],"generated_ids":["65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-21 02:26:01 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":37,"generating_count":0,"generated_count":34}
+2025-06-21 02:26:14 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 02:26:14 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-21 02:26:15 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-21 02:26:15 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-21 02:26:15 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 02:26:15 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":37}
+2025-06-21 02:26:15 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 02:26:15 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":34}
+2025-06-21 02:26:15 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":37,"generating_count":0,"generated_count":34,"approved_ids":["26","69","62","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":[],"generated_ids":["65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-21 02:26:15 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":37,"generating_count":0,"generated_count":34}
+2025-06-21 02:26:25 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:26:25 - AJAX_EDIT_IDEA_START [INFO]: Editing idea via AJAX - Context: {"idea_id":26,"title":"Student-Led Learning: Poster Making Machines Empower Middle Schoolers"}
+2025-06-21 02:26:25 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"title":"Student-Led Learning: Poster Making Machines Empower Middle Schoolers","description":"Explore how giving middle school students access to poster printing technology transforms their learning experience and builds 21st-century skills. Features project-based learning ideas and classroom management strategies for student-operated equipment.","persona_id":6,"updated_at":"2025-06-21 02:26:25"}
+  Format: ["%s","%s","%d","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `title` = 'Student-Led Learning: Poster Making Machines Empower Middle Schoolers', `description` = 'Explore how giving middle school students access to poster printing ...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-21 02:26:25 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":26,"updated_fields":["title","description","persona_id","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `title` = 'Student-Led Learning: Poster Making Machines Empower Middle Schoolers', `description` = 'Explore how giving middle school students access to poster printing technology transforms their learning experience and builds 21st-century skills. Features project-based learning ideas and classroom management strategies for student-operated equipment.', `persona_id` = 6, `updated_at` = '2025-06-21 02:26:25' WHERE `id` = 26"}
+2025-06-21 02:26:25 - AJAX_IDEA_EDITED [INFO]: Idea edited successfully - Context: {"idea_id":26,"updated_data":{"title":"Student-Led Learning: Poster Making Machines Empower Middle Schoolers","description":"Explore how giving middle school students access to poster printing technology transforms their learning experience and builds 21st-century skills. Features project-based learning ideas and classroom management strategies for student-operated equipment.","persona_id":6,"updated_at":"2025-06-21 02:26:25"}}
+2025-06-21 02:26:26 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-21 02:26:26 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-21 02:26:26 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 02:26:26 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":37}
+2025-06-21 02:26:26 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 02:26:26 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":34}
+2025-06-21 02:26:26 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":37,"generating_count":0,"generated_count":34,"approved_ids":["26","69","62","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":[],"generated_ids":["65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-21 02:26:26 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":37,"generating_count":0,"generated_count":34}
+2025-06-21 02:26:31 - AJAX_SUBMIT_GENERATION_START [INFO]: Submitting ideas for generation via AJAX - Context: {"idea_ids":[26],"count":1}
+2025-06-21 02:26:31 - GENERATION_QUEUE_ADD [INFO]: Adding ideas to generation queue - Context: {"idea_ids":[26],"count":1}
+2025-06-21 02:26:31 - GENERATION_QUEUE_START [INFO]: Starting generation for idea - Context: {"idea_id":26}
+2025-06-21 02:26:31 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"status":"generating","generation_status":"Starting...","generation_started_at":"2025-06-21 02:26:31","generation_error":null,"updated_at":"2025-06-21 02:26:31"}
+  Format: ["%s","%s","%s","%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `generation_status` = 'Starting...', `generation_started_at` = '2025-06-21 02:26:31', `generation_error` = NULL, `updated_at` = '2025-06-21 02:...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-21 02:26:31 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":26,"updated_fields":["status","generation_status","generation_started_at","generation_error","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `generation_status` = 'Starting...', `generation_started_at` = '2025-06-21 02:26:31', `generation_error` = NULL, `updated_at` = '2025-06-21 02:26:31' WHERE `id` = 26"}
+2025-06-21 02:26:31 - AJAX_QUEUE_RESULT [INFO]: Ideas added to generation queue - Context: {"success":true,"queued":[],"started":[26],"errors":[],"active_count":1,"queue_length":0}
+2025-06-21 02:26:34 - PROCESS_SINGLE_GENERATION [INFO]: Processing single generation from queue - Context: {"idea_id":26}
+2025-06-21 02:26:34 - BACKGROUND_PROCESSOR: process_generation CRON JOB STARTED for idea_id: 26
+2025-06-21 02:26:34 - BACKGROUND_PROCESSOR: Starting try block for idea_id: 26
+2025-06-21 02:26:34 - BACKGROUND_PROCESSOR: Idea loaded successfully for idea_id: 26
+2025-06-21 02:26:34 - BLOG_MODEL::count_generated_today - Method called
+2025-06-21 02:26:34 - BLOG_MODEL::count_generated_today - DATA: {"memory_usage":89000792}
+2025-06-21 02:26:34 - BLOG_MODEL::count_generated_today - Date calculated
+2025-06-21 02:26:34 - BLOG_MODEL::count_generated_today - DATA: {"today":"2025-06-21"}
+2025-06-21 02:26:34 - BLOG_MODEL::count_generated_today - Table name resolved
+2025-06-21 02:26:34 - BLOG_MODEL::count_generated_today - DATA: {"table":"psec_ai_blog_generated_posts"}
+2025-06-21 02:26:34 - BLOG_MODEL::count_generated_today - SQL query prepared
+2025-06-21 02:26:34 - BLOG_MODEL::count_generated_today - DATA: {"sql":"SELECT COUNT(*) FROM psec_ai_blog_generated_posts WHERE DATE(created_at) = '2025-06-21'","today_param":"2025-06-21"}
+2025-06-21 02:26:34 - BLOG_MODEL::count_generated_today - Query executed
+2025-06-21 02:26:34 - BLOG_MODEL::count_generated_today - DATA: {"count":0,"count_type":"integer","wpdb_last_error":""}
+2025-06-21 02:26:34 - BACKGROUND_PROCESSOR: Calling Content_Generator for idea_id: 26
+2025-06-21 02:26:34 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Starting blog post generation (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"generation_lock_set":true}
+2025-06-21 02:26:34 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Checking if generation is paused (AI_Blog_Generator\Services\Content_Generator::generate_blog_post)
+2025-06-21 02:26:34 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Getting idea details (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:26:34 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Idea details retrieved (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"idea_data":{"id":"26","title":"Student-Led Learning: Poster Making Machines Empower Middle Schoolers","description":"Explore how giving middle school students access to poster printing technology transforms their learning experience and builds 21st-century skills. Features project-based learning ideas and classroom management strategies for student-operated equipment.","category_id":"0","persona_id":"6","status":"generating","created_at":"2025-06-14 15:00:29","updated_at":"2025-06-21 02:26:31","generation_status":"Starting...","generation_error":null,"generation_started_at":"2025-06-21 02:26:31","generation_completed_at":null,"persona_name":"Jason","category_ids":[],"category_names":[],"created_at_ny":"Jun 14, 2025 11:00 AM EDT"},"idea_is_array":true,"idea_keys":["id","title","description","category_id","persona_id","status","created_at","updated_at","generation_status","generation_error","generation_started_at","generation_completed_at","persona_name","category_ids","ca... [truncated]
+2025-06-21 02:26:34 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Checking if idea exists (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:26:34 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Idea exists, checking status field (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"has_status":true,"status_value":"generating","status_raw":"'generating'","status_type":"string","status_length":10,"all_idea_keys":["id","title","description","category_id","persona_id","status","created_at","updated_at","generation_status","generation_error","generation_started_at","generation_completed_at","persona_name","category_ids","category_names","created_at_ny"],"full_idea_data":{"id":"26","title":"Student-Led Learning: Poster Making Machines Empower Middle Schoolers","description":"Explore how giving middle school students access to poster printing technology transforms their learning experience and builds 21st-century skills. Features project-based learning ideas and classroom management strategies for student-operated equipment.","category_id":"0","persona_id":"6","status":"generating","created_at":"2025-06-14 15:00:29","updated_at":"2025-06-21 02:26:31","generation_status":"Starting...","generation_error":null,"generation_started_at":"2025-06-21 02:26:31","g... [truncated]
+2025-06-21 02:26:34 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Checking idea status value (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"current_status":"generating","current_status_raw":"'generating'","current_status_type":"string","current_status_length":10,"required_status":"approved","strict_comparison":false,"loose_comparison":false,"trimmed_comparison":false}
+2025-06-21 02:26:34 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: All idea validations passed, starting transaction (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:26:34 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Ready to begin generation process (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:26:34 - PRE_STATUS_UPDATE [INFO]: About to update idea status to generating (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:26:34 - IDEA_MODEL_VALIDATED [INFO]: Idea model is available (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"idea_model_class":"AI_Blog_Generator\\Models\\Blog_Ideas_Model_V2"}
+2025-06-21 02:26:34 - UPDATING_IDEA_STATUS [INFO]: Updating idea status to generating (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:26:34 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"status":"generating","updated_at":"2025-06-21 02:26:34"}
+  Format: ["%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `updated_at` = '2025-06-21 02:26:34' WHERE `id` = 26...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-21 02:26:34 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":26,"updated_fields":["status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `updated_at` = '2025-06-21 02:26:34' WHERE `id` = 26"}
+2025-06-21 02:26:34 - IDEA_STATUS_UPDATED [INFO]: Idea status update completed (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"update_result":true}
+2025-06-21 02:26:34 - UPDATING_GENERATION_STATUS [INFO]: Updating generation status (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:26:34 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":26,"stage":"starting","message":"Initializing generation process......","is_stage_change":false,"is_critical":false,"is_batch_update":false}
+2025-06-21 02:26:34 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"generation_status":"Initializing generation process...","updated_at":"2025-06-21 02:26:34"}
+  Format: ["%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Initializing generation process...', `updated_at` = '2025-06-21 02:26:34' WHERE `id` = 26...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-21 02:26:34 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":26,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Initializing generation process...', `updated_at` = '2025-06-21 02:26:34' WHERE `id` = 26"}
+2025-06-21 02:26:34 - GENERATION_STATUS_UPDATED [INFO]: Generation status update completed (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:26:34 - COMPILING_CONTEXTS_START [INFO]: Starting context compilation (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:26:34 - COMPILE_CONTEXTS_ENHANCED_START [INFO]: Starting enhanced context compilation (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","options":{"max_contexts_per_type":5,"priority_threshold":0}}
+2025-06-21 02:26:34 - CONTEXT_OPTIONS_PREPARED [INFO]: Context options prepared (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","merged_options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":[],"include_metadata":false}}
+2025-06-21 02:26:34 - CALLING_CONTEXT_MODEL [INFO]: Calling context model get_for_prompt (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","context_model_class":"AI_Blog_Generator\\Models\\Context_Model"}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Method called
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"usage":"content","options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":[],"include_metadata":false},"memory_usage":89055296}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Starting method execution
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Setting up defaults
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Options merged
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_options":{"max_contexts_per_type":5,"include_metadata":false,"priority_threshold":0,"type_filters":[]}}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - About to call get_compiled_for_usage
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_compiled_for_usage - Method called
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_compiled_for_usage - DATA: {"usage":"content","type_filters":[],"memory_usage":89055672}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_compiled_for_usage - Starting method execution
+2025-06-21 02:26:34 - CONTEXT_GET_COMPILED_START [INFO]: Starting context compilation for usage - Context: {"usage":"content","type_filters":[]}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":"content","preserve_structure":true,"memory_usage":89055672}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 02:26:34 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":"content","preserve_structure":true}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - Added usage filter
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - DATA: {"usage":"content"}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL...[truncated]","params":["%content%"]}
+2025-06-21 02:26:34 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL OR usage_flags = '') ORDER BY type ASC, priority DESC, name ASC","params_count":1,"usage":"content","type":null}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 02:26:34 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":"content","type":null}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":true}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - Returning results with preserved structure
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6}
+2025-06-21 02:26:34 - CONTEXT_ENHANCED_ACTIVE_RECEIVED [INFO]: Enhanced active contexts received - Context: {"usage":"content","contexts_count":6,"contexts_is_array":true}
+2025-06-21 02:26:34 - CONTEXTS_COMPILED_FOR_USAGE [INFO]: Compiled contexts for specific usage - Context: {"usage":"content","types_included":["general","products","seo","keywords","image"],"total_contexts":5,"type_filters":[]}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_compiled_for_usage - Method completed for usage: content
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - get_compiled_for_usage completed
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"compiled_types":["general","products","seo","keywords","image"],"compiled_count":5}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Starting result processing loop
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Processing type: general
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for general
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Limited contexts for general
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Compiling content for general
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Completed processing for general
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Processing type: products
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for products
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Limited contexts for products
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Compiling content for products
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Completed processing for products
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Processing type: seo
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for seo
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Limited contexts for seo
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Compiling content for seo
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Completed processing for seo
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Processing type: keywords
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for keywords
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Limited contexts for keywords
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Compiling content for keywords
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Completed processing for keywords
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Processing type: image
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for image
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Limited contexts for image
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Compiling content for image
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Completed processing for image
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Processing loop completed
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","seo","keywords","image"]}
+2025-06-21 02:26:34 - CONTEXT_GET_FOR_PROMPT_SUCCESS [INFO]: Context retrieval for prompt completed - Context: {"usage":"content","result_types":["general","products","seo","keywords","image"],"total_contexts":5}
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - Method completing successfully
+2025-06-21 02:26:34 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","seo","keywords","image"],"total_types":5}
+2025-06-21 02:26:34 - CONTEXT_MODEL_SUCCESS [INFO]: Context model returned successfully (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","contexts_returned":5,"contexts_keys":["general","products","seo","keywords","image"]}
+2025-06-21 02:26:34 - CONVERTING_CONTEXTS [INFO]: Converting contexts to simple format (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","contexts_to_convert":5}
+2025-06-21 02:26:34 - CONTEXTS_CONVERTED [INFO]: Contexts converted successfully (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","original_count":5,"converted_count":5}
+2025-06-21 02:26:34 - CONTEXTS_COMPILED_ENHANCED [INFO]: Enhanced contexts compilation completed (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","types_included":["general","products","seo","keywords","image"],"total_context_types":5,"options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":[],"include_metadata":false}}
+2025-06-21 02:26:34 - COMPILING_CONTEXTS_SUCCESS [INFO]: Context compilation successful (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"context_types":["general","products","seo","keywords","image"],"context_count":5}
+2025-06-21 02:26:34 - EXTRACTING_SEO_KEYWORDS [INFO]: Extracting SEO keywords (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:26:34 - SEO_KEYWORDS_FILTERED [INFO]: Filtered SEO keywords for specific topic (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_title":"Student-Led Learning: Poster Making Machines Empower Middle Schoolers","generic_keywords_count":10,"filtered_keywords_count":15,"keywords":["poster machine for schools","poster maker for schools","poster maker printer","poster makers for schools","poster print machine","poster printer machine","poster printer machines","poster printing machine","poster machine maker","poster maker machine","student-led","student-led learning:","student-led learning: poster","learning:","learning: poster"]}
+2025-06-21 02:26:34 - ANTHROPIC_GENERATION_START [INFO]: Starting Anthropic content generation (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:26:34 - ANTHROPIC_SERVICE_VALIDATED [INFO]: Anthropic service is available (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"service_class":"AI_Blog_Generator\\Services\\Anthropic_Service"}
+2025-06-21 02:26:34 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 02:26:34 - PERSONA_FETCHED [INFO]: Persona data fetched successfully (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"persona_id":"6","persona_name":"Jason"}
+2025-06-21 02:26:34 - ANTHROPIC_SERVICE: Starting blog content generation
+2025-06-21 02:26:34 - ANTHROPIC_CONTENT_GENERATION_START [INFO]: Starting blog content generation - Context: {"idea_id":"26","idea_title":"Student-Led Learning: Poster Making Machines Empower Middle Schoolers","contexts_available":["general","products","seo","keywords","image"],"seo_keywords_count":15,"model":"claude-sonnet-4-20250514","persona_provided":true,"persona_name":"Jason"}
+2025-06-21 02:26:34 - BUILDING_CONTENT_PROMPT [INFO]: Building content generation prompt - Context: {"idea_id":"26"}
+2025-06-21 02:26:34 - CONTENT_PROMPT_BUILT [INFO]: Content prompt built successfully - Context: {"idea_id":"26","prompt_length":26578}
+2025-06-21 02:26:34 - MAKING_ANTHROPIC_REQUEST [INFO]: Making request to Anthropic API - Context: {"idea_id":"26","model":"claude-sonnet-4-20250514","max_tokens":64000,"prompt_length":26578}
+2025-06-21 02:26:34 - ANTHROPIC_SERVICE: About to make API request
+2025-06-21 02:26:34 - ANTHROPIC_SERVICE: Memory before API call: 98566144 bytes
+2025-06-21 02:26:34 - SSL_VERIFICATION_DISABLED [INFO]: SSL verification disabled for local development (AI_Blog_Generator\Services\Anthropic_Service::make_request) - Context: {"host":"localhost","server_name":"localhost","abspath":"D:\\Dropbox\\poster website\/","php_sapi":"cgi-fcgi","is_local":true,"force_disabled":true}
+2025-06-21 02:26:34 - ANTHROPIC_SERVICE: SSL verification DISABLED for local environment
+2025-06-21 02:26:34 - ANTHROPIC_REQUEST_DETAILS [INFO]: Sending request to Anthropic API (AI_Blog_Generator\Services\Anthropic_Service::make_request) - Context: {"url":"https:\/\/api.anthropic.com\/v1\/messages","headers":{"Content-Type":"application\/json","x-api-key":"[REDACTED]","anthropic-version":"2023-06-01"},"model":"claude-sonnet-4-20250514","max_tokens":64000,"message_count":1,"request_size":28264}
+2025-06-21 02:28:35 - ANTHROPIC_RESPONSE_DETAILS [INFO]: Received response from Anthropic API (AI_Blog_Generator\Services\Anthropic_Service::make_request) - Context: {"response_code":200,"response_headers":{},"response_body_length":22613,"response_preview":"{\"id\":\"msg_01JA6QdLrwHtXrtwpK2iduVF\",\"type\":\"message\",\"role\":\"assistant\",\"model\":\"claude-sonnet-4-20250514\",\"content\":[{\"type\":\"text\",\"text\":\"TITLE: Student-Led Learning: How Poster Machines Empower Middle Schoolers\\n\\nMETA_DESCRIPTION: Discover how poster machine for schools enables student-led learning in middle school classrooms. Explore project-based activities and 21st-century skill development through student-operated printing technology.\\n\\nFOCUS_KEYPHRASE: poster machine for schools\\n\\nT..."}
+2025-06-21 02:28:35 - ANTHROPIC_RESPONSE_DECODED [INFO]: Successfully decoded API response (AI_Blog_Generator\Services\Anthropic_Service::make_request) - Context: {"response_keys":["id","type","role","model","content","stop_reason","stop_sequence","usage"],"has_content":true,"content_count":1,"usage":{"input_tokens":6805,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":6166,"service_tier":"standard"},"model":"claude-sonnet-4-20250514"}
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: API request completed in 121.09024000168 seconds
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Memory after API call: 98566144 bytes
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Response type: array
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Response keys: id, type, role, model, content, stop_reason, stop_sequence, usage
+2025-06-21 02:28:35 - ANTHROPIC_REQUEST_SUCCESS [INFO]: Anthropic API request successful - Context: {"idea_id":"26","response_keys":["id","type","role","model","content","stop_reason","stop_sequence","usage"],"has_content":true,"has_usage":true,"api_duration":121.09024000167847}
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Starting response validation
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Response validation passed, extracting content
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Content extracted, length: 21424
+2025-06-21 02:28:35 - ANTHROPIC_CONTENT_EXTRACTED [INFO]: Content extracted from API response - Context: {"idea_id":null,"content_length":21424,"content_preview":"TITLE: Student-Led Learning: How Poster Machines Empower Middle Schoolers\n\nMETA_DESCRIPTION: Discover how poster machine for schools enables student-led learning in middle school classrooms. Explore p..."}
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Starting content parsing
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Memory before parsing: 98566144 bytes
+2025-06-21 02:28:35 - PARSING_CONTENT_RESPONSE [INFO]: Parsing content response - Context: {"idea_id":null,"content_length":21424}
+2025-06-21 02:28:35 - CONTENT_PARSED [INFO]: Parsed content from API response - Context: {"has_title":true,"has_meta":true,"has_focus_keyphrase":true,"tags_count":8,"html_length":19352,"images_count":2,"has_featured_image":true,"has_charts":true,"has_references":true}
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Content parsing completed in 0.00041007995605469 seconds
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Memory after parsing: 98566144 bytes
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Parsed fields: title, meta_description, focus_keyphrase, tags, html, images, featured_image, charts, references
+2025-06-21 02:28:35 - CONTENT_PARSING_SUCCESS [INFO]: Content parsed successfully - Context: {"idea_id":null,"parsed_fields":["title","meta_description","focus_keyphrase","tags","html","images","featured_image","charts","references"],"html_length":19352,"has_title":true,"has_meta_description":true,"parse_duration":0.0004100799560546875}
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Starting cost recording
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Cost calculated: 0.112905 USD, Tokens: 12971
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Cost recording completed successfully
+2025-06-21 02:28:35 - COST_RECORDED [INFO]: API cost recorded successfully - Context: {"idea_id":null,"cost":0.11290499999999999,"tokens_used":12971}
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Preparing final response
+2025-06-21 02:28:35 - ANTHROPIC_CONTENT_GENERATED [INFO]: Blog content generated successfully - Context: {"idea_id":null,"model":"claude-sonnet-4-20250514","max_tokens":64000,"word_count":2603,"tokens_used":12971,"input_tokens":6805,"output_tokens":6166,"cost":0.11290499999999999}
+2025-06-21 02:28:35 - ANTHROPIC_SERVICE: Blog content generation completed successfully, returning result
+2025-06-21 02:28:35 - ANTHROPIC_GENERATION_SUCCESS [INFO]: Anthropic content generation completed (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"success":true}
+2025-06-21 02:28:35 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":26,"stage":"content","message":"AI content generated successfully. Validating......","is_stage_change":false,"is_critical":false,"is_batch_update":true}
+2025-06-21 02:28:35 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"generation_status":"Generating blog content with AI...","updated_at":"2025-06-21 02:28:35"}
+  Format: ["%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating blog content with AI...', `updated_at` = '2025-06-21 02:28:35' WHERE `id` = 26...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-21 02:28:35 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":26,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating blog content with AI...', `updated_at` = '2025-06-21 02:28:35' WHERE `id` = 26"}
+2025-06-21 02:28:35 - CONTENT_GENERATOR: Content result success: 1
+2025-06-21 02:28:35 - CONTENT_GENERATOR: Content result keys: success, content, cost, tokens_used, usage
+2025-06-21 02:28:35 - CONTENT_GENERATOR: Content extracted, initializing cost calculation
+2025-06-21 02:28:35 - CONTENT_VALIDATION_WARNING [WARNING]: Meta description too long (AI_Blog_Generator\Services\Content_Generator::validate_generated_content) - Context: {"length":211}
+2025-06-21 02:28:35 - H1_TO_H2_CONVERSION [INFO]: Converted H1 headings to H2 headings (AI_Blog_Generator\Services\Content_Generator::convert_h1_to_h2) - Context: {"original_h1_count":0,"final_html_length":19352}
+2025-06-21 02:28:35 - IMAGE_GENERATION_START [INFO]: Starting image generation (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"total_image_count":3,"content_image_count":2,"has_featured_image":true}
+2025-06-21 02:28:35 - COMPILE_CONTEXTS_ENHANCED_START [INFO]: Starting enhanced context compilation (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","options":{"type_filters":["general","products","image"],"priority_threshold":0}}
+2025-06-21 02:28:35 - CONTEXT_OPTIONS_PREPARED [INFO]: Context options prepared (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","merged_options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":["general","products","image"],"include_metadata":false}}
+2025-06-21 02:28:35 - CALLING_CONTEXT_MODEL [INFO]: Calling context model get_for_prompt (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","context_model_class":"AI_Blog_Generator\\Models\\Context_Model"}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Method called
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"usage":"images","options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":["general","products","image"],"include_metadata":false},"memory_usage":89505048}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Starting method execution
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Setting up defaults
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Options merged
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_options":{"max_contexts_per_type":5,"include_metadata":false,"priority_threshold":0,"type_filters":["general","products","image"]}}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - About to call get_compiled_for_usage
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_compiled_for_usage - Method called
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_compiled_for_usage - DATA: {"usage":"images","type_filters":["general","products","image"],"memory_usage":89505424}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_compiled_for_usage - Starting method execution
+2025-06-21 02:28:35 - CONTEXT_GET_COMPILED_START [INFO]: Starting context compilation for usage - Context: {"usage":"images","type_filters":["general","products","image"]}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":"images","preserve_structure":true,"memory_usage":89505424}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 02:28:35 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":"images","preserve_structure":true}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - Added usage filter
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - DATA: {"usage":"images"}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL...[truncated]","params":["%images%"]}
+2025-06-21 02:28:35 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL OR usage_flags = '') ORDER BY type ASC, priority DESC, name ASC","params_count":1,"usage":"images","type":null}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 02:28:35 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":"images","type":null}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":true}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - Returning results with preserved structure
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6}
+2025-06-21 02:28:35 - CONTEXT_ENHANCED_ACTIVE_RECEIVED [INFO]: Enhanced active contexts received - Context: {"usage":"images","contexts_count":6,"contexts_is_array":true}
+2025-06-21 02:28:35 - CONTEXTS_COMPILED_FOR_USAGE [INFO]: Compiled contexts for specific usage - Context: {"usage":"images","types_included":["general","products","image"],"total_contexts":3,"type_filters":["general","products","image"]}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_compiled_for_usage - Method completed for usage: images
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - get_compiled_for_usage completed
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"compiled_types":["general","products","image"],"compiled_count":3}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Starting result processing loop
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Processing type: general
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for general
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Limited contexts for general
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Compiling content for general
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Completed processing for general
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Processing type: products
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for products
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Limited contexts for products
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Compiling content for products
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Completed processing for products
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Processing type: image
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for image
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Limited contexts for image
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Compiling content for image
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Completed processing for image
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Processing loop completed
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","image"]}
+2025-06-21 02:28:35 - CONTEXT_GET_FOR_PROMPT_SUCCESS [INFO]: Context retrieval for prompt completed - Context: {"usage":"images","result_types":["general","products","image"],"total_contexts":3}
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - Method completing successfully
+2025-06-21 02:28:35 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","image"],"total_types":3}
+2025-06-21 02:28:35 - CONTEXT_MODEL_SUCCESS [INFO]: Context model returned successfully (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","contexts_returned":3,"contexts_keys":["general","products","image"]}
+2025-06-21 02:28:35 - CONVERTING_CONTEXTS [INFO]: Converting contexts to simple format (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","contexts_to_convert":3}
+2025-06-21 02:28:35 - CONTEXTS_CONVERTED [INFO]: Contexts converted successfully (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","original_count":3,"converted_count":3}
+2025-06-21 02:28:35 - CONTEXTS_COMPILED_ENHANCED [INFO]: Enhanced contexts compilation completed (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","types_included":["general","products","image"],"total_context_types":3,"options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":["general","products","image"],"include_metadata":false}}
+2025-06-21 02:28:35 - SEED_IMAGE_APPLIED [INFO]: Applied different seed image to requirement (AI_Blog_Generator\Services\Content_Generator::add_seed_images_to_requirements) - Context: {"requirement_index":0,"seed_index":0,"seed_id":"7","seed_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","product_name":"Studio Series 36","token":"{{featured}}"}
+2025-06-21 02:28:35 - SEED_IMAGE_APPLIED [INFO]: Applied different seed image to requirement (AI_Blog_Generator\Services\Content_Generator::add_seed_images_to_requirements) - Context: {"requirement_index":1,"seed_index":1,"seed_id":"6","seed_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c06258566.png","product_name":"Designjet Z6 24\\\"","token":"{{image1}}"}
+2025-06-21 02:28:35 - SEED_IMAGE_APPLIED [INFO]: Applied different seed image to requirement (AI_Blog_Generator\Services\Content_Generator::add_seed_images_to_requirements) - Context: {"requirement_index":2,"seed_index":0,"seed_id":"7","seed_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","product_name":"Studio Series 36","token":"{{image2}}"}
+2025-06-21 02:28:35 - SEQUENTIAL_IMAGE_GENERATION_START [INFO]: Starting sequential image generation - Context: {"total_images":3,"memory_usage":89537608,"generation_start_time":1750472915.995268}
+2025-06-21 02:28:35 - SEED_IMAGE_SELECTED [INFO]: Selected seed image for sequential processing - Context: {"seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png"}
+2025-06-21 02:28:35 - SEQUENTIAL_IMAGE_PROCESSING [INFO]: Processing image 1 of 3 - Context: {"index":0,"token":"{{featured}}","prompt_length":493,"has_seed_image":true,"using_seed_image":true,"progress_percentage":0,"memory_usage":89520792}
+2025-06-21 02:28:35 - SEQUENTIAL_SEED_IMAGE_EDIT [INFO]: Starting seed image edit for image 1 - Context: {"token":"{{featured}}","seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","prompt_preview":"Include this exact product if it makes sense for this image. Do not change the look of the product a"}
+2025-06-21 02:28:35 - OPENAI_IMAGE_EDIT_START [INFO]: Starting image edit with seed image - Context: {"seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","original_prompt_length":493,"enhanced_prompt_length":645}
+2025-06-21 02:28:36 - SEED_IMAGE_DOWNLOADED_TO_TEMP [INFO]: Seed image downloaded to temporary file - Context: {"url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","temp_file":"C:\\temp\\ai_86DF.tmp","file_size":708162}
+2025-06-21 02:28:36 - OPENAI_IMAGE_EDIT_REQUEST [INFO]: Making edit request to OpenAI - Context: {"model":"gpt-image-1","size":"1024x1024","temp_file":"C:\\temp\\ai_86DF.tmp"}
+2025-06-21 02:28:36 - OPENAI_MULTIPART_REQUEST [INFO]: Sending multipart request to OpenAI edits endpoint - Context: {"url":"https:\/\/api.openai.com\/v1\/images\/edits","form_data":{"model":"gpt-image-1","prompt":"Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. A group of diverse middle school students gathered around a large-format poster printer, watching excitedly as their colorful science fair project poster emerges from the machine. The students are pointing and discussing the print quality, with finished posters visible in the background showing various school subjects and creative designs.","size":"1024x1024","n":1},"body_size":709293}
+2025-06-21 02:29:19 - OPENAI_RESPONSE_DETAILS [INFO]: Received response from OpenAI API - Context: {"response_code":200,"response_headers":{},"response_body_length":2522385,"response_preview":"{\n  \"created\": 1750472961,\n  \"background\": \"opaque\",\n  \"data\": [\n    {\n      \"b64_json\": \"iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAIAAADwf7zUAAGfzWNhQlgAAZ\/NanVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANw..."}
+2025-06-21 02:29:19 - OPENAI_EDIT_RESPONSE_B64 [INFO]: Received base64 response from gpt-image-1 - Context: {"data_size":2522028}
+2025-06-21 02:29:19 - OPENAI_IMAGE_EDIT_SUCCESS [INFO]: Image edited successfully - Context: {"data_size":2522028,"cost":0.02,"format":"base64"}
+2025-06-21 02:29:19 - SEQUENTIAL_SEED_EDIT_RESULT [INFO]: Seed image edit completed for image 1 - Context: {"token":"{{featured}}","success":true,"error_message":"none"}
+2025-06-21 02:29:19 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":26,"stage":"images","message":"Saving image 1 of 3 to media library......","is_stage_change":false,"is_critical":false,"is_batch_update":true}
+2025-06-21 02:29:19 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"generation_status":"Generating image 1 of 3: Include this exact product if it makes sense for t...","updated_at":"2025-06-21 02:29:19"}
+  Format: ["%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 1 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-21 02:29:19' WHERE `id` = 26...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-21 02:29:19 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":26,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 1 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-21 02:29:19' WHERE `id` = 26"}
+2025-06-21 02:29:20 - OPENAI_IMAGE_SAVED [INFO]: Image saved to media library - Context: {"attachment_id":425,"filename":"ai-blog-image-featured-1750472959-0.png","file_size":1891521,"format":"png"}
+2025-06-21 02:29:20 - SEQUENTIAL_IMAGE_SUCCESS [INFO]: Successfully generated and saved image 1 - Context: {"token":"{{featured}}","attachment_id":425,"cost":0.02,"method":"edit","duration_seconds":44.96460294723511}
+2025-06-21 02:29:22 - SEQUENTIAL_IMAGE_PROCESSING [INFO]: Processing image 2 of 3 - Context: {"index":1,"token":"{{image1}}","prompt_length":500,"has_seed_image":true,"using_seed_image":true,"progress_percentage":33,"memory_usage":94597632}
+2025-06-21 02:29:22 - SEQUENTIAL_SEED_IMAGE_EDIT [INFO]: Starting seed image edit for image 2 - Context: {"token":"{{image1}}","seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","prompt_preview":"Include this exact product if it makes sense for this image. Do not change the look of the product a"}
+2025-06-21 02:29:22 - OPENAI_IMAGE_EDIT_START [INFO]: Starting image edit with seed image - Context: {"seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","original_prompt_length":500,"enhanced_prompt_length":652}
+2025-06-21 02:29:23 - SEED_IMAGE_DOWNLOADED_TO_TEMP [INFO]: Seed image downloaded to temporary file - Context: {"url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","temp_file":"C:\\temp\\ai_3EA7.tmp","file_size":708162}
+2025-06-21 02:29:23 - OPENAI_IMAGE_EDIT_REQUEST [INFO]: Making edit request to OpenAI - Context: {"model":"gpt-image-1","size":"1024x1024","temp_file":"C:\\temp\\ai_3EA7.tmp"}
+2025-06-21 02:29:23 - OPENAI_MULTIPART_REQUEST [INFO]: Sending multipart request to OpenAI edits endpoint - Context: {"url":"https:\/\/api.openai.com\/v1\/images\/edits","form_data":{"model":"gpt-image-1","prompt":"Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. A before-and-after comparison showing a traditional hand-made poster board with markers and construction paper next to a professionally printed poster created by students. The contrast highlights the dramatic difference in quality and visual appeal, with the printed version featuring crisp graphics, vibrant colors, and professional layout design.","size":"1024x1024","n":1},"body_size":709300}
+2025-06-21 02:29:23 - OPENAI_RESPONSE_DETAILS [INFO]: Received response from OpenAI API - Context: {"response_code":500,"response_headers":{},"response_body_length":133,"response_preview":"{\n  \"error\": {\n    \"message\": \"Missing image-scanner response\",\n    \"type\": \"server_error\",\n    \"param\": null,\n    \"code\": null\n  }\n}..."}
+2025-06-21 02:29:23 - OPENAI_EDITS_API_ERROR [ERROR]: API returned error response - Context: {"response_code":500,"error_data":{"error":{"message":"Missing image-scanner response","type":"server_error","param":null,"code":null}},"error_message":"Missing image-scanner response"}
+2025-06-21 02:29:23 - OPENAI_IMAGE_EDIT_FAILED [ERROR]: Image edit failed - Context: {"error":"API error (HTTP 500): Missing image-scanner response","seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","prompt_length":500}
+2025-06-21 02:29:23 - SEQUENTIAL_SEED_EDIT_RESULT [INFO]: Seed image edit completed for image 2 - Context: {"token":"{{image1}}","success":false,"error_message":"API error (HTTP 500): Missing image-scanner response"}
+2025-06-21 02:29:23 - SEQUENTIAL_IMAGE_GENERATION_FAILED [ERROR]: Failed to generate image 2 - Context: {"token":"{{image1}}","error":"API error (HTTP 500): Missing image-scanner response"}
+2025-06-21 02:29:25 - SEQUENTIAL_IMAGE_PROCESSING [INFO]: Processing image 3 of 3 - Context: {"index":2,"token":"{{image2}}","prompt_length":473,"has_seed_image":true,"using_seed_image":true,"progress_percentage":67,"memory_usage":90402992}
+2025-06-21 02:29:25 - SEQUENTIAL_SEED_IMAGE_EDIT [INFO]: Starting seed image edit for image 3 - Context: {"token":"{{image2}}","seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","prompt_preview":"Include this exact product if it makes sense for this image. Do not change the look of the product a"}
+2025-06-21 02:29:25 - OPENAI_IMAGE_EDIT_START [INFO]: Starting image edit with seed image - Context: {"seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","original_prompt_length":473,"enhanced_prompt_length":625}
+2025-06-21 02:29:25 - SEED_IMAGE_DOWNLOADED_TO_TEMP [INFO]: Seed image downloaded to temporary file - Context: {"url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","temp_file":"C:\\temp\\ai_48F9.tmp","file_size":708162}
+2025-06-21 02:29:25 - OPENAI_IMAGE_EDIT_REQUEST [INFO]: Making edit request to OpenAI - Context: {"model":"gpt-image-1","size":"1024x1024","temp_file":"C:\\temp\\ai_48F9.tmp"}
+2025-06-21 02:29:25 - OPENAI_MULTIPART_REQUEST [INFO]: Sending multipart request to OpenAI edits endpoint - Context: {"url":"https:\/\/api.openai.com\/v1\/images\/edits","form_data":{"model":"gpt-image-1","prompt":"Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. Middle school students collaborating on designing a poster using tablets and laptops, with one student operating the poster printer while others review printed drafts and provide feedback. The scene captures the collaborative, student-led learning environment with various completed projects displayed on classroom walls.","size":"1024x1024","n":1},"body_size":709273}
+2025-06-21 02:30:16 - OPENAI_RESPONSE_DETAILS [INFO]: Received response from OpenAI API - Context: {"response_code":200,"response_headers":{},"response_body_length":2451697,"response_preview":"{\n  \"created\": 1750473019,\n  \"background\": \"opaque\",\n  \"data\": [\n    {\n      \"b64_json\": \"iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAIAAADwf7zUAAGJsWNhQlgAAYmxanVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANw..."}
+2025-06-21 02:30:16 - OPENAI_EDIT_RESPONSE_B64 [INFO]: Received base64 response from gpt-image-1 - Context: {"data_size":2451340}
+2025-06-21 02:30:16 - PERFORMANCE [INFO]: Performance: database_insert took 0.0014419555664062s (AI_Blog_Generator\Models\Database_Manager::end_timer) - Context: {"table":"cost_analytics","insert_id":438,"duration":0.00144195556640625,"operation":"database_insert"}
+2025-06-21 02:30:16 - OPENAI_IMAGE_EDIT_SUCCESS [INFO]: Image edited successfully - Context: {"data_size":2451340,"cost":0.02,"format":"base64"}
+2025-06-21 02:30:16 - SEQUENTIAL_SEED_EDIT_RESULT [INFO]: Seed image edit completed for image 3 - Context: {"token":"{{image2}}","success":true,"error_message":"none"}
+2025-06-21 02:30:16 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":26,"stage":"images","message":"Saving image 3 of 3 to media library......","is_stage_change":false,"is_critical":false,"is_batch_update":true}
+2025-06-21 02:30:16 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"generation_status":"Generating image 3 of 3: Include this exact product if it makes sense for t...","updated_at":"2025-06-21 02:30:16"}
+  Format: ["%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 3 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-21 02:30:16' WHERE `id` = 26...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-21 02:30:16 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":26,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 3 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-21 02:30:16' WHERE `id` = 26"}
+2025-06-21 02:30:18 - OPENAI_IMAGE_SAVED [INFO]: Image saved to media library - Context: {"attachment_id":426,"filename":"ai-blog-image-image2-1750473016-2.png","file_size":1838505,"format":"png"}
+2025-06-21 02:30:18 - SEQUENTIAL_IMAGE_SUCCESS [INFO]: Successfully generated and saved image 3 - Context: {"token":"{{image2}}","attachment_id":426,"cost":0.02,"method":"edit","duration_seconds":52.77158784866333}
+2025-06-21 02:30:18 - SEQUENTIAL_IMAGE_GENERATION_COMPLETE [INFO]: Sequential image generation completed - Context: {"total":3,"successful":2,"failed":1,"total_cost":0.04,"total_duration_seconds":102.41262793540955,"used_seed_image":true,"seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png"}
+2025-06-21 02:30:18 - IMAGE_GENERATION_COMPLETE [INFO]: Image generation completed (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"successful":2,"failed":1,"cost":0.04}
+2025-06-21 02:30:18 - CONTENT_GENERATOR: Post data prepared, calling wp_insert_post
+2025-06-21 02:30:18 - STARTING_SAVE_TRANSACTION [INFO]: Starting transaction for critical saves (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26}
+2025-06-21 02:30:18 - Entering start_transaction method
+2025-06-21 02:30:18 - Checking MySQL connection status
+2025-06-21 02:30:18 - Connection check result: SUCCESS
+2025-06-21 02:30:18 - About to execute START TRANSACTION query
+2025-06-21 02:30:18 - START TRANSACTION completed with result: SUCCESS in 0.00017189979553223 seconds
+2025-06-21 02:30:18 - Setting in_transaction to true
+2025-06-21 02:30:18 - start_transaction completed successfully, returning true
+2025-06-21 02:30:18 - SAVE_TRANSACTION_STARTED [INFO]: Save transaction started (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"result":true}
+2025-06-21 02:30:18 - BLOG_MODEL::create - Method called
+2025-06-21 02:30:18 - BLOG_MODEL::create - DATA: {"data":{"idea_id":26,"post_id":427,"title":"Student-Led Learning: How Poster Machines Empower Middle Schoolers","status":"draft","generation_cost":0.15290499999999999},"data_keys":["idea_id","post_id","title","status","generation_cost"],"memory_usage":90588312}
+2025-06-21 02:30:18 - BLOG_MODEL::create - Calling parent::create method
+2025-06-21 02:30:18 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"ideas","where_conditions":1,"sql_length":56,"raw_sql":"SELECT * FROM psec_ai_blog_ideas WHERE id = '26' LIMIT 1","where_clause":"id = '26'","fields":"*"}
+2025-06-21 02:30:18 - BLOG_MODEL::create - Parent create method completed
+2025-06-21 02:30:18 - BLOG_MODEL::create - DATA: {"result":38,"result_type":"integer"}
+2025-06-21 02:30:18 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"status":"generated","updated_at":"2025-06-21 02:30:18"}
+  Format: ["%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generated', `updated_at` = '2025-06-21 02:30:18' WHERE `id` = 26...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-21 02:30:18 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":26,"updated_fields":["status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `status` = 'generated', `updated_at` = '2025-06-21 02:30:18' WHERE `id` = 26"}
+2025-06-21 02:30:18 - COMMIT executed in 0.0010941028594971 seconds, result: SUCCESS
+2025-06-21 02:30:18 - COMMIT successful, transaction flags cleared
+2025-06-21 02:30:18 - CONTENT_GENERATOR: Transaction commit attempt completed in 0.0012800693511963s, result: SUCCESS
+2025-06-21 02:30:18 - BLOG_GENERATION_COMPLETE [INFO]: Successfully generated blog post (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":26,"post_id":427,"blog_id":38,"total_cost":0.15290499999999999}
+2025-06-21 02:30:18 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"generation_status":"WordPress post created successfully. Finalizing...","updated_at":"2025-06-21 02:30:18"}
+  Format: ["%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'WordPress post created successfully. Finalizing...', `updated_at` = '2025-06-21 02:30:18' WHERE `id` = 26...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-21 02:30:18 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":26,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'WordPress post created successfully. Finalizing...', `updated_at` = '2025-06-21 02:30:18' WHERE `id` = 26"}
+2025-06-21 02:30:18 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":26,"stage":"complete","message":"Blog post generated successfully!...","is_stage_change":false,"is_critical":true,"is_batch_update":false}
+2025-06-21 02:30:18 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"generation_status":"Blog post generated successfully!","updated_at":"2025-06-21 02:30:18"}
+  Format: ["%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Blog post generated successfully!', `updated_at` = '2025-06-21 02:30:18' WHERE `id` = 26...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-21 02:30:18 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":26,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Blog post generated successfully!', `updated_at` = '2025-06-21 02:30:18' WHERE `id` = 26"}
+2025-06-21 02:30:18 - BACKGROUND_PROCESSOR: Content generation completed in 223.70025682449s for idea_id: 26
+2025-06-21 02:30:18 - BACKGROUND_PROCESSOR_SUCCESS [INFO]: Blog post generated successfully via cron - Context: {"idea_id":26,"post_id":427,"generation_duration":223.7002568244934,"total_duration":223.70217418670654}
+2025-06-21 02:30:18 - BACKGROUND_PROCESSOR: SUCCESS for idea_id: 26
+2025-06-21 02:32:25 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:32:25 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:34:27 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 02:38:28 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered`
+2025-06-21 02:38:28 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:44:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:44:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:50:34 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:50:34 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:50:35 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 02:56:38 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:56:38 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:02:41 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:04:42 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 03:08:44 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:08:44 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 03:14:47 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:14:47 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:20:49 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:20:49 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:20:50 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 03:26:53 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:32:56 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:32:56 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:34:57 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 03:38:59 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:38:59 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:45:02 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:51:04 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 03:51:05 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 03:57:07 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:03:10 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:05:12 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 04:07:13 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 04:09:13 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:15:16 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:19:19 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 04:21:19 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:21:19 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:27:22 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:33:25 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:33:25 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:35:27 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 04:39:28 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:45:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:49:34 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 04:51:34 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:57:38 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 04:57:38 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:03:40 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:05:42 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 05:07:43 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 05:09:43 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:15:47 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:15:47 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:19:49 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 05:21:49 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:27:53 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:33:55 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:35:57 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 05:39:58 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:46:02 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:46:02 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:50:04 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 05:52:04 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 05:58:07 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:00:09 - CRON_DAILY_IDEAS_START [INFO]: Starting daily idea generation
+2025-06-21 06:04:10 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:04:10 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:04:11 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 06:08:13 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 06:10:13 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:16:16 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:16:16 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:20:19 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 06:22:19 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:28:22 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:34:25 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:34:25 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:34:26 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 06:40:32 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:46:36 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:50:38 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 06:52:38 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 06:58:42 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:04:45 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:04:45 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 07:08:47 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 07:10:47 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:16:50 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:20:53 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 07:22:53 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:28:57 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:28:57 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:35:00 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:35:00 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:35:00 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 07:41:02 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:47:05 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:47:05 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:51:08 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 07:53:08 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 07:59:11 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 08:05:14 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 08:05:15 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 08:07:16 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 08:11:17 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 08:17:19 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 08:19:21 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 08:23:22 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 08:29:25 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 08:35:28 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 08:35:29 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 08:41:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 08:47:34 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 08:49:36 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 08:53:37 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 08:59:40 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 09:05:43 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 09:05:44 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 09:07:45 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 09:11:46 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 09:17:49 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 09:19:51 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 09:23:52 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 09:29:55 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 09:35:58 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 09:35:59 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 09:42:01 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 09:48:04 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 09:50:06 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 09:54:07 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 10:00:10 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 10:04:13 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 10:06:13 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 10:08:15 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 10:12:16 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 10:18:19 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 10:20:21 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 10:24:22 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 10:30:25 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 10:34:28 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 10:36:28 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 10:42:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 10:48:34 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 10:50:36 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 10:54:37 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 11:00:40 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 11:04:43 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 11:06:43 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 11:08:45 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 11:12:46 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 11:18:49 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 11:20:51 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 11:24:52 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 11:30:55 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 11:34:58 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 11:36:58 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 11:43:01 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 11:49:04 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 11:51:06 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 11:55:07 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 12:01:10 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 12:05:13 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 12:07:13 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 12:07:14 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 12:13:16 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 12:14:43 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:14:45 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 12:14:45 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":6}
+2025-06-21 12:14:45 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 12:19:44 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 12:19:44 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 12:25:12 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 12:26:03 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":99997200}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 12:26:03 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 12:26:03 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 12:26:03 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 12:26:03 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 12:27:33 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:27:33 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-21 12:27:34 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-21 12:27:34 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-21 12:27:34 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 12:27:34 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":36}
+2025-06-21 12:27:34 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 12:27:34 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":35}
+2025-06-21 12:27:34 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":36,"generating_count":0,"generated_count":35,"approved_ids":["69","62","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":[],"generated_ids":["26","65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-21 12:27:34 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":36,"generating_count":0,"generated_count":35}
+2025-06-21 12:27:37 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":99997480}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 12:27:37 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 12:27:37 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 12:27:37 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 12:27:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 12:27:40 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 12:27:40 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":4}
+2025-06-21 12:27:40 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 12:28:25 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:28:39 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"seed_images","where_conditions":1,"sql_length":61,"raw_sql":"SELECT * FROM psec_ai_blog_seed_images WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 12:28:39 - SEED IMAGE DELETED [INFO]: Array
+2025-06-21 12:29:14 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:30:15 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 12:34:16 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 12:36:15 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 12:43:16 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 12:44:33 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:44:35 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 12:44:55 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"fields_to_update":["context_id","name","type","content"],"user_id":2}
+2025-06-21 12:44:55 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 12:44:55 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":6,"updated_fields":["name","type","content","seed_image_id","updated_at"],"updated_by":2,"old_name":null,"new_name":"Layout Guidelines"}
+2025-06-21 12:44:55 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 12:44:55 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 12:48:00 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:48:03 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 12:48:09 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:49:10 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 12:49:10 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 12:50:07 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:50:11 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 12:50:19 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"fields_to_update":["context_id","name","type","content","seed_image_id","always_include_content"],"user_id":2}
+2025-06-21 12:50:19 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 12:50:19 - DATABASE_UPDATE_FAILED [ERROR]: Update operation failed (AI_Blog_Generator\Models\Database_Manager::update) - Context: {"table":"contexts","error":"Unknown column 'always_include_content' in 'field list'","data_size":6,"where_conditions":1}
+2025-06-21 12:52:33 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:52:40 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 12:52:43 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 12:52:47 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"fields_to_update":["context_id","name","type","content","seed_image_id","always_include_images"],"user_id":2}
+2025-06-21 12:52:47 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 12:52:47 - DATABASE_UPDATE_FAILED [ERROR]: Update operation failed (AI_Blog_Generator\Models\Database_Manager::update) - Context: {"table":"contexts","error":"Unknown column 'always_include_content' in 'field list'","data_size":6,"where_conditions":1}
+2025-06-21 12:55:42 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 13:01:44 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 13:01:54 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:01:57 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 13:02:00 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 13:04:20 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 13:04:20 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 13:04:27 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:04:33 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"fields_to_update":["context_id","name","type","content","always_include_images"],"user_id":2}
+2025-06-21 13:04:33 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:04:33 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"updated_fields":["name","type","content","seed_image_id","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Image Generation Guidelines","new_name":"Image Generation Guidelines"}
+2025-06-21 13:04:33 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:04:33 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 13:04:36 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:04:42 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"fields_to_update":["context_id","name","type","content","always_include_images"],"user_id":2}
+2025-06-21 13:04:42 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:04:42 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"updated_fields":["name","type","content","seed_image_id","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Image Generation Guidelines","new_name":"Image Generation Guidelines"}
+2025-06-21 13:04:42 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:04:42 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 13:04:45 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:04:51 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"fields_to_update":["context_id","name","type","content","seed_image_id","always_include_content","always_include_images"],"user_id":2}
+2025-06-21 13:04:51 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:04:51 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"updated_fields":["name","type","content","seed_image_id","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Image Generation Guidelines","new_name":"Image Generation Guidelines"}
+2025-06-21 13:04:51 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:04:51 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 13:04:57 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:06:56 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 13:07:57 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 13:08:26 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:08:30 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"fields_to_update":["context_id","name","type","content","seed_image_id","always_include_images"],"user_id":2}
+2025-06-21 13:08:30 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:08:30 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"updated_fields":["name","type","content","seed_image_id","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Image Generation Guidelines","new_name":"Image Generation Guidelines"}
+2025-06-21 13:08:30 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:08:30 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 13:08:32 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:08:58 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:09:01 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:10:58 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:11:13 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:11:15 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:12:14 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 13:19:14 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 13:19:14 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 13:25:14 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 13:31:14 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 13:34:49 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 13:37:50 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 13:42:03 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:42:06 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 13:42:18 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":2,"fields_to_update":["context_id","name","type","usage_flags","content","always_include_content"],"user_id":2}
+2025-06-21 13:42:18 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 13:42:18 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":2,"updated_fields":["name","type","content","usage_flags","seed_image_id","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Products and Services","new_name":"Products and Services"}
+2025-06-21 13:42:18 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 13:42:18 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 13:42:20 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 13:42:54 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 13:42:54 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:43:08 - UPDATE_CONTEXT_START [INFO]: Starting context update process (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"fields_to_update":["context_id","name","type","usage_flags","content","seed_image_id"],"user_id":2}
+2025-06-21 13:43:08 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:43:08 - CONTEXT_UPDATED_SUCCESS [INFO]: Context updated successfully (AI_Blog_Generator\Controllers\Context_Controller::update_context) - Context: {"context_id":5,"updated_fields":["name","type","content","usage_flags","seed_image_id","always_include_content","always_include_images","updated_at"],"updated_by":2,"old_name":"Image Generation Guidelines","new_name":"Image Generation Guidelines"}
+2025-06-21 13:43:08 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:43:08 - AJAX_SUCCESS_UPDATE_CONTEXT [INFO]: Context updated successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context","context_id","updated_fields"],"response_size":3}
+2025-06-21 13:43:12 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:49:06 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 13:50:25 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 13:50:30 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:50:32 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 13:50:45 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 13:50:49 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100021272}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 13:50:49 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 13:50:49 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 13:50:49 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 13:50:49 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 13:50:51 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 13:50:51 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":4}
+2025-06-21 13:50:51 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 13:51:18 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 13:51:18 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 13:51:18 - WORDPRESS_USER_CREATED [INFO]: WordPress user created for persona - Context: {"persona_name":"Sarah","user_id":5,"username":"sarah"}
+2025-06-21 13:51:18 - PERSONA_UPDATED [INFO]: Persona updated - Context: {"persona_id":4,"name":"Sarah"}
+2025-06-21 13:51:18 - AJAX_SUCCESS_UPDATE_PERSONA [INFO]: Persona updated successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona_id"],"response_size":1}
+2025-06-21 13:51:20 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100030568}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 13:51:20 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 13:51:20 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 13:51:20 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 13:51:20 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 13:51:22 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 13:51:22 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":6}
+2025-06-21 13:51:22 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 13:51:27 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 13:51:27 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":1}
+2025-06-21 13:51:27 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 13:51:30 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 13:51:30 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 13:51:30 - WORDPRESS_USER_CREATED [INFO]: WordPress user created for persona - Context: {"persona_name":"John","user_id":6,"username":"john"}
+2025-06-21 13:51:30 - PERSONA_UPDATED [INFO]: Persona updated - Context: {"persona_id":1,"name":"John"}
+2025-06-21 13:51:30 - AJAX_SUCCESS_UPDATE_PERSONA [INFO]: Persona updated successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona_id"],"response_size":1}
+2025-06-21 13:51:32 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100039096}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 13:51:32 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 13:51:32 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 13:51:32 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 13:51:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 13:51:51 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 13:51:51 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":4}
+2025-06-21 13:51:51 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 13:52:15 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:52:29 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:52:33 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:52:36 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:52:36 - IDEA_MODEL::get_with_category - Method called
+2025-06-21 13:52:36 - IDEA_MODEL::get_with_category - DATA: {"filters":{"status":"approved"},"order_by":"created_at ASC","memory_usage":99879232}
+2025-06-21 13:52:36 - IDEA_MODEL::get_with_category - Starting method execution
+2025-06-21 13:52:36 - IDEA_MODEL::get_with_category - Tables resolved
+2025-06-21 13:52:36 - IDEA_MODEL::get_with_category - DATA: {"ideas_table":"psec_ai_blog_ideas","categories_table":"psec_terms","term_taxonomy_table":"psec_term_taxonomy","personas_table":"psec_ai_blog_personas"}
+2025-06-21 13:52:36 - IDEA_MODEL::get_with_category - SQL query built
+2025-06-21 13:52:36 - IDEA_MODEL::get_with_category - DATA: {"sql":"SELECT i.*, t.name as category_name, t.slug as category_slug, p.name as persona_name, p.tone as pers...[truncated]","where_values":["approved"]}
+2025-06-21 13:52:36 - IDEA_MODEL::get_with_category - Query executed
+2025-06-21 13:52:36 - IDEA_MODEL::get_with_category - DATA: {"results_count":36,"wpdb_last_error":""}
+2025-06-21 13:52:36 - BLOG_MODEL::count_generated_today - Method called
+2025-06-21 13:52:36 - BLOG_MODEL::count_generated_today - DATA: {"memory_usage":99949008}
+2025-06-21 13:52:36 - BLOG_MODEL::count_generated_today - Date calculated
+2025-06-21 13:52:36 - BLOG_MODEL::count_generated_today - DATA: {"today":"2025-06-21"}
+2025-06-21 13:52:36 - BLOG_MODEL::count_generated_today - Table name resolved
+2025-06-21 13:52:36 - BLOG_MODEL::count_generated_today - DATA: {"table":"psec_ai_blog_generated_posts"}
+2025-06-21 13:52:36 - BLOG_MODEL::count_generated_today - SQL query prepared
+2025-06-21 13:52:36 - BLOG_MODEL::count_generated_today - DATA: {"sql":"SELECT COUNT(*) FROM psec_ai_blog_generated_posts WHERE DATE(created_at) = '2025-06-21'","today_param":"2025-06-21"}
+2025-06-21 13:52:36 - BLOG_MODEL::count_generated_today - Query executed
+2025-06-21 13:52:36 - BLOG_MODEL::count_generated_today - DATA: {"count":0,"count_type":"integer","wpdb_last_error":""}
+2025-06-21 13:52:36 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:52:37 - GET_APPROVED_IDEAS_START [INFO]: Getting approved ideas for admin page (AI_Blog_Generator\Admin\Admin_Manager::ajax_get_approved_ideas) - Context: {"user_id":2}
+2025-06-21 13:52:37 - IDEA_MODEL::get_with_category - Method called
+2025-06-21 13:52:37 - IDEA_MODEL::get_with_category - DATA: {"filters":{"status":"approved"},"order_by":"created_at ASC","memory_usage":104157176}
+2025-06-21 13:52:37 - IDEA_MODEL::get_with_category - Starting method execution
+2025-06-21 13:52:37 - IDEA_MODEL::get_with_category - Tables resolved
+2025-06-21 13:52:37 - IDEA_MODEL::get_with_category - DATA: {"ideas_table":"psec_ai_blog_ideas","categories_table":"psec_terms","term_taxonomy_table":"psec_term_taxonomy","personas_table":"psec_ai_blog_personas"}
+2025-06-21 13:52:37 - IDEA_MODEL::get_with_category - SQL query built
+2025-06-21 13:52:37 - IDEA_MODEL::get_with_category - DATA: {"sql":"SELECT i.*, t.name as category_name, t.slug as category_slug, p.name as persona_name, p.tone as pers...[truncated]","where_values":["approved"]}
+2025-06-21 13:52:37 - IDEA_MODEL::get_with_category - Query executed
+2025-06-21 13:52:37 - IDEA_MODEL::get_with_category - DATA: {"results_count":36,"wpdb_last_error":""}
+2025-06-21 13:52:37 - MODEL_LOADED [INFO]: Model Loaded (AI_Blog_Generator\Admin\Admin_Manager::ajax_get_approved_ideas) - Context: {"user_id":2,"ideas_count":36}
+2025-06-21 13:52:37 - GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully (AI_Blog_Generator\Admin\Admin_Manager::ajax_get_approved_ideas) - Context: {"ideas_count":36}
+2025-06-21 13:52:37 - AJAX_SUCCESS_GET_APPROVED_IDEAS [INFO]: Approved ideas loaded successfully. (AI_Blog_Generator\Admin\Admin_Manager::send_ajax_success) - Context: {"data_keys":["ideas","generation_statuses","total_count"],"response_size":3}
+2025-06-21 13:52:39 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 13:52:39 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-21 13:52:40 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-21 13:52:40 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-21 13:52:40 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 13:52:40 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":36}
+2025-06-21 13:52:40 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 13:52:40 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":35}
+2025-06-21 13:52:40 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":36,"generating_count":0,"generated_count":35,"approved_ids":["69","62","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":[],"generated_ids":["26","65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-21 13:52:40 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":36,"generating_count":0,"generated_count":35}
+2025-06-21 13:55:40 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 14:01:40 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 14:05:41 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 14:07:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:07:40 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 14:07:41 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:07:41 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 14:09:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:11:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:13:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:13:40 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 14:15:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:17:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:19:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:19:40 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 14:19:41 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:19:41 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 14:21:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:23:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:25:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:25:40 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 14:27:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:29:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:31:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:31:40 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 14:33:40 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:34:53 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:34:53 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:34:54 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 14:34:58 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:34:58 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 14:35:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:09 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:16 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:29 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:35 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:36 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 14:35:36 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:36 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:37 - GET_PENDING_IDEAS_REQUEST [INFO]: Processing request for pending ideas
+2025-06-21 14:35:37 - PENDING_IDEAS_RETRIEVED [INFO]: Retrieved pending ideas (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_pending_ideas) - Context: {"count":0}
+2025-06-21 14:35:37 - AJAX_SUCCESS_GET_PENDING_IDEAS [INFO]: Pending ideas retrieved successfully (AI_Blog_Generator\Controllers\Blog_Ideas_Controller_V2::send_ajax_success) - Context: {"data_keys":["ideas","count"],"response_size":2}
+2025-06-21 14:35:37 - GET_STATISTICS_REQUEST [INFO]: Processing request for idea statistics
+2025-06-21 14:35:37 - STATISTICS_RETRIEVED [INFO]: Retrieved idea statistics (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_statistics) - Context: {"total_generated":"71","approved":"36","denied":"0","generated":"35","pending":"0"}
+2025-06-21 14:35:37 - AJAX_SUCCESS_GET_STATISTICS [INFO]: Statistics retrieved successfully (AI_Blog_Generator\Controllers\Blog_Ideas_Controller_V2::send_ajax_success) - Context: {"data_keys":["total_generated","approved","denied","generated","pending"],"response_size":5}
+2025-06-21 14:35:45 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:45 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 14:35:45 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-21 14:35:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:46 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-21 14:35:46 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-21 14:35:46 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 14:35:46 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":36}
+2025-06-21 14:35:46 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 14:35:46 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":35}
+2025-06-21 14:35:46 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":36,"generating_count":0,"generated_count":35,"approved_ids":["69","62","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":[],"generated_ids":["26","65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-21 14:35:46 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":36,"generating_count":0,"generated_count":35}
+2025-06-21 14:35:52 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:52 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100206856}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 14:35:52 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 14:35:52 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 14:35:52 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 14:35:52 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 14:35:56 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:35:56 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 14:35:56 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":2}
+2025-06-21 14:35:56 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 14:36:33 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:36:33 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 14:36:46 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:36:46 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 14:36:46 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 14:36:47 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:36:58 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:36:59 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 14:37:59 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:38:00 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:38:59 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:39:59 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:40:59 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:41:26 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:41:27 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 14:41:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:41:34 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:42:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:42:28 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 14:44:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:46:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:48:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:48:28 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 14:48:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:50:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:50:28 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:50:28 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 14:52:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:54:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:54:28 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 14:56:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 14:58:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:00:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:00:29 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 15:01:18 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:01:19 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:01:19 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:01:19 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:01:19 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:01:20 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:01:20 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:01:30 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:01:31 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:01:31 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:01:31 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:01:31 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:01:32 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:01:32 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:02:31 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:03:31 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:03:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:03:33 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:03:33 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:03:33 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:03:33 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:03:33 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:03:37 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:03:37 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:03:54 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:03:55 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:03:55 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:03:55 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:03:55 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:03:56 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:03:56 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:04:55 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:04:56 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:04:56 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 15:06:48 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:06:49 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 15:06:49 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:06:49 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:06:49 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:06:49 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:06:50 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:06:50 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:07:49 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:07:50 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:07:50 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 15:09:22 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:09:24 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:09:25 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:09:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:09:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:09:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:09:26 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:09:26 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":null}
+2025-06-21 15:09:39 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:10:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:12:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:12:26 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 15:14:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:16:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:16:42 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:16:43 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:16:43 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:16:43 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:16:44 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:16:44 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":"ai_blog_generator_products"}
+2025-06-21 15:16:44 - DATABASE_GET_ALL [ERROR]: Invalid table name - Context: {"table":"ai_blog_generator_products"}
+2025-06-21 15:16:53 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:16:53 - DATABASE_INSERT_INVALID_TABLE [ERROR]: Invalid table name provided (AI_Blog_Generator\Models\Database_Manager::insert) - Context: {"table":"ai_blog_generator_products","valid_tables":["ideas","generated_posts","contexts","personas","logs","cost_analytics","seed_images"]}
+2025-06-21 15:17:07 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:17:07 - DATABASE_INSERT_INVALID_TABLE [ERROR]: Invalid table name provided (AI_Blog_Generator\Models\Database_Manager::insert) - Context: {"table":"ai_blog_generator_products","valid_tables":["ideas","generated_posts","contexts","personas","logs","cost_analytics","seed_images"]}
+2025-06-21 15:17:43 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:17:44 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 15:19:44 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:19:45 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:19:45 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 15:23:04 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:23:05 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 15:23:05 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:23:05 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:23:05 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:23:11 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:23:12 - PRODUCT_CREATE_ATTEMPT [INFO]: Attempting to create product - Context: {"data":{"product_name":"xx","product_description":"dsfg","ideal_uses":"fdgdf"}}
+2025-06-21 15:23:12 - PRODUCT_CREATED [INFO]: Product created successfully - Context: {"product_id":1}
+2025-06-21 15:23:12 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:23:15 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:23:22 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:23:25 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:23:30 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:23:30 - PRODUCT_IMAGE_ADDED [INFO]: Image added to product - Context: {"product_id":1,"attachment_id":153,"is_primary":true}
+2025-06-21 15:23:52 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:23:53 - PRODUCT_LINK_ADDED [INFO]: Link added to product - Context: {"product_id":1,"link_url":"https:\/\/posterstudioexpress.com","link_type":"product_page"}
+2025-06-21 15:23:56 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:23:56 - PRODUCT_UPDATED [INFO]: Product updated successfully - Context: {"product_id":1}
+2025-06-21 15:23:56 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:24:05 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:24:20 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:24:20 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:24:20 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-21 15:24:21 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:24:21 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-21 15:24:21 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-21 15:24:21 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 15:24:21 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":36}
+2025-06-21 15:24:21 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 15:24:21 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":35}
+2025-06-21 15:24:21 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":36,"generating_count":0,"generated_count":35,"approved_ids":["69","62","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":[],"generated_ids":["26","65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-21 15:24:21 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":36,"generating_count":0,"generated_count":35}
+2025-06-21 15:24:27 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:24:27 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:24:31 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:24:32 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":null,"preserve_structure":false,"memory_usage":100232040}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-21 15:24:32 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":null,"preserve_structure":false}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params":[]}
+2025-06-21 15:24:32 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 ORDER BY type ASC, priority DESC, name ASC","params_count":0,"usage":null,"type":null}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-21 15:24:32 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":null,"type":null}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":false}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Starting grouping by type
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 0
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":""}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 1
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"general"}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 2
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"products"}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 3
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"seo"}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 4
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"keywords"}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Processing context 5
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"context_type":"image"}
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - Grouping completed
+2025-06-21 15:24:32 - CONTEXT_MODEL::get_enhanced_active - DATA: {"grouped_types":["","general","products","seo","keywords","image"],"total_groups":6}
+2025-06-21 15:24:34 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:24:34 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 15:24:34 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":6}
+2025-06-21 15:24:34 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 15:25:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:27:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:29:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:29:32 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 15:29:42 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:29:42 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 15:29:42 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":2}
+2025-06-21 15:29:42 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 15:30:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:31:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered
+2025-06-21 15:32:32 - PRODUCT_AJAX_HANDLERS_REGISTERED [INFO]: Product AJAX handlers registered

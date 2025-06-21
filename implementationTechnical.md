@@ -21,7 +21,8 @@ ai-blog-generator/
 │   │   └── js/
 │   │       ├── admin.js (948 lines - AJAX handlers, UI interactions)
 │   │       ├── contexts.js
-│   │       └── personas.js
+│   │       ├── personas.js
+│   │       └── products.js
 │   ├── views/
 │   │   ├── settings.php
 │   │   ├── blog-ideas.php
@@ -30,6 +31,7 @@ ai-blog-generator/
 │   │   ├── published-posts.php
 │   │   ├── contexts.php
 │   │   ├── personas.php
+│   │   ├── products.php
 │   │   ├── logs.php
 │   │   └── costs-dashboard.php
 │   └── class-admin-manager.php (592 lines)
@@ -38,6 +40,7 @@ ai-blog-generator/
 │   ├── class-idea-controller.php
 │   ├── class-context-controller.php
 │   ├── class-persona-controller.php
+│   ├── class-product-controller.php
 │   ├── class-image-controller.php
 │   └── class-analytics-controller.php
 ├── includes/
@@ -52,6 +55,7 @@ ai-blog-generator/
 │   ├── class-idea-model.php
 │   ├── class-context-model.php
 │   ├── class-persona-model.php
+│   ├── class-product-model.php
 │   ├── class-log-model.php
 │   └── class-cost-model.php
 ├── services/
@@ -156,6 +160,37 @@ created_at (datetime)
 updated_at (datetime)
 ```
 
+### 8. Products Table (`wp_ai_blog_generator_products`)
+```sql
+id (bigint) PRIMARY KEY
+name (varchar 255)
+description (text)
+ideal_uses (text)
+created_at (datetime)
+updated_at (datetime)
+```
+
+### 9. Product Images Table (`wp_ai_blog_generator_product_images`)
+```sql
+id (bigint) PRIMARY KEY
+product_id (bigint) FOREIGN KEY
+attachment_id (bigint)
+image_url (varchar 500)
+is_primary (tinyint) DEFAULT 0
+display_order (int) DEFAULT 0
+created_at (datetime)
+```
+
+### 10. Product Links Table (`wp_ai_blog_generator_product_links`)
+```sql
+id (bigint) PRIMARY KEY
+product_id (bigint) FOREIGN KEY
+link_type (enum: product_page, purchase, documentation, other) DEFAULT 'other'
+link_text (varchar 255)
+link_url (varchar 500)
+created_at (datetime)
+```
+
 ## Key Classes and Implementation
 
 ### 1. Database Manager (Singleton)
@@ -184,6 +219,7 @@ All models extend the abstract `Model` class providing:
 - `Idea_Model` - Handles blog ideas with category relationships
 - `Context_Model` - Business context management
 - `Persona_Model` - Writing personas with expertise and style management
+- `Product_Model` - Product catalog with images and links management
 - `Log_Model` - Logging with filtering and cleanup
 - `Cost_Model` - Cost tracking and budget calculations
 
@@ -233,6 +269,7 @@ All controllers implement:
 - `Idea_Controller` - Manages idea generation, approval, and denial
 - `Context_Controller` - CRUD operations for contexts
 - `Persona_Controller` - CRUD operations for personas, persona assignment
+- `Product_Controller` - CRUD operations for products, images, links, and WooCommerce import
 - `Image_Controller` - Image generation and seed image management
 - `Analytics_Controller` - Cost tracking and analytics data
 
@@ -295,13 +332,14 @@ Location: `services/class-scheduler-service.php`
 ### ✅ Completed:
 1. **Database Layer**: All models and Database Manager implemented
 2. **API Services**: Both Anthropic and OpenAI services complete with error handling
-3. **Controllers**: All 5 controllers with AJAX handlers
-4. **Admin Views**: All 8 admin pages created with proper escaping
+3. **Controllers**: All 6 controllers with AJAX handlers (including Products)
+4. **Admin Views**: All 10 admin pages created with proper escaping (including Products)
 5. **Logger**: Complete with database storage and cleanup
 6. **Cost Tracking**: Integrated in all API calls
 7. **Plugin Infrastructure**: Activator, Deactivator, Loader implemented
 8. **Cron System**: All scheduled tasks registered
 9. **Admin Assets**: CSS (940 lines) and JS (948 lines) complete
+10. **Products Management**: Full CRUD with images, links, and WooCommerce import
 
 ### ⚠️ Areas for Enhancement:
 1. **Dependency Injection**: Services currently use direct instantiation instead of DI
@@ -1215,27 +1253,6 @@ public function select_persona_for_idea($idea) {
 }
 ```
 
-### Prompt Engineering Updates
-
-#### Idea Generation with Persona Selection
-```php
-private function build_ideas_prompt_with_personas($contexts, $personas) {
-    $prompt = "You are an AI assistant helping to generate blog ideas. ";
-    $prompt .= "You have access to these writing personas:\n\n";
-    
-    foreach ($personas as $persona) {
-        $prompt .= "- {$persona['name']}: {$persona['bio']}\n";
-        $prompt .= "  Expertise: {$persona['expertise']}\n\n";
-    }
-    
-    $prompt .= "For each blog idea, also suggest which persona would be best suited ";
-    $prompt .= "to write it based on their expertise and the topic requirements.\n\n";
-    
-    // Rest of existing prompt...
-    return $prompt;
-}
-```
-
 #### Content Generation with Persona Context
 ```php
 private function build_content_prompt_with_persona($idea, $contexts, $persona) {
@@ -1621,3 +1638,318 @@ This implementation provides a robust, scalable solution for managing concurrent
 - Ideas Model merges transient data with database data for real-time display
 
 ### Frontend Features
+
+## Products Management System (v1.7.0)
+
+### Overview
+Version 1.7.0 introduces a comprehensive products management system that allows users to catalog their products with multiple images and links. The system supports both manual product creation and WooCommerce product import, providing a centralized product database for AI content generation context.
+
+### Database Schema
+
+#### Products Table (`wp_ai_blog_generator_products`)
+```sql
+CREATE TABLE wp_ai_blog_generator_products (
+    id BIGINT(20) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    ideal_uses TEXT,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    KEY idx_name (name)
+);
+```
+
+#### Product Images Table (`wp_ai_blog_generator_product_images`)
+```sql
+CREATE TABLE wp_ai_blog_generator_product_images (
+    id BIGINT(20) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT(20) UNSIGNED NOT NULL,
+    attachment_id BIGINT(20) UNSIGNED NOT NULL,
+    image_url VARCHAR(500) NOT NULL,
+    is_primary TINYINT(1) DEFAULT 0,
+    display_order INT DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_product (product_id),
+    KEY idx_primary (is_primary),
+    KEY idx_order (display_order)
+);
+```
+
+#### Product Links Table (`wp_ai_blog_generator_product_links`)
+```sql
+CREATE TABLE wp_ai_blog_generator_product_links (
+    id BIGINT(20) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_id BIGINT(20) UNSIGNED NOT NULL,
+    link_type ENUM('product_page','purchase','documentation','other') DEFAULT 'other',
+    link_text VARCHAR(255) NOT NULL,
+    link_url VARCHAR(500) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    KEY idx_product (product_id),
+    KEY idx_type (link_type)
+);
+```
+
+### Model Implementation
+
+#### Product_Model
+Location: `models/class-product-model.php`
+
+**Key Features:**
+- Extends base Model class but overrides all CRUD methods
+- Direct wpdb queries for compatibility
+- Handles relationships with images and links tables
+- Comprehensive validation and sanitization
+
+**Key Methods:**
+```php
+public function get_all($where = [], $order_by = 'name ASC', $limit = '') {
+    // Gets products with primary image and link counts
+}
+
+public function get($where = [], $fields = '*') {
+    // Gets single product with all images and links
+}
+
+public function insert($data) {
+    // Creates new product
+}
+
+public function update($data, $where) {
+    // Updates existing product
+}
+
+public function delete($where) {
+    // Deletes product and cascade deletes images/links
+}
+
+public function get_product_images($product_id) {
+    // Gets all images for a product ordered by display_order
+}
+
+public function get_product_links($product_id) {
+    // Gets all links for a product
+}
+```
+
+### Controller Implementation
+
+#### Product_Controller
+Location: `controllers/class-product-controller.php`
+
+**AJAX Handlers:**
+```php
+// Product CRUD
+'wp_ajax_ai_blog_get_products' => 'ajax_get_products'
+'wp_ajax_ai_blog_get_product' => 'ajax_get_product'
+'wp_ajax_ai_blog_create_product' => 'ajax_create_product'
+'wp_ajax_ai_blog_update_product' => 'ajax_update_product'
+'wp_ajax_ai_blog_delete_product' => 'ajax_delete_product'
+
+// Image management
+'wp_ajax_ai_blog_add_product_images' => 'ajax_add_product_images'
+'wp_ajax_ai_blog_update_product_images' => 'ajax_update_product_images'
+'wp_ajax_ai_blog_delete_product_image' => 'ajax_delete_product_image'
+'wp_ajax_ai_blog_set_primary_image' => 'ajax_set_primary_image'
+'wp_ajax_ai_blog_reorder_images' => 'ajax_reorder_images'
+
+// Link management
+'wp_ajax_ai_blog_update_product_links' => 'ajax_update_product_links'
+
+// WooCommerce integration
+'wp_ajax_ai_blog_get_woocommerce_products' => 'ajax_get_woocommerce_products'
+'wp_ajax_ai_blog_import_woocommerce_product' => 'ajax_import_woocommerce_product'
+```
+
+**Security Implementation:**
+- All handlers use `verify_ajax_security()` for nonce and capability checks
+- Input sanitization using WordPress functions
+- Output escaping in JSON responses
+- SQL injection prevention with prepared statements
+
+### Frontend Implementation
+
+#### Admin View
+Location: `admin/views/products.php`
+
+**Features:**
+- Grid layout with responsive cards
+- Search functionality with real-time filtering
+- Pagination (12 products per page)
+- Modal-based add/edit interface
+- WooCommerce import section
+
+#### JavaScript Implementation
+Location: `admin/assets/js/products.js`
+
+**Core Object Structure:**
+```javascript
+window.aiBlogProducts = {
+    currentPage: 1,
+    searchTerm: '',
+    editingProductId: null,
+    selectedImages: [],
+    productLinks: [],
+    
+    // Core methods
+    init: function() { ... },
+    loadProducts: function() { ... },
+    showAddModal: function() { ... },
+    editProduct: function(productId) { ... },
+    saveProduct: function() { ... },
+    deleteProduct: function(productId) { ... },
+    
+    // Image management
+    openMediaLibrary: function() { ... },
+    updateImageDisplay: function() { ... },
+    removeImage: function(attachmentId) { ... },
+    setPrimaryImage: function(attachmentId) { ... },
+    
+    // Link management
+    addLink: function() { ... },
+    removeLink: function(index) { ... },
+    
+    // WooCommerce integration
+    loadWooCommerceProducts: function() { ... },
+    importWooCommerceProduct: function(productId) { ... }
+};
+```
+
+**Key Features:**
+1. **Media Library Integration**
+   - Uses WordPress media modal for image selection
+   - Supports multiple image selection
+   - Automatic thumbnail generation
+
+2. **Drag-and-Drop Image Ordering**
+   - jQuery UI sortable for image reordering
+   - Visual feedback during drag
+   - Automatic order saving
+
+3. **Dynamic Link Management**
+   - Add unlimited links per product
+   - Predefined link types with icons
+   - URL validation
+
+4. **Real-time Search**
+   - Client-side filtering for instant results
+   - Searches product names and descriptions
+   - Maintains pagination state
+
+### CSS Styling
+
+**Key Styles:**
+- `.ai-blog-products-grid`: Responsive grid layout
+- `.ai-blog-product-card`: Individual product cards with hover effects
+- `.ai-blog-product-images-grid`: Image grid in edit modal
+- `.ai-blog-product-image-item`: Individual images with actions
+- `.ai-blog-product-links`: Link management section
+- `.ai-blog-woocommerce-section`: WooCommerce import styling
+
+### WooCommerce Integration
+
+**Import Process:**
+1. Queries WooCommerce products via `wc_get_products()`
+2. Retrieves product images and galleries
+3. Maps WooCommerce data to plugin structure
+4. Creates product with all images and product page link
+5. Handles variations as separate products
+
+**Data Mapping:**
+```php
+// WooCommerce -> Plugin
+'name' => $wc_product->get_name()
+'description' => $wc_product->get_description()
+'ideal_uses' => $wc_product->get_short_description()
+
+// Images
+- Featured image becomes primary
+- Gallery images added with order preserved
+
+// Links
+- Product permalink added as 'product_page' type
+```
+
+### Integration Points
+
+#### With Content Generation
+- Products can be referenced in contexts
+- Product descriptions enhance AI understanding
+- Images can be used as seed images
+- Links provide additional context
+
+#### With WordPress Core
+- Full media library integration
+- Proper capability checking
+- WordPress coding standards
+- Hooks for extensibility
+
+### Performance Considerations
+
+1. **Database Optimization**
+   - Indexed columns for fast queries
+   - Efficient JOIN operations
+   - Pagination to limit results
+
+2. **Frontend Performance**
+   - Lazy loading of images
+   - Debounced search input
+   - Optimized JavaScript execution
+
+3. **Caching Strategy**
+   - Transient caching for expensive queries
+   - Client-side caching of loaded products
+
+### Security Measures
+
+1. **Input Validation**
+   - Product name required and sanitized
+   - URL validation for links
+   - File type validation for images
+
+2. **Access Control**
+   - Requires `manage_options` capability
+   - Nonce verification on all actions
+   - User permission checks
+
+3. **Data Sanitization**
+   - All text inputs sanitized
+   - URLs properly escaped
+   - SQL injection prevention
+
+### Error Handling
+
+1. **User-Friendly Messages**
+   - Clear error descriptions
+   - Suggested solutions
+   - Success confirmations
+
+2. **Logging**
+   - All errors logged with context
+   - Debug information available
+   - Performance metrics tracked
+
+3. **Graceful Degradation**
+   - Fallbacks for missing data
+   - Partial success handling
+   - Recovery mechanisms
+
+### Future Enhancements
+
+1. **Bulk Operations**
+   - Multi-select for bulk delete
+   - Bulk import from CSV
+   - Bulk image upload
+
+2. **Advanced Features**
+   - Product categories/tags
+   - Custom fields support
+   - Product variations
+
+3. **Integration Expansion**
+   - Other e-commerce platforms
+   - External product feeds
+   - API access
+
+This implementation provides a robust, user-friendly products management system that seamlessly integrates with the AI blog generation workflow while maintaining WordPress best practices and security standards.
+
+#### Status Updates

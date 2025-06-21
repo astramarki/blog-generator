@@ -169,6 +169,16 @@ class Admin_Manager {
 			[ $this, 'render_personas_page' ]
 		);
 
+		// Products submenu.
+		add_submenu_page(
+			$this->menu_slug,
+			__( 'Products', 'ai-blog-generator' ),
+			__( 'Products', 'ai-blog-generator' ),
+			$this->capability,
+			$this->menu_slug . '-products',
+			[ $this, 'render_products_page' ]
+		);
+
 		// Logs submenu.
 
 
@@ -343,6 +353,7 @@ class Admin_Manager {
 		// Localize for page-specific scripts (wp_localize_script silently fails if script doesn't exist)
 		wp_localize_script( 'ai-blog-generator-contexts', 'aiBlogAjax', $localized_data );
 		wp_localize_script( 'ai-blog-generator-personas', 'aiBlogAjax', $localized_data );
+		wp_localize_script( 'ai-blog-generator-products', 'aiBlogAjax', $localized_data );
 
 		
 		// Debug Blog Ideas V2 script localization
@@ -477,6 +488,21 @@ class Admin_Manager {
 				'ai-blog-generator-personas',
 				AI_BLOG_GENERATOR_PLUGIN_URL . 'admin/assets/js/personas.js',
 				[ 'jquery', 'ai-blog-generator-admin' ],
+				$this->version,
+				true
+			);
+		}
+
+		// Products page - products.js for functionality.
+		if ( strpos( $hook, $this->menu_slug . '-products' ) !== false ) {
+			// Enqueue media library
+			wp_enqueue_media();
+			
+			// Enqueue products-specific JavaScript
+			wp_enqueue_script(
+				'ai-blog-generator-products',
+				AI_BLOG_GENERATOR_PLUGIN_URL . 'admin/assets/js/products.js',
+				[ 'jquery', 'ai-blog-generator-admin', 'wp-media-utils' ],
 				$this->version,
 				true
 			);
@@ -1003,7 +1029,18 @@ class Admin_Manager {
 		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'admin/views/personas.php';
 	}
 
+	/**
+	 * Render the products page.
+	 */
+	public function render_products_page() {
+		// Check user capabilities.
+		if ( ! current_user_can( $this->capability ) ) {
+			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'ai-blog-generator' ) );
+		}
 
+		// Load the view.
+		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'admin/views/products.php';
+	}
 
 	/**
 	 * Render the costs dashboard.

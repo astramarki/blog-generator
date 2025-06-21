@@ -8,10 +8,12 @@ CREATE TABLE psec_ai_blog_contexts (
   description text DEFAULT NULL,
   type enum ('general', 'products', 'seo', 'keywords', 'image', 'layout') DEFAULT 'general',
   content text DEFAULT NULL,
-  seed_image_id bigint(20) DEFAULT NULL,
+  
   active tinyint(1) DEFAULT 1,
   priority int(11) DEFAULT 50,
-  usage_flags varchar(255) DEFAULT 'ideas,content,images',
+  usage_flags varchar(255) DEFAULT 'content',
+  always_include_content tinyint(1) DEFAULT 0,
+  always_include_images tinyint(1) DEFAULT 0,
   created_at datetime DEFAULT current_timestamp,
   updated_at datetime DEFAULT current_timestamp ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id)
@@ -254,4 +256,84 @@ ADD INDEX idx_product (product_name);
 --
 ALTER TABLE psec_ai_blog_seed_images
 ADD INDEX idx_context (context_id);
+
+## Products Table
+
+```sql
+CREATE TABLE `wp_ai_blog_generator_products` (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    product_name varchar(255) NOT NULL,
+    product_description text DEFAULT NULL,
+    ideal_uses text DEFAULT NULL,
+    woocommerce_product_id bigint(20) unsigned DEFAULT NULL,
+    created_at datetime DEFAULT CURRENT_TIMESTAMP,
+    updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_woocommerce_product_id (woocommerce_product_id),
+    KEY idx_product_name (product_name)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### Fields:
+- **id**: Primary key
+- **product_name**: Name of the product (required)
+- **product_description**: Detailed description of the product
+- **ideal_uses**: Text describing ideal use cases for the product
+- **woocommerce_product_id**: Optional reference to WooCommerce product for imported products
+- **created_at**: Timestamp when product was created
+- **updated_at**: Timestamp when product was last updated
+
+## Product Images Table
+
+```sql
+CREATE TABLE `wp_ai_blog_generator_product_images` (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    product_id bigint(20) unsigned NOT NULL,
+    attachment_id bigint(20) unsigned NOT NULL,
+    display_order int(11) DEFAULT 0,
+    is_primary tinyint(1) DEFAULT 0,
+    created_at datetime DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_product_id (product_id),
+    KEY idx_attachment_id (attachment_id),
+    KEY idx_display_order (display_order),
+    CONSTRAINT fk_product_images_product FOREIGN KEY (product_id) REFERENCES wp_ai_blog_generator_products(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### Fields:
+- **id**: Primary key
+- **product_id**: Foreign key to products table
+- **attachment_id**: WordPress media library attachment ID
+- **display_order**: Order for displaying images (0 = first)
+- **is_primary**: Whether this is the primary/featured image
+- **created_at**: Timestamp when image was linked
+
+## Product Links Table
+
+```sql
+CREATE TABLE `wp_ai_blog_generator_product_links` (
+    id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+    product_id bigint(20) unsigned NOT NULL,
+    link_url varchar(500) NOT NULL,
+    link_text varchar(255) DEFAULT NULL,
+    link_type enum('product_page','purchase','documentation','other') DEFAULT 'product_page',
+    display_order int(11) DEFAULT 0,
+    created_at datetime DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    KEY idx_product_id (product_id),
+    KEY idx_link_type (link_type),
+    KEY idx_display_order (display_order),
+    CONSTRAINT fk_product_links_product FOREIGN KEY (product_id) REFERENCES wp_ai_blog_generator_products(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+```
+
+### Fields:
+- **id**: Primary key
+- **product_id**: Foreign key to products table
+- **link_url**: URL of the link
+- **link_text**: Display text for the link (optional)
+- **link_type**: Type of link (product_page, purchase, documentation, other)
+- **display_order**: Order for displaying links
+- **created_at**: Timestamp when link was added
 

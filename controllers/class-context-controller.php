@@ -86,9 +86,11 @@ class Context_Controller {
 		// Validate input
 		$name = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
 		$type = isset( $_POST['type'] ) ? sanitize_text_field( $_POST['type'] ) : '';
+		$usage_flags = isset( $_POST['usage_flags'] ) ? sanitize_text_field( $_POST['usage_flags'] ) : 'content';
 		$content = isset( $_POST['content'] ) ? sanitize_textarea_field( $_POST['content'] ) : '';
-		$seed_image_id = isset( $_POST['seed_image_id'] ) ? absint( $_POST['seed_image_id'] ) : 0;
 		$active = isset( $_POST['active'] ) ? (bool) $_POST['active'] : true;
+		$always_include_content = isset( $_POST['always_include_content'] ) ? (bool) $_POST['always_include_content'] : false;
+		$always_include_images = isset( $_POST['always_include_images'] ) ? (bool) $_POST['always_include_images'] : false;
 
 		if ( empty( $name ) || empty( $type ) || empty( $content ) ) {
 			wp_send_json_error( [ 'message' => __( 'Name, type, and content are required.', 'ai-blog-generator' ) ] );
@@ -100,21 +102,23 @@ class Context_Controller {
 			wp_send_json_error( [ 'message' => __( 'Invalid context type.', 'ai-blog-generator' ) ] );
 		}
 
-		// Validate seed image if provided
-		if ( $seed_image_id ) {
-			$is_seed_image = get_post_meta( $seed_image_id, '_ai_blog_seed_image', true );
-			if ( ! $is_seed_image ) {
-				wp_send_json_error( [ 'message' => __( 'Invalid seed image ID.', 'ai-blog-generator' ) ] );
-			}
+		// Validate usage flags
+		$valid_usage = [ 'ideas', 'content', 'images' ];
+		if ( ! in_array( $usage_flags, $valid_usage, true ) ) {
+			wp_send_json_error( [ 'message' => __( 'Invalid usage category.', 'ai-blog-generator' ) ] );
 		}
+
+
 
 		// Create context
 		$context_id = $this->context_model->create( [
 			'name' => $name,
 			'type' => $type,
+			'usage_flags' => $usage_flags,
 			'content' => $content,
-			'seed_image_id' => $seed_image_id,
 			'active' => $active,
+			'always_include_content' => $always_include_content,
+			'always_include_images' => $always_include_images,
 		] );
 
 		if ( ! $context_id ) {
@@ -167,8 +171,10 @@ class Context_Controller {
 				'context_id' => 'absint',
 				'name' => 'sanitize_text_field',
 				'type' => 'sanitize_text_field',
+				'usage_flags' => 'sanitize_text_field',
 				'content' => 'sanitize_textarea_field',
-				'seed_image_id' => 'absint'
+				'always_include_content' => function( $value ) { return (int) (bool) $value; },
+				'always_include_images' => function( $value ) { return (int) (bool) $value; },
 			] );
 
 			$context_id = $sanitized_data['context_id'];
@@ -231,10 +237,24 @@ class Context_Controller {
 			if ( ! empty( $sanitized_data['content'] ) ) {
 				$update_data['content'] = $sanitized_data['content'];
 			}
-
-			if ( isset( $sanitized_data['seed_image_id'] ) ) {
-				$update_data['seed_image_id'] = $sanitized_data['seed_image_id'];
+			
+			if ( ! empty( $sanitized_data['usage_flags'] ) ) {
+				$valid_usage = [ 'ideas', 'content', 'images' ];
+				if ( ! in_array( $sanitized_data['usage_flags'], $valid_usage, true ) ) {
+					$this->send_ajax_error( 
+						__( 'Invalid usage category.', 'ai-blog-generator' ),
+						[ 'provided_usage' => $sanitized_data['usage_flags'], 'valid_usage' => $valid_usage ],
+						'update_context',
+						'invalid_usage'
+					);
+					return;
+				}
+				$update_data['usage_flags'] = $sanitized_data['usage_flags'];
 			}
+
+			// Always include checkbox fields in update data since they're always sent from JS (as 0 or 1)
+			$update_data['always_include_content'] = isset( $_POST['always_include_content'] ) ? (int) $_POST['always_include_content'] : 0;
+			$update_data['always_include_images'] = isset( $_POST['always_include_images'] ) ? (int) $_POST['always_include_images'] : 0;
 
 			// Add updated timestamp
 			$update_data['updated_at'] = current_time( 'mysql' );
@@ -261,8 +281,7 @@ class Context_Controller {
 			if ( ! $updated ) {
 				$this->log_error( 'context_update_failed', 'Failed to update context in database', [
 					'context_id' => $context_id,
-					'update_data' => $update_data,
-					'database_error' => $this->context_model->get_last_error()
+					'update_data' => $update_data
 				] );
 
 				$this->send_ajax_error( 
@@ -482,15 +501,7 @@ class Context_Controller {
 				wp_send_json_error( [ 'message' => __( 'Context not found.', 'ai-blog-generator' ) ] );
 			}
 
-			// Add seed image details if exists
-			if ( isset( $context->seed_image_id ) && $context->seed_image_id ) {
-				$image_url = wp_get_attachment_url( $context->seed_image_id );
-				$image_thumb = wp_get_attachment_image_src( $context->seed_image_id, 'thumbnail' );
-				if ( $image_url ) {
-					$context->seed_image_url = $image_url;
-					$context->seed_image_thumbnail = $image_thumb[0] ?? '';
-				}
-			}
+
 
 			// Clean any output buffer content and send success
 			ob_end_clean();
@@ -542,15 +553,7 @@ class Context_Controller {
 		$contexts = $this->context_model->get_all( $conditions, $per_page, ( $page - 1 ) * $per_page );
 		$total = $this->context_model->count( $conditions );
 
-		// Add seed image details
-		foreach ( $contexts as $context ) {
-			if ( $context->seed_image_id ) {
-				$image_thumb = wp_get_attachment_image_src( $context->seed_image_id, 'thumbnail' );
-				if ( $image_thumb ) {
-					$context->seed_image_thumbnail = $image_thumb[0];
-				}
-			}
-		}
+
 
 		// Get type statistics
 		$type_stats = $this->context_model->get_type_statistics();

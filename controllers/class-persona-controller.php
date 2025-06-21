@@ -142,6 +142,12 @@ class Persona_Controller {
 				'layout_rules' => 'sanitize_text_field',
 				'wordpress_user_id' => function( $value ) { return $value ? absint( $value ) : null; },
 				'active' => function( $value ) { return (int) (bool) $value; },
+				'uses_seed_mages' => function( $value ) { return (int) (bool) $value; },
+				'number_of_images' => function( $value ) { return $value ? absint( $value ) : null; },
+				'uses_charts' => function( $value ) { return (int) (bool) $value; },
+				'uses_avada_layouts' => function( $value ) { return (int) (bool) $value; },
+				'uses_plain_html' => function( $value ) { return (int) (bool) $value; },
+				'include_contexts' => 'sanitize_text_field',
 			] );
 
 			// Validate required fields
@@ -225,6 +231,12 @@ class Persona_Controller {
 				'layout_rules' => 'sanitize_text_field',
 				'wordpress_user_id' => function( $value ) { return $value ? absint( $value ) : null; },
 				'active' => function( $value ) { return (int) (bool) $value; },
+				'uses_seed_mages' => function( $value ) { return (int) (bool) $value; },
+				'number_of_images' => function( $value ) { return $value ? absint( $value ) : null; },
+				'uses_charts' => function( $value ) { return (int) (bool) $value; },
+				'uses_avada_layouts' => function( $value ) { return (int) (bool) $value; },
+				'uses_plain_html' => function( $value ) { return (int) (bool) $value; },
+				'include_contexts' => 'sanitize_text_field',
 			] );
 
 			// Update persona
