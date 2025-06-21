@@ -1,76 +1,41 @@
 <?php
 /**
- * Centralized Logger Class
+ * Logger utility class for AI Blog Generator - File-based logging.
  *
  * @package AI_Blog_Generator
- * @subpackage Utilities
  */
 
 namespace AI_Blog_Generator\Utilities;
 
-use AI_Blog_Generator\Models\Log_Model;
-
-// Exit if accessed directly.
-if ( ! defined( 'ABSPATH' ) ) {
-	exit;
-}
-
 /**
- * Centralized Logger Class
- *
- * Handles all logging operations using Log_Model.
- * Provides debug/console logging and centralized error handling.
- *
- * @since 1.0.0
+ * Logger utility class - writes to debug-transaction.log file.
  */
 class Logger {
-
 	/**
-	 * Logger instance.
+	 * Singleton instance.
 	 *
-	 * @var Logger
+	 * @var self|null
 	 */
 	private static $instance = null;
 
 	/**
-	 * Log model instance.
+	 * Debug file path.
 	 *
-	 * @var Log_Model
+	 * @var string
 	 */
-	private $log_model;
+	private $debug_file;
 
 	/**
-	 * Debug mode flag.
-	 *
-	 * @var bool
+	 * Constructor.
 	 */
-	private $debug_mode;
-
-	/**
-	 * Recursion protection flag.
-	 *
-	 * @var bool
-	 */
-	private static $logging_in_progress = false;
-
-	/**
-	 * Console log buffer to prevent duplicate outputs.
-	 *
-	 * @var array
-	 */
-	private $console_buffer = [];
-
-	/**
-	 * Maximum memory usage before stopping detailed logging.
-	 *
-	 * @var int
-	 */
-	private $memory_limit;
+	private function __construct() {
+		$this->debug_file = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+	}
 
 	/**
 	 * Get singleton instance.
 	 *
-	 * @return Logger
+	 * @return self
 	 */
 	public static function get_instance() {
 		if ( null === self::$instance ) {
@@ -80,539 +45,307 @@ class Logger {
 	}
 
 	/**
-	 * Constructor.
-	 */
-	private function __construct() {
-		$this->debug_mode = defined( 'AI_BLOG_GENERATOR_DEBUG' ) ? AI_BLOG_GENERATOR_DEBUG : false;
-		
-		// Set memory limit to 80% of available memory
-		$memory_limit_bytes = ini_get( 'memory_limit' );
-		$this->memory_limit = $this->parse_memory_limit( $memory_limit_bytes ) * 0.8;
-		
-		// Only initialize Log_Model if we're not already logging to prevent recursion
-		if ( ! self::$logging_in_progress ) {
-			try {
-				$this->log_model = new Log_Model();
-			} catch ( \Exception $e ) {
-				// If Log_Model fails, disable logging to prevent further issues
-				$this->debug_mode = false;
-				error_log( 'AI Blog Generator: Failed to initialize Log_Model: ' . $e->getMessage() );
-			}
-		}
-	}
-
-	/**
-	 * Parse memory limit string to bytes.
+	 * Log debug message to file.
 	 *
-	 * @param string $memory_limit Memory limit string (e.g., '128M', '1G').
-	 * @return int Memory limit in bytes.
-	 */
-	private function parse_memory_limit( $memory_limit ) {
-		$memory_limit = trim( $memory_limit );
-		$last = strtolower( $memory_limit[ strlen( $memory_limit ) - 1 ] );
-		$number = (int) $memory_limit;
-		
-		switch ( $last ) {
-			case 'g':
-				$number *= 1024;
-			case 'm':
-				$number *= 1024;
-			case 'k':
-				$number *= 1024;
-		}
-		
-		return $number;
-	}
-
-	/**
-	 * Check if we're approaching memory limit.
-	 *
-	 * @return bool True if memory usage is getting too high.
-	 */
-	private function is_memory_limit_approaching() {
-		return memory_get_usage( true ) > $this->memory_limit;
-	}
-
-	/**
-	 * Log debug message (only if debug mode is enabled).
-	 *
-	 * @param string $action  Action identifier.
+	 * @param string $action Action identifier.
 	 * @param string $message Log message.
 	 * @param array  $context Additional context data.
-	 * @param string $class   Class name for context.
-	 * @param string $method  Method name for context.
+	 * @param string $class_name Class name.
+	 * @param string $method_name Method name.
 	 */
-	public static function debug( $action, $message, $context = [], $class = '', $method = '' ) {
-		$instance = self::get_instance();
-		
-		// Skip if debug mode is off or we're approaching memory limit
-		if ( ! $instance->debug_mode || $instance->is_memory_limit_approaching() ) {
-			return;
-		}
-
-		// Prevent recursion
-		if ( self::$logging_in_progress ) {
-			return;
-		}
-
-		self::$logging_in_progress = true;
-
-		try {
-			if ( $instance->log_model ) {
-				$enhanced_context = $instance->enhance_context( $context, $class, $method );
-				$instance->log_model->info( $action, $message, $enhanced_context );
-				$instance->console_log( 'DEBUG', $action, $message, $enhanced_context );
-	}
-		} catch ( \Exception $e ) {
-			// Log to error_log as fallback
-			error_log( "AI Blog Generator Debug Log Error: {$e->getMessage()}" );
-		} finally {
-			self::$logging_in_progress = false;
-		}
+	public static function debug( $action, $message, $context = [], $class_name = '', $method_name = '' ) {
+		self::log_to_file( 'DEBUG', $action, $message, $context, $class_name, $method_name );
 	}
 
 	/**
-	 * Log info message.
+	 * Log info message to file.
 	 *
-	 * @param string $action  Action identifier.
+	 * @param string $action Action identifier.
 	 * @param string $message Log message.
 	 * @param array  $context Additional context data.
-	 * @param string $class   Class name for context.
-	 * @param string $method  Method name for context.
+	 * @param string $class_name Class name.
+	 * @param string $method_name Method name.
 	 */
-	public static function info( $action, $message, $context = [], $class = '', $method = '' ) {
-		$instance = self::get_instance();
-
-		// Prevent recursion
-		if ( self::$logging_in_progress ) {
-			return;
-		}
-
-		self::$logging_in_progress = true;
-
-		try {
-			if ( $instance->log_model ) {
-				$enhanced_context = $instance->enhance_context( $context, $class, $method );
-				$instance->log_model->info( $action, $message, $enhanced_context );
-				
-				if ( $instance->debug_mode && ! $instance->is_memory_limit_approaching() ) {
-					$instance->console_log( 'INFO', $action, $message, $enhanced_context );
-				}
-			}
-		} catch ( \Exception $e ) {
-			// Log to error_log as fallback
-			error_log( "AI Blog Generator Info Log Error: {$e->getMessage()}" );
-		} finally {
-			self::$logging_in_progress = false;
-		}
+	public static function info( $action, $message, $context = [], $class_name = '', $method_name = '' ) {
+		self::log_to_file( 'INFO', $action, $message, $context, $class_name, $method_name );
 	}
 
 	/**
-	 * Log warning message.
+	 * Log warning message to file.
 	 *
-	 * @param string $action  Action identifier.
+	 * @param string $action Action identifier.
 	 * @param string $message Log message.
 	 * @param array  $context Additional context data.
-	 * @param string $class   Class name for context.
-	 * @param string $method  Method name for context.
+	 * @param string $class_name Class name.
+	 * @param string $method_name Method name.
 	 */
-	public static function warning( $action, $message, $context = [], $class = '', $method = '' ) {
-		$instance = self::get_instance();
-
-		// Prevent recursion
-		if ( self::$logging_in_progress ) {
-			return;
-		}
-
-		self::$logging_in_progress = true;
-
-		try {
-			if ( $instance->log_model ) {
-				$enhanced_context = $instance->enhance_context( $context, $class, $method );
-				$instance->log_model->warning( $action, $message, $enhanced_context );
-				$instance->console_log( 'WARNING', $action, $message, $enhanced_context );
-	}
-		} catch ( \Exception $e ) {
-			// Log to error_log as fallback
-			error_log( "AI Blog Generator Warning Log Error: {$e->getMessage()}" );
-		} finally {
-			self::$logging_in_progress = false;
-		}
+	public static function warning( $action, $message, $context = [], $class_name = '', $method_name = '' ) {
+		self::log_to_file( 'WARNING', $action, $message, $context, $class_name, $method_name );
 	}
 
 	/**
-	 * Log error message.
+	 * Log error message to file.
 	 *
-	 * @param string $action  Action identifier.
+	 * @param string $action Action identifier.
 	 * @param string $message Log message.
 	 * @param array  $context Additional context data.
-	 * @param string $class   Class name for context.
-	 * @param string $method  Method name for context.
+	 * @param string $class_name Class name.
+	 * @param string $method_name Method name.
 	 */
-	public static function error( $action, $message, $context = [], $class = '', $method = '' ) {
-		$instance = self::get_instance();
-
-		// Prevent recursion
-		if ( self::$logging_in_progress ) {
-			// For critical errors, still log to error_log as fallback
-			error_log( "AI Blog Generator Error (recursion prevented): {$action} - {$message}" );
-			return;
-		}
-
-		self::$logging_in_progress = true;
-
-		try {
-			if ( $instance->log_model ) {
-				$enhanced_context = $instance->enhance_context( $context, $class, $method );
-				$instance->log_model->error( $action, $message, $enhanced_context );
-				$instance->console_log( 'ERROR', $action, $message, $enhanced_context );
-			} else {
-				// Fallback to error_log if log_model is not available
-				error_log( "AI Blog Generator Error: {$action} - {$message}" );
-			}
-		} catch ( \Exception $e ) {
-			// Log to error_log as fallback
-			error_log( "AI Blog Generator Error Log Error: {$e->getMessage()}" );
-		} finally {
-			self::$logging_in_progress = false;
-		}
+	public static function error( $action, $message, $context = [], $class_name = '', $method_name = '' ) {
+		self::log_to_file( 'ERROR', $action, $message, $context, $class_name, $method_name );
 	}
 
 	/**
-	 * Log exception with full stack trace.
+	 * Log exception to file.
 	 *
-	 * @param string     $action    Action identifier.
+	 * @param string     $action Action identifier.
 	 * @param \Exception $exception Exception object.
-	 * @param array      $context   Additional context data.
-	 * @param string     $class     Class name for context.
-	 * @param string     $method    Method name for context.
+	 * @param array      $context Additional context data.
+	 * @param string     $class_name Class name.
+	 * @param string     $method_name Method name.
 	 */
-	public static function exception( $action, $exception, $context = [], $class = '', $method = '' ) {
-		$instance = self::get_instance();
+	public static function exception( $action, $exception, $context = [], $class_name = '', $method_name = '' ) {
+		$context['exception_message'] = $exception->getMessage();
+		$context['exception_file'] = $exception->getFile();
+		$context['exception_line'] = $exception->getLine();
+		$context['exception_trace'] = $exception->getTraceAsString();
 		
-		$exception_context = array_merge( $context, [
-			'exception_message' => $exception->getMessage(),
-			'exception_file'    => $exception->getFile(),
-			'exception_line'    => $exception->getLine(),
-			'exception_trace'   => $exception->getTraceAsString(),
-		] );
-
-		$enhanced_context = $instance->enhance_context( $exception_context, $class, $method );
-		$message = sprintf( 'Exception: %s in %s:%d', $exception->getMessage(), basename( $exception->getFile() ), $exception->getLine() );
-		
-		$instance->log_model->error( $action, $message, $enhanced_context );
-		$instance->console_log( 'EXCEPTION', $action, $message, $enhanced_context );
-		}
-		
-	/**
-	 * Log function entry (debug mode only).
-	 *
-	 * @param string $class  Class name.
-	 * @param string $method Method name.
-	 * @param array  $params Method parameters.
-	 */
-	public static function function_entry( $class, $method, $params = [] ) {
-		$instance = self::get_instance();
-		
-		// Skip if debug mode is off, memory limit approaching, or already logging
-		if ( ! $instance->debug_mode || $instance->is_memory_limit_approaching() || self::$logging_in_progress ) {
-			return;
-		}
-		
-		// Limit function entry logging to prevent excessive memory usage
-		static $entry_count = 0;
-		$entry_count++;
-		
-		// Only log every 10th function entry to reduce noise
-		if ( $entry_count % 10 !== 0 ) {
-			return;
-		}
-
-		$action = 'function_entry';
-		$message = sprintf( 'Entering %s::%s', $class, $method );
-		
-		// Limit parameter size to prevent memory issues
-		$limited_params = [];
-		if ( is_array( $params ) && count( $params ) > 5 ) {
-			$limited_params = array_slice( $params, 0, 5 );
-			$limited_params['_note'] = 'Parameters truncated (showing first 5)';
-			} else {
-			$limited_params = $params;
-		}
-		
-		$context = [ 'parameters' => $limited_params ];
-		
-		self::debug( $action, $message, $context, $class, $method );
+		self::log_to_file( 'ERROR', $action, 'Exception: ' . $exception->getMessage(), $context, $class_name, $method_name );
 	}
 
 	/**
-	 * Log function exit (debug mode only).
+	 * Log function entry.
 	 *
-	 * @param string $class  Class name.
-	 * @param string $method Method name.
-	 * @param mixed  $result Return value.
+	 * @param string $class_name Class name.
+	 * @param string $method_name Method name.
+	 * @param array  $params Parameters.
 	 */
-	public static function function_exit( $class, $method, $result = null ) {
-		$instance = self::get_instance();
-		
-		// Skip if debug mode is off, memory limit approaching, or already logging
-		if ( ! $instance->debug_mode || $instance->is_memory_limit_approaching() || self::$logging_in_progress ) {
-			return;
-		}
-		
-		// Limit function exit logging to prevent excessive memory usage
-		static $exit_count = 0;
-		$exit_count++;
-		
-		// Only log every 10th function exit to reduce noise
-		if ( $exit_count % 10 !== 0 ) {
-			return;
-		}
+	public static function function_entry( $class_name, $method_name, $params = [] ) {
+		self::log_to_file( 'DEBUG', 'function_entry', "Entering {$class_name}::{$method_name}", [ 'params' => $params ], $class_name, $method_name );
+	}
 
-		$action = 'function_exit';
-		$message = sprintf( 'Exiting %s::%s', $class, $method );
-		
-		// Limit return value size
-		$limited_result = $result;
-		if ( is_array( $result ) && count( $result ) > 5 ) {
-			$limited_result = array_slice( $result, 0, 5 );
-			$limited_result['_note'] = 'Return value truncated (showing first 5 items)';
-		} elseif ( is_string( $result ) && strlen( $result ) > 200 ) {
-			$limited_result = substr( $result, 0, 200 ) . '... [truncated]';
-			}
-		
-		$context = [ 'return_value' => $limited_result ];
-		
-		self::debug( $action, $message, $context, $class, $method );
+	/**
+	 * Log function exit.
+	 *
+	 * @param string $class_name Class name.
+	 * @param string $method_name Method name.
+	 * @param mixed  $result Result value.
+	 */
+	public static function function_exit( $class_name, $method_name, $result = null ) {
+		self::log_to_file( 'DEBUG', 'function_exit', "Exiting {$class_name}::{$method_name}", [ 'result' => $result ], $class_name, $method_name );
 	}
 
 	/**
 	 * Log database operation.
 	 *
-	 * @param string $operation Database operation (insert, update, delete, select).
-	 * @param string $table     Table name.
-	 * @param array  $data      Operation data.
-	 * @param string $class     Class name.
-	 * @param string $method    Method name.
+	 * @param string $operation Operation type.
+	 * @param string $table Table name.
+	 * @param array  $data Operation data.
+	 * @param string $class_name Class name.
+	 * @param string $method_name Method name.
 	 */
-	public static function database( $operation, $table, $data = [], $class = '', $method = '' ) {
-		$action = 'database_' . $operation;
-		$message = sprintf( 'Database %s on table %s', $operation, $table );
-		$context = [ 'table' => $table, 'data' => $data ];
-		
-		if ( self::get_instance()->debug_mode ) {
-			self::debug( $action, $message, $context, $class, $method );
-		} else {
-			self::info( $action, $message, $context, $class, $method );
-		}
+	public static function database( $operation, $table, $data = [], $class_name = '', $method_name = '' ) {
+		self::log_to_file( 'DEBUG', 'database_' . $operation, "Database {$operation} on {$table}", $data, $class_name, $method_name );
 	}
 
 	/**
 	 * Log API request.
 	 *
-	 * @param string $service   API service name.
-	 * @param string $endpoint  API endpoint.
-	 * @param array  $request   Request data.
-	 * @param array  $response  Response data.
-	 * @param string $class     Class name.
-	 * @param string $method    Method name.
+	 * @param string $service Service name.
+	 * @param string $endpoint Endpoint.
+	 * @param array  $request Request data.
+	 * @param array  $response Response data.
+	 * @param string $class_name Class name.
+	 * @param string $method_name Method name.
 	 */
-	public static function api_request( $service, $endpoint, $request = [], $response = [], $class = '', $method = '' ) {
-		$action = 'api_request_' . $service;
-		$message = sprintf( 'API request to %s: %s', $service, $endpoint );
+	public static function api_request( $service, $endpoint, $request = [], $response = [], $class_name = '', $method_name = '' ) {
 		$context = [
-			'service'  => $service,
+			'service' => $service,
 			'endpoint' => $endpoint,
-			'request'  => $request,
+			'request' => $request,
 			'response' => $response,
 		];
-		
-		if ( self::get_instance()->debug_mode ) {
-			self::debug( $action, $message, $context, $class, $method );
-		} else {
-			self::info( $action, $message, [ 'service' => $service, 'endpoint' => $endpoint ], $class, $method );
-		}
+		self::log_to_file( 'INFO', 'api_request', "API request to {$service} {$endpoint}", $context, $class_name, $method_name );
 	}
 
 	/**
-	 * Log performance metrics.
+	 * Log performance metric.
 	 *
 	 * @param string $operation Operation name.
-	 * @param float  $start_time Start time (microtime).
-	 * @param array  $context   Additional context.
-	 * @param string $class     Class name.
-	 * @param string $method    Method name.
+	 * @param float  $start_time Start timestamp.
+	 * @param array  $context Additional context.
+	 * @param string $class_name Class name.
+	 * @param string $method_name Method name.
 	 */
-	public static function performance( $operation, $start_time, $context = [], $class = '', $method = '' ) {
-		$instance = self::get_instance();
-		
-		// Skip if debug mode is off, memory limit approaching, or already logging
-		if ( ! $instance->debug_mode || $instance->is_memory_limit_approaching() || self::$logging_in_progress ) {
-			return;
-		}
-
-		// Limit performance logging to prevent excessive memory usage
-		static $perf_count = 0;
-		$perf_count++;
-		
-		// Only log every 5th performance metric to reduce noise
-		if ( $perf_count % 5 !== 0 ) {
-			return;
-		}
-		
-		$execution_time = microtime( true ) - $start_time;
-		$action = 'performance_' . $operation;
-		$message = sprintf( 'Operation %s completed in %.4f seconds', $operation, $execution_time );
-		
-		// Limit context size for performance logs
-		$limited_context = array_merge( 
-			[ 'execution_time' => $execution_time ],
-			$instance->limit_context_size( $context )
-		);
-
-		self::debug( $action, $message, $limited_context, $class, $method );
+	public static function performance( $operation, $start_time, $context = [], $class_name = '', $method_name = '' ) {
+		$duration = microtime( true ) - $start_time;
+		$context['duration'] = $duration;
+		$context['operation'] = $operation;
+		self::log_to_file( 'INFO', 'performance', "Performance: {$operation} took {$duration}s", $context, $class_name, $method_name );
 	}
 
 	/**
-	 * Enhance context with additional debug information.
+	 * Write log entry to file.
 	 *
-	 * @param array  $context Original context.
-	 * @param string $class   Class name.
-	 * @param string $method  Method name.
-	 * @return array Enhanced context.
-	 */
-	private function enhance_context( $context, $class = '', $method = '' ) {
-		$enhanced = $context;
-		
-		if ( ! empty( $class ) ) {
-			$enhanced['class'] = $class;
-		}
-		
-		if ( ! empty( $method ) ) {
-			$enhanced['method'] = $method;
-		}
-		
-		// Only add memory usage in debug mode and if we're not approaching memory limit
-		if ( $this->debug_mode && ! $this->is_memory_limit_approaching() ) {
-			$enhanced['memory_usage'] = round( memory_get_usage( true ) / 1024 / 1024, 2 ) . 'MB';
-		}
-		
-		// Add user context if available and not already logging
-		if ( function_exists( 'get_current_user_id' ) && ! self::$logging_in_progress ) {
-			$user_id = get_current_user_id();
-			if ( $user_id ) {
-				$enhanced['user_id'] = $user_id;
-			}
-		}
-		
-		return $enhanced;
-	}
-
-	/**
-	 * Output log to browser console for debugging.
-	 *
-	 * @param string $level   Log level.
-	 * @param string $action  Action identifier.
+	 * @param string $level Log level.
+	 * @param string $action Action identifier.
 	 * @param string $message Log message.
-	 * @param array  $context Context data.
+	 * @param array  $context Additional context data.
+	 * @param string $class_name Class name.
+	 * @param string $method_name Method name.
 	 */
-	private function console_log( $level, $action, $message, $context = [] ) {
-		// Skip console logging if not in debug mode, not in admin, or approaching memory limit
-		if ( ! $this->debug_mode || ! is_admin() || $this->is_memory_limit_approaching() ) {
-			return;
-		}
-		
-		// Limit context size to prevent memory issues
-		$limited_context = $this->limit_context_size( $context );
-		
-		$console_data = [
-			'level'     => $level,
-			'action'    => $action,
-			'message'   => $message,
-			'context'   => $limited_context,
-			'timestamp' => current_time( 'mysql' ),
+	private static function log_to_file( $level, $action, $message, $context = [], $class_name = '', $method_name = '' ) {
+		// Define actions to exclude from logging (routine operations)
+		$excluded_actions = [
+			'blog_ideas_model_v2_init',
+			'blog_ideas_controller_v2_init',
+			'controller_initialization',
+			'ajax_handlers_registration',
+			'ajax_handlers_registration_completed',
+			'ssl_fix_applied',
+			'ajax_get_status_updates_start',
+			'ajax_status_updates_requested',
+			'ajax_duplicate_idea_removed',
+			'ajax_ideas_deduplicated',
+			'get_statistics_start',
+			'ideas_counted_by_status',
+			'statistics_calculated',
+			'ajax_status_updates_retrieved',
+			'approved_ideas_controller_init_start',
+			'approved_ideas_model_created',
+			'generation_queue_created',
+			'approved_ideas_controller_init',
+			'ajax_hooks_registered',
+			'blog_ideas_v2_ajax_registered',
+			'function_entry',
+			'function_exit',
+			'database_get',
+			'database_get_success',
+			'database_insert_success',
+			'database_update_success',
+			'context_get_for_prompt_start',
+			'context_calling_get_compiled',
+			'context_compiled_received',
 		];
 		
-		// Prevent duplicate console logs
-		$log_hash = md5( serialize( $console_data ) );
-		if ( isset( $this->console_buffer[ $log_hash ] ) ) {
-			return;
-		}
-		$this->console_buffer[ $log_hash ] = true;
-
-		// Limit console buffer size
-		if ( count( $this->console_buffer ) > 100 ) {
-			$this->console_buffer = array_slice( $this->console_buffer, -50, null, true );
-	}
-
-		// Add to footer for console output
-		add_action( 'admin_footer', function() use ( $console_data ) {
-			echo '<script>console.log("AI Blog Generator [' . esc_js( $console_data['level'] ) . ']", ' . wp_json_encode( $console_data ) . ');</script>';
-		} );
-	}
-
-	/**
-	 * Limit context size to prevent memory issues.
-	 *
-	 * @param array $context Context data.
-	 * @return array Limited context data.
-	 */
-	private function limit_context_size( $context ) {
-		$limited = [];
-		$max_string_length = 500;
-		$max_array_items = 10;
-
-		foreach ( $context as $key => $value ) {
-			if ( is_string( $value ) && strlen( $value ) > $max_string_length ) {
-				$limited[ $key ] = substr( $value, 0, $max_string_length ) . '... [truncated]';
-			} elseif ( is_array( $value ) && count( $value ) > $max_array_items ) {
-				$limited[ $key ] = array_slice( $value, 0, $max_array_items );
-				$limited[ $key ]['_truncated'] = 'Array truncated, showing first ' . $max_array_items . ' items';
-			} else {
-				$limited[ $key ] = $value;
+		// Define important actions that should always be logged
+		$important_actions = [
+			// Generation process milestones
+			'generation_start',
+			'generation_complete',
+			'generation_failed',
+			'background_processor_success',
+			'background_processor_failed',
+			'background_processor_daily_limit',
+			
+			// Critical errors
+			'database_error',
+			'database_insert_failed',
+			'database_update_failed',
+			'api_error',
+			'generation_error',
+			'background_processor_error',
+			
+			// Important state changes
+			'idea_status_changed',
+			'blog_post_created',
+			'blog_post_published',
+			
+			// Transaction management
+			'transaction_start',
+			'transaction_commit',
+			'transaction_rollback',
+			
+			// API milestones
+			'api_request',
+			'anthropic_request',
+			'openai_request',
+			
+			// User actions
+			'ajax_submit_generation_start',
+			'generation_queue_add',
+			'generation_queue_start',
+			
+			// Memory warnings
+			'memory_limit_approaching',
+			'memory_exhausted',
+		];
+		
+		// Convert action to lowercase for comparison
+		$action_lower = strtolower( $action );
+		
+		// Skip excluded actions unless they're errors
+		// Also skip specific warnings that are too frequent
+		if ( in_array( $action_lower, $excluded_actions, true ) ) {
+			// Always log errors
+			if ( $level === 'ERROR' ) {
+				// Continue logging
+			} 
+			// Skip specific warnings that are routine
+			elseif ( $level === 'WARNING' && $action_lower === 'ajax_duplicate_idea_removed' ) {
+				return;
+			}
+			// Skip all other excluded actions that aren't errors
+			elseif ( $level !== 'ERROR' ) {
+				return;
 			}
 		}
-
-		return $limited;
-	}
-
-	/**
-	 * Get logs with filtering (delegated to Log_Model).
-	 *
-	 * @param array $filters Filters.
-	 * @return array
-	 */
-	public static function get_logs( $filters = [] ) {
-		return self::get_instance()->log_model->get_filtered( $filters );
-	}
-
-	/**
-	 * Clean old logs (delegated to Log_Model).
-	 *
-	 * @param int $days Number of days to keep.
-	 * @return int Number of logs deleted.
-	 */
-	public static function clean_old_logs( $days = 30 ) {
-		return self::get_instance()->log_model->clean_old_logs( $days );
-	}
-
-	/**
-	 * Get log statistics (delegated to Log_Model).
-	 *
-	 * @param string $period Time period.
-	 * @return array
-	 */
-	public static function get_statistics( $period = 'day' ) {
-		return self::get_instance()->log_model->get_statistics( $period );
-	}
-
-	/**
-	 * Get recent errors (delegated to Log_Model).
-	 *
-	 * @param int $limit Number of errors.
-	 * @return array
-	 */
-	public static function get_recent_errors( $limit = 10 ) {
-		return self::get_instance()->log_model->get_recent_errors( $limit );
+		
+		// For debug level, only log if it's an important action
+		if ( $level === 'DEBUG' && ! in_array( $action_lower, $important_actions, true ) ) {
+			return;
+		}
+		
+		$instance = self::get_instance();
+		
+		// Format timestamp
+		$timestamp = date( 'Y-m-d H:i:s' );
+		
+		// Build log entry
+		$log_entry = sprintf(
+			"%s - %s [%s]: %s",
+			$timestamp,
+			strtoupper( $action ),
+			$level,
+			$message
+		);
+		
+		// Add class and method if provided
+		if ( ! empty( $class_name ) ) {
+			$log_entry .= " ({$class_name}";
+			if ( ! empty( $method_name ) ) {
+				$log_entry .= "::{$method_name}";
+			}
+			$log_entry .= ")";
+		}
+		
+		// Add context if provided
+		if ( ! empty( $context ) ) {
+			// Remove sensitive data
+			if ( isset( $context['api_key'] ) ) {
+				$context['api_key'] = '[REDACTED]';
+			}
+			if ( isset( $context['anthropic_api_key'] ) ) {
+				$context['anthropic_api_key'] = '[REDACTED]';
+			}
+			if ( isset( $context['openai_api_key'] ) ) {
+				$context['openai_api_key'] = '[REDACTED]';
+			}
+			
+			// Convert context to string
+			$context_str = wp_json_encode( $context );
+			if ( strlen( $context_str ) > 1000 ) {
+				// Truncate very large context
+				$context_str = substr( $context_str, 0, 1000 ) . '... [truncated]';
+			}
+			$log_entry .= " - Context: " . $context_str;
+		}
+		
+		$log_entry .= "\n";
+		
+		// Write to file
+		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
+		file_put_contents( $instance->debug_file, $log_entry, FILE_APPEND | LOCK_EX );
 	}
 } 

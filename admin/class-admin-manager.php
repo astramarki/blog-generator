@@ -170,14 +170,7 @@ class Admin_Manager {
 		);
 
 		// Logs submenu.
-		add_submenu_page(
-			$this->menu_slug,
-			__( 'Logs', 'ai-blog-generator' ),
-			__( 'Logs', 'ai-blog-generator' ),
-			$this->capability,
-			$this->menu_slug . '-logs',
-			[ $this, 'render_logs_page' ]
-		);
+
 
 		// Cost Dashboard submenu.
 		add_submenu_page(
@@ -350,7 +343,7 @@ class Admin_Manager {
 		// Localize for page-specific scripts (wp_localize_script silently fails if script doesn't exist)
 		wp_localize_script( 'ai-blog-generator-contexts', 'aiBlogAjax', $localized_data );
 		wp_localize_script( 'ai-blog-generator-personas', 'aiBlogAjax', $localized_data );
-		wp_localize_script( 'ai-blog-generator-logs', 'aiBlogAjax', $localized_data );
+
 		
 		// Debug Blog Ideas V2 script localization
 		$script_registered = wp_script_is( 'ai-blog-ideas-v2', 'registered' );
@@ -489,17 +482,7 @@ class Admin_Manager {
 			);
 		}
 
-		// Logs page - Enhanced logs functionality
-		if ( strpos( $hook, $this->menu_slug . '-logs' ) !== false ) {
-			// Enqueue logs-specific JavaScript
-			wp_enqueue_script(
-				'ai-blog-generator-logs',
-				AI_BLOG_GENERATOR_PLUGIN_URL . 'admin/assets/js/logs.js',
-				[ 'jquery', 'ai-blog-generator-admin' ],
-				$this->version,
-				true
-			);
-		}
+
 
 		// Blog Ideas V2 page - Bootstrap 5 and modern assets
 		// WordPress admin hooks can be: ai-blog-generator_page_ai-blog-generator-ideas-v2
@@ -1020,42 +1003,7 @@ class Admin_Manager {
 		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'admin/views/personas.php';
 	}
 
-	/**
-	 * Render the logs page.
-	 */
-	public function render_logs_page() {
-		// Check user capabilities.
-		if ( ! current_user_can( $this->capability ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'ai-blog-generator' ) );
-		}
 
-		// Get filter parameters.
-		$filters = [
-			'level' => isset( $_GET['level'] ) ? sanitize_text_field( $_GET['level'] ) : '',
-			'action' => isset( $_GET['action'] ) ? sanitize_text_field( $_GET['action'] ) : '',
-			'date_from' => isset( $_GET['date_from'] ) ? sanitize_text_field( $_GET['date_from'] ) : '',
-			'date_to' => isset( $_GET['date_to'] ) ? sanitize_text_field( $_GET['date_to'] ) : '',
-			'search' => isset( $_GET['search'] ) ? sanitize_text_field( $_GET['search'] ) : '',
-		];
-
-		// Get per_page parameter
-		$per_page = isset( $_GET['per_page'] ) ? absint( $_GET['per_page'] ) : 50;
-		$per_page = max( 1, min( 500, $per_page ) ); // Limit between 1 and 500
-		
-		// Get current page
-		$current_page = isset( $_GET['paged'] ) ? absint( $_GET['paged'] ) : 1;
-		$offset = ( $current_page - 1 ) * $per_page;
-
-		// Get logs.
-		$log_model = new Log_Model();
-		$logs = $log_model->get_filtered( $filters, $per_page, $offset );
-		
-		// Get available actions for filter.
-		$available_actions = $log_model->get_distinct_actions();
-
-		// Load the view.
-		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'admin/views/logs.php';
-	}
 
 	/**
 	 * Render the costs dashboard.
@@ -1130,15 +1078,7 @@ class Admin_Manager {
 		
 		// Note: Seed image handlers are registered in Context_Controller
 		
-		// Log handlers.
-		add_action( 'wp_ajax_ai_blog_export_logs', [ $this, 'ajax_export_logs' ] );
-		add_action( 'wp_ajax_ai_blog_clear_logs', [ $this, 'ajax_clear_logs' ] );
-		
-		// Enhanced log handlers for new logs page
-		add_action( 'wp_ajax_ai_blog_get_logs', [ $this, 'ajax_get_logs' ] );
-		add_action( 'wp_ajax_ai_blog_get_log_stats', [ $this, 'ajax_get_log_stats' ] );
-		add_action( 'wp_ajax_ai_blog_check_new_logs', [ $this, 'ajax_check_new_logs' ] );
-		add_action( 'wp_ajax_ai_blog_clear_old_logs', [ $this, 'ajax_clear_old_logs' ] );
+
 		
 		// Cost handlers.
 		add_action( 'wp_ajax_ai_blog_get_cost_data', [ $this, 'ajax_get_cost_data' ] );
@@ -1433,293 +1373,9 @@ class Admin_Manager {
 		}
 	}
 
-	/**
-	 * AJAX handler for getting logs with filtering and pagination.
-	 */
-	public function ajax_get_logs() {
-		$start_time = $this->start_timer();
 
-		try {
-			// Verify security
-			if ( ! $this->verify_ajax_security() ) {
-				return;
-			}
 
-			$this->log_info( 'get_logs_request', 'Processing logs request', [
-				'user_id' => get_current_user_id(),
-				'request_data' => array_keys( $_POST )
-			] );
 
-			// Get and sanitize parameters
-			$page = isset( $_POST['page'] ) ? absint( $_POST['page'] ) : 1;
-			$per_page = isset( $_POST['per_page'] ) ? absint( $_POST['per_page'] ) : 20;
-			$filters = isset( $_POST['filters'] ) ? $_POST['filters'] : [];
-
-			// Sanitize filters
-			$sanitized_filters = [
-				'search' => isset( $filters['search'] ) ? sanitize_text_field( $filters['search'] ) : '',
-				'level' => isset( $filters['level'] ) ? sanitize_text_field( $filters['level'] ) : '',
-				'action' => isset( $filters['action'] ) ? sanitize_text_field( $filters['action'] ) : '',
-				'date_from' => isset( $filters['date_from'] ) ? sanitize_text_field( $filters['date_from'] ) : '',
-				'date_to' => isset( $filters['date_to'] ) ? sanitize_text_field( $filters['date_to'] ) : '',
-			];
-
-			// Validate per_page
-			$per_page = max( 1, min( 100, $per_page ) );
-
-			$this->log_debug( 'get_logs_params', 'Parameters validated', [
-				'page' => $page,
-				'per_page' => $per_page,
-				'filters' => $sanitized_filters
-			] );
-
-			// Get logs
-			$log_model = new \AI_Blog_Generator\Models\Log_Model();
-			
-			// Calculate offset
-			$offset = ( $page - 1 ) * $per_page;
-			
-			// Get filtered logs
-			$logs = $log_model->get_filtered( $sanitized_filters, $per_page, $offset );
-			$total_logs = $log_model->count_filtered( $sanitized_filters );
-			$total_pages = ceil( $total_logs / $per_page );
-
-			// Get statistics
-			$stats = $log_model->get_level_statistics( $sanitized_filters );
-
-			// Prepare pagination info
-			$pagination = [
-				'current_page' => $page,
-				'total_pages' => $total_pages,
-				'total_logs' => $total_logs,
-				'per_page' => $per_page,
-				'has_previous' => $page > 1,
-				'has_next' => $page < $total_pages
-			];
-
-			$this->log_info( 'get_logs_success', 'Logs retrieved successfully', [
-				'logs_count' => count( $logs ),
-				'total_logs' => $total_logs,
-				'current_page' => $page,
-				'filters_applied' => ! empty( array_filter( $sanitized_filters ) )
-			] );
-
-			$this->send_ajax_success( [
-				'logs' => $logs,
-				'pagination' => $pagination,
-				'stats' => $stats
-			], 'Logs retrieved successfully', 'get_logs' );
-
-		} catch ( \Exception $e ) {
-			$this->handle_ajax_exception( $e, 'get_logs', [
-				'page' => $page ?? 1,
-				'per_page' => $per_page ?? 20,
-				'filters' => $sanitized_filters ?? []
-			] );
-		}
-
-		$this->end_timer( $start_time, 'get_logs' );
-	}
-
-	/**
-	 * AJAX handler for getting log statistics.
-	 */
-	public function ajax_get_log_stats() {
-		try {
-			// Verify security
-			if ( ! $this->verify_ajax_security() ) {
-				return;
-			}
-
-			// Get filters
-			$filters = isset( $_POST['filters'] ) ? $_POST['filters'] : [];
-			$sanitized_filters = [
-				'search' => isset( $filters['search'] ) ? sanitize_text_field( $filters['search'] ) : '',
-				'level' => isset( $filters['level'] ) ? sanitize_text_field( $filters['level'] ) : '',
-				'action' => isset( $filters['action'] ) ? sanitize_text_field( $filters['action'] ) : '',
-				'date_from' => isset( $filters['date_from'] ) ? sanitize_text_field( $filters['date_from'] ) : '',
-				'date_to' => isset( $filters['date_to'] ) ? sanitize_text_field( $filters['date_to'] ) : '',
-			];
-
-			$log_model = new \AI_Blog_Generator\Models\Log_Model();
-			$stats = $log_model->get_level_statistics( $sanitized_filters );
-
-			$this->send_ajax_success( $stats, 'Statistics retrieved successfully', 'get_log_stats' );
-
-		} catch ( \Exception $e ) {
-			$this->handle_ajax_exception( $e, 'get_log_stats', [
-				'filters' => $sanitized_filters ?? []
-			] );
-		}
-	}
-
-	/**
-	 * AJAX handler for checking for new logs (live updates).
-	 */
-	public function ajax_check_new_logs() {
-		try {
-			// Verify security
-			if ( ! $this->verify_ajax_security() ) {
-				return;
-			}
-
-			$last_log_id = isset( $_POST['last_log_id'] ) ? absint( $_POST['last_log_id'] ) : 0;
-			$filters = isset( $_POST['filters'] ) ? $_POST['filters'] : [];
-			
-			$sanitized_filters = [
-				'search' => isset( $filters['search'] ) ? sanitize_text_field( $filters['search'] ) : '',
-				'level' => isset( $filters['level'] ) ? sanitize_text_field( $filters['level'] ) : '',
-				'action' => isset( $filters['action'] ) ? sanitize_text_field( $filters['action'] ) : '',
-				'date_from' => isset( $filters['date_from'] ) ? sanitize_text_field( $filters['date_from'] ) : '',
-				'date_to' => isset( $filters['date_to'] ) ? sanitize_text_field( $filters['date_to'] ) : '',
-			];
-
-			$log_model = new \AI_Blog_Generator\Models\Log_Model();
-			$has_new_logs = $log_model->has_new_logs_since( $last_log_id, $sanitized_filters );
-
-			$this->send_ajax_success( [
-				'has_new_logs' => $has_new_logs,
-				'last_checked' => current_time( 'mysql' )
-			], '', 'check_new_logs' );
-
-		} catch ( \Exception $e ) {
-			$this->handle_ajax_exception( $e, 'check_new_logs', [
-				'last_log_id' => $last_log_id ?? 0
-			] );
-		}
-	}
-
-	/**
-	 * AJAX handler for exporting logs.
-	 */
-	public function ajax_export_logs() {
-		try {
-			// Verify security
-			if ( ! $this->verify_ajax_security() ) {
-				return;
-			}
-
-			$this->log_info( 'export_logs_request', 'Log export requested', [
-				'user_id' => get_current_user_id()
-			] );
-
-			// Get filters
-			$filters_json = isset( $_GET['filters'] ) ? $_GET['filters'] : '{}';
-			$filters = json_decode( $filters_json, true ) ?: [];
-			
-			$sanitized_filters = [
-				'search' => isset( $filters['search'] ) ? sanitize_text_field( $filters['search'] ) : '',
-				'level' => isset( $filters['level'] ) ? sanitize_text_field( $filters['level'] ) : '',
-				'action' => isset( $filters['action'] ) ? sanitize_text_field( $filters['action'] ) : '',
-				'date_from' => isset( $filters['date_from'] ) ? sanitize_text_field( $filters['date_from'] ) : '',
-				'date_to' => isset( $filters['date_to'] ) ? sanitize_text_field( $filters['date_to'] ) : '',
-			];
-
-			// Get all logs matching filters (no limit for export)
-			$log_model = new \AI_Blog_Generator\Models\Log_Model();
-			$logs = $log_model->get_filtered( $sanitized_filters, 0 ); // 0 = no limit
-
-			// Generate CSV content
-			$csv_content = "ID,Level,Action,Message,Class,Method,Memory Usage,Created At\n";
-			
-			foreach ( $logs as $log ) {
-				$csv_content .= sprintf(
-					"%d,%s,%s,%s,%s,%s,%s,%s\n",
-					$log->id,
-					'"' . str_replace( '"', '""', $log->level ) . '"',
-					'"' . str_replace( '"', '""', $log->action ) . '"',
-					'"' . str_replace( '"', '""', $log->message ) . '"',
-					'"' . str_replace( '"', '""', $log->class_name ?? '' ) . '"',
-					'"' . str_replace( '"', '""', $log->method_name ?? '' ) . '"',
-					'"' . str_replace( '"', '""', $log->memory_usage ?? '' ) . '"',
-					'"' . str_replace( '"', '""', $log->created_at ) . '"'
-				);
-			}
-
-			// Set headers for download
-			$filename = 'ai-blog-logs-' . date( 'Y-m-d-H-i-s' ) . '.csv';
-			
-			header( 'Content-Type: text/csv' );
-			header( 'Content-Disposition: attachment; filename="' . $filename . '"' );
-			header( 'Content-Length: ' . strlen( $csv_content ) );
-			
-			// Clean any output buffer
-			while ( ob_get_level() ) {
-				ob_end_clean();
-			}
-			
-			echo $csv_content;
-			
-			$this->log_info( 'export_logs_success', 'Logs exported successfully', [
-				'filename' => $filename,
-				'log_count' => count( $logs ),
-				'user_id' => get_current_user_id()
-			] );
-			
-			exit;
-
-		} catch ( \Exception $e ) {
-			$this->log_error( 'export_logs_failed', 'Failed to export logs', [
-				'error' => $e->getMessage(),
-				'user_id' => get_current_user_id()
-			] );
-			
-			// Clean any output buffer
-			while ( ob_get_level() ) {
-				ob_end_clean();
-			}
-			
-			wp_send_json_error( [ 'message' => __( 'Failed to export logs.', 'ai-blog-generator' ) ] );
-		}
-	}
-
-	/**
-	 * AJAX handler for clearing old logs.
-	 */
-	public function ajax_clear_old_logs() {
-		$start_time = $this->start_timer();
-
-		try {
-			// Verify security
-			if ( ! $this->verify_ajax_security() ) {
-				return;
-			}
-
-			$this->log_info( 'clear_old_logs_request', 'Clear old logs requested', [
-				'user_id' => get_current_user_id()
-			] );
-
-			// Get retention days from settings
-			$retention_days = intval( get_option( 'ai_blog_generator_log_retention_days', 30 ) );
-			
-			// Clear old logs
-			$log_model = new \AI_Blog_Generator\Models\Log_Model();
-			$deleted_count = $log_model->clean_old_logs( $retention_days );
-
-			$this->log_info( 'clear_old_logs_success', 'Old logs cleared successfully', [
-				'deleted_count' => $deleted_count,
-				'retention_days' => $retention_days,
-				'user_id' => get_current_user_id()
-			] );
-
-			$this->send_ajax_success( [
-				'deleted_count' => $deleted_count,
-				'retention_days' => $retention_days
-			], sprintf(
-				__( 'Successfully deleted %d old logs older than %d days.', 'ai-blog-generator' ),
-				$deleted_count,
-				$retention_days
-			), 'clear_old_logs' );
-
-		} catch ( \Exception $e ) {
-			$this->handle_ajax_exception( $e, 'clear_old_logs', [
-				'retention_days' => $retention_days ?? 30,
-				'user_id' => get_current_user_id()
-			] );
-		}
-
-		$this->end_timer( $start_time, 'clear_old_logs' );
-	}
 
 	/**
 	 * AJAX handler for getting approved ideas.

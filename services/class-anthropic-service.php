@@ -879,7 +879,7 @@ class Anthropic_Service {
 		
 		$prompt .= "CONTENT ELEMENTS:\n";
 		$prompt .= "[fusion_title] - REQUIRED for ALL headings. Parameters:\n";
-		$prompt .= "  • size='2' for main headings, size='3' for subheadings\n";
+		$prompt .= "  • size='h2' for main headings, size='h3' for subheadings. Never use h1 titles.\n";
 		$prompt .= "  • color='#hexcode' or gradient colors\n";
 		$prompt .= "  • style_type='default' or 'double solid' for decorative lines\n";
 		$prompt .= "  • sep_color='#hexcode' for separator color\n";
@@ -899,7 +899,6 @@ class Anthropic_Service {
 		$prompt .= "[fusion_checklist] - Styled lists with icons\n";
 		$prompt .= "[fusion_counters_box] - Animated number counters\n";
 		$prompt .= "[fusion_progress] - Progress bars\n";
-		$prompt .= "[fusion_accordion] - Collapsible content sections\n";
 		$prompt .= "[fusion_tabs] - Tabbed content\n";
 		$prompt .= "[fusion_testimonials] - Quote/testimonial sliders\n\n";
 		
@@ -927,11 +926,13 @@ class Anthropic_Service {
 		$prompt .= "- Alternate between different column layouts for visual variety\n";
 		$prompt .= "- Include colorful separators between major sections\n";
 		$prompt .= "- Use background colors/gradients on containers for visual appeal\n";
+		$prompt .= "- Make all colored divs with 10pt rounded corners.\n";
+		$prompt .= "- Make all colored divs have at least 15pt padding.\n";
 		$prompt .= "- Ensure mobile responsiveness with Avada's built-in responsive settings\n\n";
 
 		$prompt .= "🎨 AVADA LAYOUT VARIETY REQUIREMENTS - CREATE UNIQUE STRUCTURES 🎨\n";
 		$prompt .= "================================================================\n";
-		$prompt .= "CRITICAL: DO NOT follow the same Avada layout pattern for every post!\n\n";
+		
 		$prompt .= "FORBIDDEN FORMULA (DO NOT USE THIS PATTERN):\n";
 		$prompt .= "❌ Always starting with full-width title → text block → alert → column grid → accordion\n";
 		$prompt .= "❌ Always using 1_2 + 1_2 columns for everything\n";
@@ -974,8 +975,14 @@ class Anthropic_Service {
 		$prompt .= "• Use different title styles and separator types\n";
 		$prompt .= "• Experiment with Avada's animation settings\n";
 		$prompt .= "• Apply gradient backgrounds to containers\n";
+		$prompt .= '• The correct format for an h2 title is: [fusion_title size="2" content_align="center" style_type="none" sep_color="#0099ff" margin_top="20px" margin_bottom="30px" color="#2d3748"]fffffffffffffffffffffffff[/fusion_title]';
+		$prompt .= "\n";
 		$prompt .= "• Use box shadows and borders creatively\n\n";
 		$prompt .= "REMEMBER: Each post should use Avada elements uniquely!\n";
+		$prompt .= "REMEMBER: Do not wrap [fusion_builder_column] in [fusion_builder_row], fusion_builder_column can go into fusion_builder_container directly.\n";
+		$prompt .= "REMEMBER: Do not use [fusion_builder_row] at all!\n";
+		$prompt .= 'The correct way to apply a gradient to a background of a container is: background_color="linear-gradient(135deg,#color1,#color2)"';
+		$prompt .= "\n";
 		$prompt .= "================================================================\n\n";
 
 		$prompt .= "CONTENT REQUIREMENTS:\n";
@@ -988,7 +995,7 @@ class Anthropic_Service {
 		$prompt .= "  • Every blog post MUST have product recommendations - NO EXCEPTIONS\n";
 		$prompt .= "- MANDATORY KEYWORD INTEGRATION:\n";
 		$prompt .= "  • Primary keyword MUST appear in at least TWO [fusion_title] elements\n";
-		$prompt .= "  • Use primary keyword 5-7 times throughout content\n";
+		$prompt .= "  • Use primary keyword minimum 5-7 times throughout content\n";
 		$prompt .= "  • Include keyword in first paragraph and conclusion\n";
 		$prompt .= "- Balance topic focus with commercial intent:\n";
 		$prompt .= "  • If about SEL: Show how poster makers enhance SEL learning\n";
@@ -1011,19 +1018,25 @@ class Anthropic_Service {
 		$prompt .= "- NEVER use emojis or text based icons anywhere in the content - they are strictly banned\n\n";
 
 		$prompt .= "SEO OPTIMIZATION REQUIREMENTS:\n";
-		$prompt .= "- MANDATORY: Use PRIMARY KEYWORD ('" . (!empty($seo_keywords) ? $seo_keywords[0] : $idea_title) . "') as follows:\n";
+		$prompt .= "- MANDATORY: Use one or more SEO KEYWORDS ('" . (!empty($seo_keywords) ? $seo_keywords[0] : $idea_title) . "') as follows:\n";
 		$prompt .= "  • In at least TWO [fusion_title] elements - THIS IS REQUIRED\n";
 		$prompt .= "  • 5-7 times in the content (1-2% density) - THIS IS REQUIRED\n";
 		$prompt .= "  • In the first paragraph - THIS IS REQUIRED\n";
 		$prompt .= "  • In the meta description - THIS IS REQUIRED\n";
 		$prompt .= "  • In the conclusion - THIS IS REQUIRED\n";
-		$prompt .= "- Focus keyword MUST relate to '" . $idea_title . "' topic\n";
+		$prompt .= "- Focus keyphrase for Yoast SEO MUST relate to '" . $idea_title . "' topic, and not be one of the SEO keywords.\n";
+		$prompt .= "- Focus keyphrase for Yoast SEO MUST\n";
+		$prompt .= "  • Appear in the meta description.\n";
+		$prompt .= "  • Appear in the SEO title\n";
+		$prompt .= "  • Appear 5-7 times in the text of the post\n";
+		$prompt .= "  • Appear in an h2 or h3 title in the post\n";
+		$prompt .= "  • Appear in the page slug\n";
 		$prompt .= "- Example integration: 'When teaching about emotions, a poster maker for schools helps create visual SEL displays'\n";
-		$prompt .= "- CRITICAL: Use [fusion_title size='2'] for main headings (equivalent to H2)\n";
-		$prompt .= "- REQUIRED: Use [fusion_title size='3'] for subheadings (equivalent to H3)\n";
-		$prompt .= "- Continue with size='4', size='5' for deeper heading levels\n";
+		$prompt .= "- CRITICAL: Use [fusion_title size='h2'] for main headings (equivalent to H2)\n";
+		$prompt .= "- REQUIRED: Use [fusion_title size='h3'] for subheadings (equivalent to H3)\n";
+		$prompt .= "- Continue with size='h4', size='h5' for deeper heading levels\n";
 		$prompt .= "- Include internal linking opportunities with descriptive anchor text\n";
-		$prompt .= "- Ensure meta description contains the primary keyword\n";
+		$prompt .= "- Ensure meta description contains the primary keyphrase\n";
 		$prompt .= "- Write compelling, click-worthy title under 60 characters\n";
 		$prompt .= "- Structure content for featured snippets when possible\n\n";
 
@@ -1927,12 +1940,14 @@ class Anthropic_Service {
 			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - ANTHROPIC_SERVICE: SSL verification DISABLED for local environment\n", FILE_APPEND );
 		}
 
-		// Log the complete request being sent
+		// Log the request being sent (without full prompt to avoid database issues)
 		$this->log_info( 'anthropic_request_details', 'Sending request to Anthropic API', [
 			'url' => $this->api_url,
 			'headers' => array_merge( $headers, [ 'x-api-key' => '[REDACTED]' ] ), // Don't log the actual API key
-			'request_body' => wp_json_encode( $data ),
-			'request_data' => $data
+			'model' => $data['model'] ?? 'unknown',
+			'max_tokens' => $data['max_tokens'] ?? 0,
+			'message_count' => isset( $data['messages'] ) ? count( $data['messages'] ) : 0,
+			'request_size' => strlen( wp_json_encode( $data ) )
 		] );
 
 		$response = wp_remote_request( $this->api_url, $args );
@@ -1949,12 +1964,12 @@ class Anthropic_Service {
 		$response_body = wp_remote_retrieve_body( $response );
 		$response_headers = wp_remote_retrieve_headers( $response );
 
-		// Log the complete response received
+		// Log the response received (without the full body to avoid database issues)
 		$this->log_info( 'anthropic_response_details', 'Received response from Anthropic API', [
 			'response_code' => $response_code,
 			'response_headers' => $response_headers,
-			'response_body' => $response_body,
-			'response_body_length' => strlen( $response_body )
+			'response_body_length' => strlen( $response_body ),
+			'response_preview' => substr( $response_body, 0, 500 ) . '...' // Only log first 500 chars
 		] );
 
 		if ( $response_code !== 200 ) {
@@ -1981,11 +1996,13 @@ class Anthropic_Service {
 			throw new \Exception( 'Invalid JSON response from API' );
 		}
 
-		// Log the decoded response structure
+		// Log the decoded response structure (without full content to avoid database issues)
 		$this->log_info( 'anthropic_response_decoded', 'Successfully decoded API response', [
-			'decoded_response' => $decoded_response,
 			'response_keys' => array_keys( $decoded_response ),
-			'content_structure' => isset( $decoded_response['content'] ) ? $decoded_response['content'] : 'no_content'
+			'has_content' => isset( $decoded_response['content'] ),
+			'content_count' => isset( $decoded_response['content'] ) ? count( $decoded_response['content'] ) : 0,
+			'usage' => $decoded_response['usage'] ?? null,
+			'model' => $decoded_response['model'] ?? 'unknown'
 		] );
 
 		return $decoded_response;

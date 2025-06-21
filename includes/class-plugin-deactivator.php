@@ -51,22 +51,24 @@ class Plugin_Deactivator {
 	 */
 	private static function unschedule_cron_jobs() {
 		// List of all plugin cron hooks.
-		$cron_hooks = [
+		$events = [
+			'ai_blog_generate_content',
 			'ai_blog_daily_ideas',
 			'ai_blog_process_queue',
 			'ai_blog_publish_scheduled',
 			'ai_blog_cleanup_logs',
+
 		];
 		
 		// Unschedule each cron job.
-		foreach ( $cron_hooks as $hook ) {
-			$timestamp = wp_next_scheduled( $hook );
+		foreach ( $events as $event ) {
+			$timestamp = wp_next_scheduled( $event );
 			if ( $timestamp ) {
-				wp_unschedule_event( $timestamp, $hook );
+				wp_unschedule_event( $timestamp, $event );
 			}
 			
 			// Clear all scheduled events for this hook.
-			wp_clear_scheduled_hook( $hook );
+			wp_clear_scheduled_hook( $event );
 		}
 		
 		Logger::info( 'cron_cleanup', 'All scheduled cron jobs have been cleared' );

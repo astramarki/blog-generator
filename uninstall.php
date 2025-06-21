@@ -108,6 +108,7 @@ if ( ! $keep_data ) {
 		'ai_blog_process_queue',
 		'ai_blog_publish_scheduled',
 		'ai_blog_cleanup_logs',
+		
 	];
 	
 	foreach ( $cron_hooks as $hook ) {

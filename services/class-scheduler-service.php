@@ -56,6 +56,13 @@ class Scheduler_Service {
 	private $blog_model;
 
 	/**
+	 * Generation queue instance.
+	 *
+	 * @var Generation_Queue
+	 */
+	private $generation_queue;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -453,6 +460,13 @@ class Scheduler_Service {
 		// Handle missed cron events.
 		add_action( 'init', [ $this, 'check_missed_cron_events' ] );
 		
+		// Hook to scheduled events.
+		add_action( 'ai_blog_generate_content', [ $this, 'run_scheduled_generation' ] );
+		add_action( 'ai_blog_auto_generate', [ $this, 'run_auto_generation' ] );
+		add_action( 'ai_blog_process_generation', [ $this, 'process_single_generation' ], 10, 1 );
+		add_action( 'ai_blog_cleanup_logs', [ $this, 'cleanup_old_data' ] );
+
+		
 		// Only log cron hooks registration once per session to prevent log spam
 		if ( ! get_transient( 'ai_blog_cron_hooks_registered_logged' ) ) {
 			Logger::info( 'cron_hooks_registered', 'All cron hooks registered successfully' );
@@ -470,6 +484,13 @@ class Scheduler_Service {
 		remove_action( 'ai_blog_publish_scheduled', [ $this, 'publish_scheduled_posts' ] );
 		remove_action( 'ai_blog_cleanup_logs', [ $this, 'cleanup_old_data' ] );
 		remove_action( 'init', [ $this, 'check_missed_cron_events' ] );
+		
+		// Remove hook to scheduled events.
+		remove_action( 'ai_blog_generate_content', [ $this, 'run_scheduled_generation' ] );
+		remove_action( 'ai_blog_auto_generate', [ $this, 'run_auto_generation' ] );
+		remove_action( 'ai_blog_process_generation', [ $this, 'process_single_generation' ], 10 );
+		remove_action( 'ai_blog_cleanup_logs', [ $this, 'cleanup_old_data' ] );
+
 		
 		Logger::info( 'cron_hooks_unregistered', 'All cron hooks unregistered' );
 	}
@@ -513,6 +534,8 @@ class Scheduler_Service {
 				'next_run' => date( 'Y-m-d H:i:s', $next_run ),
 			] );
 		}
+		
+
 	}
 
 	/**

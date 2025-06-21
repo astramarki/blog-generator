@@ -261,7 +261,7 @@ class Background_Processor {
             
             // Check daily limit before proceeding
             $daily_count = $this->blog_model->count_generated_today();
-            $daily_limit = (int) get_option( 'ai_blog_generator_daily_limit', 5 );
+            $daily_limit = (int) get_option( 'ai_blog_generator_posts_per_day', 10 );
             
             if ( $daily_count >= $daily_limit ) {
                 file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Daily limit reached ({$daily_count}/{$daily_limit}) for idea_id: {$idea_id}\n", FILE_APPEND );

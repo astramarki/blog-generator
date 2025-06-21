@@ -1,826 +1,811 @@
-2025-06-20 12:52:55 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"status":"generating","generation_status":"Starting...","generation_started_at":"2025-06-20 12:52:55","generation_error":null,"updated_at":"2025-06-20 12:52:55"}
+2025-06-20 21:19:34 - AJAX_SUBMIT_GENERATION_START [INFO]: Submitting ideas for generation via AJAX - Context: {"idea_ids":[26],"count":1}
+2025-06-20 21:19:34 - GENERATION_QUEUE_ADD [INFO]: Adding ideas to generation queue - Context: {"idea_ids":[26],"count":1}
+2025-06-20 21:19:34 - GENERATION_QUEUE_START [INFO]: Starting generation for idea - Context: {"idea_id":26}
+2025-06-20 21:19:34 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"status":"generating","generation_status":"Starting...","generation_started_at":"2025-06-20 21:19:34","generation_error":null,"updated_at":"2025-06-20 21:19:34"}
   Format: ["%s","%s","%s","%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `generation_status` = 'Starting...', `generation_started_at` = '2025-06-20 12:52:55', `generation_error` = NULL, `updated_at` = '2025-06-20 12:...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `generation_status` = 'Starting...', `generation_started_at` = '2025-06-20 21:19:34', `generation_error` = NULL, `updated_at` = '2025-06-20 21:...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:52:58 - BACKGROUND_PROCESSOR: process_generation CRON JOB STARTED for idea_id: 44
-2025-06-20 12:52:58 - BACKGROUND_PROCESSOR: Starting try block for idea_id: 44
-2025-06-20 12:52:58 - BACKGROUND_PROCESSOR: Idea loaded successfully for idea_id: 44
-2025-06-20 12:52:58 - BLOG_MODEL::count_generated_today - Method called
-2025-06-20 12:52:58 - BLOG_MODEL::count_generated_today - DATA: {"memory_usage":89069600}
-2025-06-20 12:52:58 - BLOG_MODEL::count_generated_today - Date calculated
-2025-06-20 12:52:58 - BLOG_MODEL::count_generated_today - DATA: {"today":"2025-06-20"}
-2025-06-20 12:52:58 - BLOG_MODEL::count_generated_today - Table name resolved
-2025-06-20 12:52:58 - BLOG_MODEL::count_generated_today - DATA: {"table":"psec_ai_blog_generated_posts"}
-2025-06-20 12:52:58 - BLOG_MODEL::count_generated_today - SQL query prepared
-2025-06-20 12:52:58 - BLOG_MODEL::count_generated_today - DATA: {"sql":"SELECT COUNT(*) FROM psec_ai_blog_generated_posts WHERE DATE(created_at) = '2025-06-20'","today_param":"2025-06-20"}
-2025-06-20 12:52:58 - BLOG_MODEL::count_generated_today - Query executed
-2025-06-20 12:52:58 - BLOG_MODEL::count_generated_today - DATA: {"count":1,"count_type":"integer","wpdb_last_error":""}
-2025-06-20 12:52:58 - BACKGROUND_PROCESSOR: Calling Content_Generator for idea_id: 44
-2025-06-20 12:52:58 - Entering start_transaction method
-2025-06-20 12:52:58 - Checking MySQL connection status
-2025-06-20 12:52:58 - Connection check result: SUCCESS
-2025-06-20 12:52:58 - About to execute START TRANSACTION query
-2025-06-20 12:52:58 - START TRANSACTION completed with result: SUCCESS in 8.1777572631836E-5 seconds
-2025-06-20 12:52:58 - Setting in_transaction to true
-2025-06-20 12:52:58 - start_transaction completed successfully, returning true
-2025-06-20 12:52:58 - CONTENT_GENERATOR: start_transaction call returned with result: SUCCESS
-2025-06-20 12:52:58 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"status":"generating","updated_at":"2025-06-20 12:52:58"}
-  Format: ["%s","%s"]
-  Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `updated_at` = '2025-06-20 12:52:58' WHERE `id` = 44...
-  SQL Error: None
-  Rows Affected: 1
-  Update Result: SUCCESS
-  Result Value: 1
-
-2025-06-20 12:52:58 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"generation_status":"Initializing generation process...","updated_at":"2025-06-20 12:52:58"}
-  Format: ["%s","%s"]
-  Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Initializing generation process...', `updated_at` = '2025-06-20 12:52:58' WHERE `id` = 44...
-  SQL Error: None
-  Rows Affected: 1
-  Update Result: SUCCESS
-  Result Value: 1
-
-2025-06-20 12:52:58 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 44
-  Stage: starting
-  Message: Initializing generation process...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":44,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:52:58 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"generation_status":"Compiling content contexts...","updated_at":"2025-06-20 12:52:58"}
-  Format: ["%s","%s"]
-  Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Compiling content contexts...', `updated_at` = '2025-06-20 12:52:58' WHERE `id` = 44...
-  SQL Error: None
-  Rows Affected: 1
-  Update Result: SUCCESS
-  Result Value: 1
-
-2025-06-20 12:52:58 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 44
-  Stage: contexts
-  Message: Compiling content contexts...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":44,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Method called
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"usage":"content","options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":[],"include_metadata":false},"memory_usage":89124872}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Starting method execution
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Setting up defaults
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Options merged
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_options":{"max_contexts_per_type":5,"include_metadata":false,"priority_threshold":0,"type_filters":[]}}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - About to call get_compiled_for_usage
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_compiled_for_usage - Method called
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_compiled_for_usage - DATA: {"usage":"content","type_filters":[],"memory_usage":89124928}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_compiled_for_usage - Starting method execution
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - Method called
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":"content","preserve_structure":true,"memory_usage":89124928}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - Added usage filter
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - DATA: {"usage":"content"}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL...[truncated]","params":["%content%"]}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - About to execute query
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - Query executed
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":true}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - Returning results with preserved structure
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_compiled_for_usage - Method completed for usage: content
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - get_compiled_for_usage completed
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"compiled_types":["general","products","seo","keywords","image"],"compiled_count":5}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Starting result processing loop
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Processing type: general
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for general
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Limited contexts for general
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Compiling content for general
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Completed processing for general
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Processing type: products
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for products
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Limited contexts for products
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Compiling content for products
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Completed processing for products
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Processing type: seo
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for seo
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Limited contexts for seo
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Compiling content for seo
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Completed processing for seo
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Processing type: keywords
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for keywords
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Limited contexts for keywords
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Compiling content for keywords
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Completed processing for keywords
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Processing type: image
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for image
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Limited contexts for image
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Compiling content for image
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Completed processing for image
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Processing loop completed
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","seo","keywords","image"]}
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - Method completing successfully
-2025-06-20 12:52:58 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","seo","keywords","image"],"total_types":5}
-2025-06-20 12:52:58 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"generation_status":"Content contexts ready. Preparing for AI generation...","updated_at":"2025-06-20 12:52:58"}
-  Format: ["%s","%s"]
-  Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Content contexts ready. Preparing for AI generation...', `updated_at` = '2025-06-20 12:52:58' WHERE `id` = 44...
-  SQL Error: None
-  Rows Affected: 1
-  Update Result: SUCCESS
-  Result Value: 1
-
-2025-06-20 12:52:58 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 44
-  Stage: contexts
-  Message: Content contexts ready. Preparing for AI generation...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":44,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:52:58 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"generation_status":"Generating blog content with AI...","updated_at":"2025-06-20 12:52:58"}
-  Format: ["%s","%s"]
-  Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating blog content with AI...', `updated_at` = '2025-06-20 12:52:58' WHERE `id` = 44...
-  SQL Error: None
-  Rows Affected: 1
-  Update Result: SUCCESS
-  Result Value: 1
-
-2025-06-20 12:52:58 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 44
-  Stage: content
-  Message: Generating blog content with AI...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":44,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - Method called
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - Parameters: table=personas, where=array[id], fields=*
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - About to get table name
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - Table name resolved: psec_ai_blog_personas
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - Building SQL query
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - Where clause: id = '5'
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - Final SQL: SELECT * FROM psec_ai_blog_personas WHERE id = '5' LIMIT 1
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - About to execute wpdb->get_row
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - wpdb->get_row completed
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - Result type: array
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - Result is null: false
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - WPDB last error: 
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - Result data: ARRAY[id, name, bio, expertise, writing_style, tone, active, created_at, updated_at]
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - Record found: true
-2025-06-20 12:52:58 - DATABASE_MANAGER::get - Method returning result
-2025-06-20 12:52:58 - ANTHROPIC_SERVICE: Starting blog content generation
-2025-06-20 12:52:58 - ANTHROPIC_SERVICE: About to make API request
-2025-06-20 12:52:58 - ANTHROPIC_SERVICE: Memory before API call: 102760448 bytes
-2025-06-20 12:52:58 - ANTHROPIC_SERVICE: SSL verification DISABLED for local environment
-2025-06-20 12:53:06 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 65
-  Update Data: {"status":"generating","generation_status":"Starting...","generation_started_at":"2025-06-20 12:53:06","generation_error":null,"updated_at":"2025-06-20 12:53:06"}
+2025-06-20 21:19:34 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":26,"updated_fields":["status","generation_status","generation_started_at","generation_error","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `generation_status` = 'Starting...', `generation_started_at` = '2025-06-20 21:19:34', `generation_error` = NULL, `updated_at` = '2025-06-20 21:19:34' WHERE `id` = 26"}
+2025-06-20 21:19:34 - AJAX_QUEUE_RESULT [INFO]: Ideas added to generation queue - Context: {"success":true,"queued":[],"started":[26],"errors":[],"active_count":5,"queue_length":0}
+2025-06-20 21:19:37 - PROCESS_SINGLE_GENERATION [INFO]: Processing single generation from queue - Context: {"idea_id":26}
+2025-06-20 21:19:37 - BACKGROUND_PROCESSOR: process_generation CRON JOB STARTED for idea_id: 26
+2025-06-20 21:19:37 - BACKGROUND_PROCESSOR: Starting try block for idea_id: 26
+2025-06-20 21:19:37 - BACKGROUND_PROCESSOR: Idea loaded successfully for idea_id: 26
+2025-06-20 21:19:37 - BLOG_MODEL::count_generated_today - Method called
+2025-06-20 21:19:37 - BLOG_MODEL::count_generated_today - DATA: {"memory_usage":88969656}
+2025-06-20 21:19:37 - BLOG_MODEL::count_generated_today - Date calculated
+2025-06-20 21:19:37 - BLOG_MODEL::count_generated_today - DATA: {"today":"2025-06-20"}
+2025-06-20 21:19:37 - BLOG_MODEL::count_generated_today - Table name resolved
+2025-06-20 21:19:37 - BLOG_MODEL::count_generated_today - DATA: {"table":"psec_ai_blog_generated_posts"}
+2025-06-20 21:19:37 - BLOG_MODEL::count_generated_today - SQL query prepared
+2025-06-20 21:19:37 - BLOG_MODEL::count_generated_today - DATA: {"sql":"SELECT COUNT(*) FROM psec_ai_blog_generated_posts WHERE DATE(created_at) = '2025-06-20'","today_param":"2025-06-20"}
+2025-06-20 21:19:37 - BLOG_MODEL::count_generated_today - Query executed
+2025-06-20 21:19:37 - BLOG_MODEL::count_generated_today - DATA: {"count":5,"count_type":"integer","wpdb_last_error":""}
+2025-06-20 21:19:37 - BACKGROUND_PROCESSOR: Daily limit reached (5/5) for idea_id: 26
+2025-06-20 21:19:37 - BACKGROUND_PROCESSOR_DAILY_LIMIT [WARNING]: Daily generation limit reached - Context: {"daily_count":5,"daily_limit":5,"idea_id":26}
+2025-06-20 21:19:46 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-20 21:21:26 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-20 21:21:26 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-20 21:21:27 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-20 21:21:27 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-20 21:21:27 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":2}
+2025-06-20 21:21:27 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":36}
+2025-06-20 21:21:27 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":2}
+2025-06-20 21:21:27 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":33}
+2025-06-20 21:21:27 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":36,"generating_count":2,"generated_count":33,"approved_ids":["65","69","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":["26","62"],"generated_ids":["18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-20 21:21:27 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":36,"generating_count":2,"generated_count":33}
+2025-06-20 21:21:34 - AJAX_SUBMIT_GENERATION_START [INFO]: Submitting ideas for generation via AJAX - Context: {"idea_ids":[69],"count":1}
+2025-06-20 21:21:34 - GENERATION_QUEUE_ADD [INFO]: Adding ideas to generation queue - Context: {"idea_ids":[69],"count":1}
+2025-06-20 21:21:34 - GENERATION_QUEUE_START [INFO]: Starting generation for idea - Context: {"idea_id":69}
+2025-06-20 21:21:34 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 69
+  Update Data: {"status":"generating","generation_status":"Starting...","generation_started_at":"2025-06-20 21:21:34","generation_error":null,"updated_at":"2025-06-20 21:21:34"}
   Format: ["%s","%s","%s","%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `generation_status` = 'Starting...', `generation_started_at` = '2025-06-20 12:53:06', `generation_error` = NULL, `updated_at` = '2025-06-20 12:...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `generation_status` = 'Starting...', `generation_started_at` = '2025-06-20 21:21:34', `generation_error` = NULL, `updated_at` = '2025-06-20 21:...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:53:59 - BACKGROUND_PROCESSOR: process_generation CRON JOB STARTED for idea_id: 65
-2025-06-20 12:53:59 - BACKGROUND_PROCESSOR: Starting try block for idea_id: 65
-2025-06-20 12:53:59 - BACKGROUND_PROCESSOR: Idea loaded successfully for idea_id: 65
-2025-06-20 12:53:59 - BLOG_MODEL::count_generated_today - Method called
-2025-06-20 12:53:59 - BLOG_MODEL::count_generated_today - DATA: {"memory_usage":89069904}
-2025-06-20 12:53:59 - BLOG_MODEL::count_generated_today - Date calculated
-2025-06-20 12:53:59 - BLOG_MODEL::count_generated_today - DATA: {"today":"2025-06-20"}
-2025-06-20 12:53:59 - BLOG_MODEL::count_generated_today - Table name resolved
-2025-06-20 12:53:59 - BLOG_MODEL::count_generated_today - DATA: {"table":"psec_ai_blog_generated_posts"}
-2025-06-20 12:53:59 - BLOG_MODEL::count_generated_today - SQL query prepared
-2025-06-20 12:53:59 - BLOG_MODEL::count_generated_today - DATA: {"sql":"SELECT COUNT(*) FROM psec_ai_blog_generated_posts WHERE DATE(created_at) = '2025-06-20'","today_param":"2025-06-20"}
-2025-06-20 12:53:59 - BLOG_MODEL::count_generated_today - Query executed
-2025-06-20 12:53:59 - BLOG_MODEL::count_generated_today - DATA: {"count":1,"count_type":"integer","wpdb_last_error":""}
-2025-06-20 12:53:59 - BACKGROUND_PROCESSOR: Calling Content_Generator for idea_id: 65
-2025-06-20 12:53:59 - Entering start_transaction method
-2025-06-20 12:53:59 - Checking MySQL connection status
-2025-06-20 12:53:59 - Connection check result: SUCCESS
-2025-06-20 12:53:59 - About to execute START TRANSACTION query
-2025-06-20 12:53:59 - START TRANSACTION completed with result: SUCCESS in 0.00012707710266113 seconds
-2025-06-20 12:53:59 - Setting in_transaction to true
-2025-06-20 12:53:59 - start_transaction completed successfully, returning true
-2025-06-20 12:53:59 - CONTENT_GENERATOR: start_transaction call returned with result: SUCCESS
-2025-06-20 12:53:59 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 65
-  Update Data: {"status":"generating","updated_at":"2025-06-20 12:53:59"}
+2025-06-20 21:21:34 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":69,"updated_fields":["status","generation_status","generation_started_at","generation_error","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `generation_status` = 'Starting...', `generation_started_at` = '2025-06-20 21:21:34', `generation_error` = NULL, `updated_at` = '2025-06-20 21:21:34' WHERE `id` = 69"}
+2025-06-20 21:21:34 - AJAX_QUEUE_RESULT [INFO]: Ideas added to generation queue - Context: {"success":true,"queued":[],"started":[69],"errors":[],"active_count":5,"queue_length":0}
+2025-06-20 21:21:37 - PROCESS_SINGLE_GENERATION [INFO]: Processing single generation from queue - Context: {"idea_id":69}
+2025-06-20 21:21:37 - BACKGROUND_PROCESSOR: process_generation CRON JOB STARTED for idea_id: 69
+2025-06-20 21:21:37 - BACKGROUND_PROCESSOR: Starting try block for idea_id: 69
+2025-06-20 21:21:37 - BACKGROUND_PROCESSOR: Idea loaded successfully for idea_id: 69
+2025-06-20 21:21:37 - BLOG_MODEL::count_generated_today - Method called
+2025-06-20 21:21:37 - BLOG_MODEL::count_generated_today - DATA: {"memory_usage":88970280}
+2025-06-20 21:21:37 - BLOG_MODEL::count_generated_today - Date calculated
+2025-06-20 21:21:37 - BLOG_MODEL::count_generated_today - DATA: {"today":"2025-06-20"}
+2025-06-20 21:21:37 - BLOG_MODEL::count_generated_today - Table name resolved
+2025-06-20 21:21:37 - BLOG_MODEL::count_generated_today - DATA: {"table":"psec_ai_blog_generated_posts"}
+2025-06-20 21:21:37 - BLOG_MODEL::count_generated_today - SQL query prepared
+2025-06-20 21:21:37 - BLOG_MODEL::count_generated_today - DATA: {"sql":"SELECT COUNT(*) FROM psec_ai_blog_generated_posts WHERE DATE(created_at) = '2025-06-20'","today_param":"2025-06-20"}
+2025-06-20 21:21:37 - BLOG_MODEL::count_generated_today - Query executed
+2025-06-20 21:21:37 - BLOG_MODEL::count_generated_today - DATA: {"count":5,"count_type":"integer","wpdb_last_error":""}
+2025-06-20 21:21:37 - BACKGROUND_PROCESSOR: Calling Content_Generator for idea_id: 69
+2025-06-20 21:21:37 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Starting blog post generation (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69,"generation_lock_set":true}
+2025-06-20 21:21:37 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Checking if generation is paused (AI_Blog_Generator\Services\Content_Generator::generate_blog_post)
+2025-06-20 21:21:37 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Getting idea details (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69}
+2025-06-20 21:21:37 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Idea details retrieved (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69,"idea_data":{"id":"69","title":"Geometry in Action: 8th Grade Math Poster Projects Using School Banner Printers","description":"Middle school students design and print large-format geometry posters showcasing real-world applications of mathematical concepts. Includes project planning guides, printer specifications for geometric precision, and assessment strategies.","category_id":null,"persona_id":"5","status":"generating","created_at":"2025-06-18 17:41:42","updated_at":"2025-06-20 21:21:34","generation_status":"Starting...","generation_error":null,"generation_started_at":"2025-06-20 21:21:34","generation_completed_at":null,"persona_name":"Maya Morales","category_ids":["1120","1123","1132"],"category_names":["Curriculum","Education &amp; Teaching","Graphic Design"],"created_at_ny":"Jun 18, 2025 1:41 PM EDT"},"idea_is_array":true,"idea_keys":["id","title","description","category_id","persona_id","status","created_at","updated_at","generation_status","generation_error","gen... [truncated]
+2025-06-20 21:21:37 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Checking if idea exists (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69}
+2025-06-20 21:21:37 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Idea exists, checking status field (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69,"has_status":true,"status_value":"generating","status_raw":"'generating'","status_type":"string","status_length":10,"all_idea_keys":["id","title","description","category_id","persona_id","status","created_at","updated_at","generation_status","generation_error","generation_started_at","generation_completed_at","persona_name","category_ids","category_names","created_at_ny"],"full_idea_data":{"id":"69","title":"Geometry in Action: 8th Grade Math Poster Projects Using School Banner Printers","description":"Middle school students design and print large-format geometry posters showcasing real-world applications of mathematical concepts. Includes project planning guides, printer specifications for geometric precision, and assessment strategies.","category_id":null,"persona_id":"5","status":"generating","created_at":"2025-06-18 17:41:42","updated_at":"2025-06-20 21:21:34","generation_status":"Starting...","generation_error":null,"generation_started_at":"2025-06-20 21:21:34","gene... [truncated]
+2025-06-20 21:21:37 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Checking idea status value (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69,"current_status":"generating","current_status_raw":"'generating'","current_status_type":"string","current_status_length":10,"required_status":"approved","strict_comparison":false,"loose_comparison":false,"trimmed_comparison":false}
+2025-06-20 21:21:37 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: All idea validations passed, starting transaction (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69}
+2025-06-20 21:21:37 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Ready to begin generation process (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69}
+2025-06-20 21:21:37 - PRE_STATUS_UPDATE [INFO]: About to update idea status to generating (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69}
+2025-06-20 21:21:37 - IDEA_MODEL_VALIDATED [INFO]: Idea model is available (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69,"idea_model_class":"AI_Blog_Generator\\Models\\Blog_Ideas_Model_V2"}
+2025-06-20 21:21:37 - UPDATING_IDEA_STATUS [INFO]: Updating idea status to generating (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69}
+2025-06-20 21:21:37 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 69
+  Update Data: {"status":"generating","updated_at":"2025-06-20 21:21:37"}
   Format: ["%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `updated_at` = '2025-06-20 12:53:59' WHERE `id` = 65...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `updated_at` = '2025-06-20 21:21:37' WHERE `id` = 69...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:53:59 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 65
-  Update Data: {"generation_status":"Initializing generation process...","updated_at":"2025-06-20 12:53:59"}
+2025-06-20 21:21:37 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":69,"updated_fields":["status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `updated_at` = '2025-06-20 21:21:37' WHERE `id` = 69"}
+2025-06-20 21:21:37 - IDEA_STATUS_UPDATED [INFO]: Idea status update completed (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69,"update_result":true}
+2025-06-20 21:21:37 - UPDATING_GENERATION_STATUS [INFO]: Updating generation status (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69}
+2025-06-20 21:21:37 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":69,"stage":"starting","message":"Initializing generation process......","is_stage_change":false,"is_critical":false,"is_batch_update":false}
+2025-06-20 21:21:37 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 69
+  Update Data: {"generation_status":"Initializing generation process...","updated_at":"2025-06-20 21:21:37"}
   Format: ["%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Initializing generation process...', `updated_at` = '2025-06-20 12:53:59' WHERE `id` = 65...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Initializing generation process...', `updated_at` = '2025-06-20 21:21:37' WHERE `id` = 69...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:53:59 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 65
-  Stage: starting
-  Message: Initializing generation process...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":65,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
+2025-06-20 21:21:37 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":69,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Initializing generation process...', `updated_at` = '2025-06-20 21:21:37' WHERE `id` = 69"}
+2025-06-20 21:21:37 - GENERATION_STATUS_UPDATED [INFO]: Generation status update completed (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69}
+2025-06-20 21:21:37 - COMPILING_CONTEXTS_START [INFO]: Starting context compilation (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69}
+2025-06-20 21:21:37 - COMPILE_CONTEXTS_ENHANCED_START [INFO]: Starting enhanced context compilation (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","options":{"max_contexts_per_type":5,"priority_threshold":0}}
+2025-06-20 21:21:37 - CONTEXT_OPTIONS_PREPARED [INFO]: Context options prepared (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","merged_options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":[],"include_metadata":false}}
+2025-06-20 21:21:37 - CALLING_CONTEXT_MODEL [INFO]: Calling context model get_for_prompt (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","context_model_class":"AI_Blog_Generator\\Models\\Context_Model"}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Method called
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"usage":"content","options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":[],"include_metadata":false},"memory_usage":89025472}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Starting method execution
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Setting up defaults
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Options merged
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_options":{"max_contexts_per_type":5,"include_metadata":false,"priority_threshold":0,"type_filters":[]}}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - About to call get_compiled_for_usage
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_compiled_for_usage - Method called
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_compiled_for_usage - DATA: {"usage":"content","type_filters":[],"memory_usage":89025848}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_compiled_for_usage - Starting method execution
+2025-06-20 21:21:37 - CONTEXT_GET_COMPILED_START [INFO]: Starting context compilation for usage - Context: {"usage":"content","type_filters":[]}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":"content","preserve_structure":true,"memory_usage":89025848}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-20 21:21:37 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":"content","preserve_structure":true}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - Added usage filter
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"usage":"content"}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL...[truncated]","params":["%content%"]}
+2025-06-20 21:21:37 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL OR usage_flags = '') ORDER BY type ASC, priority DESC, name ASC","params_count":1,"usage":"content","type":null}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-20 21:21:37 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":"content","type":null}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":true}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - Returning results with preserved structure
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6}
+2025-06-20 21:21:37 - CONTEXT_ENHANCED_ACTIVE_RECEIVED [INFO]: Enhanced active contexts received - Context: {"usage":"content","contexts_count":6,"contexts_is_array":true}
+2025-06-20 21:21:37 - CONTEXTS_COMPILED_FOR_USAGE [INFO]: Compiled contexts for specific usage - Context: {"usage":"content","types_included":["general","products","seo","keywords","image"],"total_contexts":5,"type_filters":[]}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_compiled_for_usage - Method completed for usage: content
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - get_compiled_for_usage completed
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"compiled_types":["general","products","seo","keywords","image"],"compiled_count":5}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Starting result processing loop
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Processing type: general
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for general
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Limited contexts for general
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Compiling content for general
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Completed processing for general
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Processing type: products
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for products
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Limited contexts for products
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Compiling content for products
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Completed processing for products
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Processing type: seo
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for seo
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Limited contexts for seo
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Compiling content for seo
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Completed processing for seo
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Processing type: keywords
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for keywords
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Limited contexts for keywords
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Compiling content for keywords
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Completed processing for keywords
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Processing type: image
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for image
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Limited contexts for image
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Compiling content for image
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Completed processing for image
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Processing loop completed
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","seo","keywords","image"]}
+2025-06-20 21:21:37 - CONTEXT_GET_FOR_PROMPT_SUCCESS [INFO]: Context retrieval for prompt completed - Context: {"usage":"content","result_types":["general","products","seo","keywords","image"],"total_contexts":5}
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - Method completing successfully
+2025-06-20 21:21:37 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","seo","keywords","image"],"total_types":5}
+2025-06-20 21:21:37 - CONTEXT_MODEL_SUCCESS [INFO]: Context model returned successfully (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","contexts_returned":5,"contexts_keys":["general","products","seo","keywords","image"]}
+2025-06-20 21:21:37 - CONVERTING_CONTEXTS [INFO]: Converting contexts to simple format (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","contexts_to_convert":5}
+2025-06-20 21:21:37 - CONTEXTS_CONVERTED [INFO]: Contexts converted successfully (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","original_count":5,"converted_count":5}
+2025-06-20 21:21:37 - CONTEXTS_COMPILED_ENHANCED [INFO]: Enhanced contexts compilation completed (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","types_included":["general","products","seo","keywords","image"],"total_context_types":5,"options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":[],"include_metadata":false}}
+2025-06-20 21:21:37 - COMPILING_CONTEXTS_SUCCESS [INFO]: Context compilation successful (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69,"context_types":["general","products","seo","keywords","image"],"context_count":5}
+2025-06-20 21:21:37 - EXTRACTING_SEO_KEYWORDS [INFO]: Extracting SEO keywords (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69}
+2025-06-20 21:21:37 - SEO_KEYWORDS_FILTERED [INFO]: Filtered SEO keywords for specific topic (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_title":"Geometry in Action: 8th Grade Math Poster Projects Using School Banner Printers","generic_keywords_count":10,"filtered_keywords_count":15,"keywords":["poster machine for schools","poster maker for schools","poster maker printer","poster makers for schools","poster print machine","poster printer machine","poster printer machines","poster printing machine","poster machine maker","poster maker machine","geometry","geometry in","geometry in action:","action:","action: 8th"]}
+2025-06-20 21:21:37 - ANTHROPIC_GENERATION_START [INFO]: Starting Anthropic content generation (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69}
+2025-06-20 21:21:37 - ANTHROPIC_SERVICE_VALIDATED [INFO]: Anthropic service is available (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69,"service_class":"AI_Blog_Generator\\Services\\Anthropic_Service"}
+2025-06-20 21:21:37 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-20 21:21:37 - PERSONA_FETCHED [INFO]: Persona data fetched successfully (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":69,"persona_id":"5","persona_name":"Maya Morales"}
+2025-06-20 21:21:37 - ANTHROPIC_SERVICE: Starting blog content generation
+2025-06-20 21:21:37 - ANTHROPIC_CONTENT_GENERATION_START [INFO]: Starting blog content generation - Context: {"idea_id":"69","idea_title":"Geometry in Action: 8th Grade Math Poster Projects Using School Banner Printers","contexts_available":["general","products","seo","keywords","image"],"seo_keywords_count":15,"model":"claude-sonnet-4-20250514","persona_provided":true,"persona_name":"Maya Morales"}
+2025-06-20 21:21:37 - BUILDING_CONTENT_PROMPT [INFO]: Building content generation prompt - Context: {"idea_id":"69"}
+2025-06-20 21:21:37 - CONTENT_PROMPT_BUILT [INFO]: Content prompt built successfully - Context: {"idea_id":"69","prompt_length":26928}
+2025-06-20 21:21:37 - MAKING_ANTHROPIC_REQUEST [INFO]: Making request to Anthropic API - Context: {"idea_id":"69","model":"claude-sonnet-4-20250514","max_tokens":64000,"prompt_length":26928}
+2025-06-20 21:21:37 - ANTHROPIC_SERVICE: About to make API request
+2025-06-20 21:21:37 - ANTHROPIC_SERVICE: Memory before API call: 90177536 bytes
+2025-06-20 21:21:37 - SSL_VERIFICATION_DISABLED [INFO]: SSL verification disabled for local development (AI_Blog_Generator\Services\Anthropic_Service::make_request) - Context: {"host":"localhost","server_name":"localhost","abspath":"D:\\Dropbox\\poster website\/","php_sapi":"cgi-fcgi","is_local":true,"force_disabled":true}
+2025-06-20 21:21:37 - ANTHROPIC_SERVICE: SSL verification DISABLED for local environment
+2025-06-20 21:21:37 - ANTHROPIC_REQUEST_DETAILS [INFO]: Sending request to Anthropic API (AI_Blog_Generator\Services\Anthropic_Service::make_request) - Context: {"url":"https:\/\/api.anthropic.com\/v1\/messages","headers":{"Content-Type":"application\/json","x-api-key":"[REDACTED]","anthropic-version":"2023-06-01"},"model":"claude-sonnet-4-20250514","max_tokens":64000,"message_count":1,"request_size":28641}
+2025-06-20 21:23:13 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 21:23:36 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-20 21:23:54 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-20 21:23:54 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-20 21:23:55 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-20 21:23:55 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-20 21:23:55 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":3}
+2025-06-20 21:23:55 - CLEANUP_RESETTING_STUCK_IDEA [INFO]: Resetting stuck idea - Context: {"idea_id":"62","title":"Reading Comprehension Wall Displays: Poster Machine Solutions for Grades 4-6","stuck_duration_minutes":11.6,"generation_status":"Starting..."}
+2025-06-20 21:23:55 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 62
+  Update Data: {"generation_status":null,"status":"approved","updated_at":"2025-06-20 21:23:55"}
+  Format: ["%s","%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = NULL, `status` = 'approved', `updated_at` = '2025-06-20 21:23:55' WHERE `id` = 62...
+  SQL Error: None
   Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
 
-2025-06-20 12:53:59 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+2025-06-20 21:23:55 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":"62","updated_fields":["generation_status","status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = NULL, `status` = 'approved', `updated_at` = '2025-06-20 21:23:55' WHERE `id` = 62"}
+2025-06-20 21:23:55 - CLEANUP_IDEA_RESET_SUCCESS [INFO]: Successfully reset stuck idea - Context: {"idea_id":"62"}
+2025-06-20 21:23:55 - CLEANUP_COMPLETED [INFO]: Cleanup completed, reset stuck ideas - Context: {"total_generating":3,"cleaned_count":1}
+2025-06-20 21:23:55 - AJAX_CLEANUP_PERFORMED [INFO]: Automatic cleanup performed before fetching ideas - Context: {"cleaned_count":1}
+2025-06-20 21:23:55 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":36}
+2025-06-20 21:23:55 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":2}
+2025-06-20 21:23:55 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":33}
+2025-06-20 21:23:55 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":36,"generating_count":2,"generated_count":33,"approved_ids":["62","65","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":["69","26"],"generated_ids":["18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-20 21:23:55 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":36,"generating_count":2,"generated_count":33}
+2025-06-20 21:28:15 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 21:29:07 - AJAX_SUBMIT_GENERATION_START [INFO]: Submitting ideas for generation via AJAX - Context: {"idea_ids":[65],"count":1}
+2025-06-20 21:29:07 - GENERATION_QUEUE_ADD [INFO]: Adding ideas to generation queue - Context: {"idea_ids":[65],"count":1}
+2025-06-20 21:29:07 - GENERATION_QUEUE_START [INFO]: Starting generation for idea - Context: {"idea_id":65}
+2025-06-20 21:29:07 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
   Idea ID: 65
-  Update Data: {"generation_status":"Compiling content contexts...","updated_at":"2025-06-20 12:53:59"}
+  Update Data: {"status":"generating","generation_status":"Starting...","generation_started_at":"2025-06-20 21:29:07","generation_error":null,"updated_at":"2025-06-20 21:29:07"}
+  Format: ["%s","%s","%s","%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `generation_status` = 'Starting...', `generation_started_at` = '2025-06-20 21:29:07', `generation_error` = NULL, `updated_at` = '2025-06-20 21:...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-20 21:29:07 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":65,"updated_fields":["status","generation_status","generation_started_at","generation_error","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `generation_status` = 'Starting...', `generation_started_at` = '2025-06-20 21:29:07', `generation_error` = NULL, `updated_at` = '2025-06-20 21:29:07' WHERE `id` = 65"}
+2025-06-20 21:29:07 - AJAX_QUEUE_RESULT [INFO]: Ideas added to generation queue - Context: {"success":true,"queued":[],"started":[65],"errors":[],"active_count":5,"queue_length":0}
+2025-06-20 21:29:10 - PROCESS_SINGLE_GENERATION [INFO]: Processing single generation from queue - Context: {"idea_id":65}
+2025-06-20 21:29:10 - BACKGROUND_PROCESSOR: process_generation CRON JOB STARTED for idea_id: 65
+2025-06-20 21:29:10 - BACKGROUND_PROCESSOR: Starting try block for idea_id: 65
+2025-06-20 21:29:10 - BACKGROUND_PROCESSOR: Idea loaded successfully for idea_id: 65
+2025-06-20 21:29:10 - BLOG_MODEL::count_generated_today - Method called
+2025-06-20 21:29:10 - BLOG_MODEL::count_generated_today - DATA: {"memory_usage":88969768}
+2025-06-20 21:29:10 - BLOG_MODEL::count_generated_today - Date calculated
+2025-06-20 21:29:10 - BLOG_MODEL::count_generated_today - DATA: {"today":"2025-06-20"}
+2025-06-20 21:29:10 - BLOG_MODEL::count_generated_today - Table name resolved
+2025-06-20 21:29:10 - BLOG_MODEL::count_generated_today - DATA: {"table":"psec_ai_blog_generated_posts"}
+2025-06-20 21:29:10 - BLOG_MODEL::count_generated_today - SQL query prepared
+2025-06-20 21:29:10 - BLOG_MODEL::count_generated_today - DATA: {"sql":"SELECT COUNT(*) FROM psec_ai_blog_generated_posts WHERE DATE(created_at) = '2025-06-20'","today_param":"2025-06-20"}
+2025-06-20 21:29:10 - BLOG_MODEL::count_generated_today - Query executed
+2025-06-20 21:29:10 - BLOG_MODEL::count_generated_today - DATA: {"count":5,"count_type":"integer","wpdb_last_error":""}
+2025-06-20 21:29:10 - BACKGROUND_PROCESSOR: Calling Content_Generator for idea_id: 65
+2025-06-20 21:29:10 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Starting blog post generation (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"generation_lock_set":true}
+2025-06-20 21:29:10 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Checking if generation is paused (AI_Blog_Generator\Services\Content_Generator::generate_blog_post)
+2025-06-20 21:29:10 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Getting idea details (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:29:10 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Idea details retrieved (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"idea_data":{"id":"65","title":"Middle School Fraction Mastery: Poster Making Machine Activities That Work","description":"Discover hands-on fraction activities where students create their own mathematical posters using school poster makers. Includes project templates, assessment rubrics, and equipment recommendations for grades 6-8 mathematics programs.","category_id":null,"persona_id":"5","status":"generating","created_at":"2025-06-18 17:41:42","updated_at":"2025-06-20 21:29:07","generation_status":"Starting...","generation_error":null,"generation_started_at":"2025-06-20 21:29:07","generation_completed_at":null,"persona_name":"Maya Morales","category_ids":["1122","1135"],"category_names":["How-To Guides","Teaching Resources"],"created_at_ny":"Jun 18, 2025 1:41 PM EDT"},"idea_is_array":true,"idea_keys":["id","title","description","category_id","persona_id","status","created_at","updated_at","generation_status","generation_error","generation_started_at","generation_comple... [truncated]
+2025-06-20 21:29:10 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Checking if idea exists (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:29:10 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Idea exists, checking status field (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"has_status":true,"status_value":"generating","status_raw":"'generating'","status_type":"string","status_length":10,"all_idea_keys":["id","title","description","category_id","persona_id","status","created_at","updated_at","generation_status","generation_error","generation_started_at","generation_completed_at","persona_name","category_ids","category_names","created_at_ny"],"full_idea_data":{"id":"65","title":"Middle School Fraction Mastery: Poster Making Machine Activities That Work","description":"Discover hands-on fraction activities where students create their own mathematical posters using school poster makers. Includes project templates, assessment rubrics, and equipment recommendations for grades 6-8 mathematics programs.","category_id":null,"persona_id":"5","status":"generating","created_at":"2025-06-18 17:41:42","updated_at":"2025-06-20 21:29:07","generation_status":"Starting...","generation_error":null,"generation_started_at":"2025-06-20 21:29:07","generation_comp... [truncated]
+2025-06-20 21:29:10 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Checking idea status value (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"current_status":"generating","current_status_raw":"'generating'","current_status_type":"string","current_status_length":10,"required_status":"approved","strict_comparison":false,"loose_comparison":false,"trimmed_comparison":false}
+2025-06-20 21:29:10 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: All idea validations passed, starting transaction (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:29:10 - CONTENT_GENERATOR_GENERATE_BLOG_POST [INFO]: Ready to begin generation process (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:29:10 - PRE_STATUS_UPDATE [INFO]: About to update idea status to generating (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:29:10 - IDEA_MODEL_VALIDATED [INFO]: Idea model is available (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"idea_model_class":"AI_Blog_Generator\\Models\\Blog_Ideas_Model_V2"}
+2025-06-20 21:29:10 - UPDATING_IDEA_STATUS [INFO]: Updating idea status to generating (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:29:10 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 65
+  Update Data: {"status":"generating","updated_at":"2025-06-20 21:29:10"}
   Format: ["%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Compiling content contexts...', `updated_at` = '2025-06-20 12:53:59' WHERE `id` = 65...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `updated_at` = '2025-06-20 21:29:10' WHERE `id` = 65...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:53:59 - CONTENT_GENERATOR STATUS UPDATE:
+2025-06-20 21:29:10 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":65,"updated_fields":["status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `status` = 'generating', `updated_at` = '2025-06-20 21:29:10' WHERE `id` = 65"}
+2025-06-20 21:29:10 - IDEA_STATUS_UPDATED [INFO]: Idea status update completed (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"update_result":true}
+2025-06-20 21:29:10 - UPDATING_GENERATION_STATUS [INFO]: Updating generation status (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:29:10 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":65,"stage":"starting","message":"Initializing generation process......","is_stage_change":false,"is_critical":false,"is_batch_update":false}
+2025-06-20 21:29:10 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
   Idea ID: 65
-  Stage: contexts
-  Message: Compiling content contexts...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":65,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Method called
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"usage":"content","options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":[],"include_metadata":false},"memory_usage":89125048}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Starting method execution
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Setting up defaults
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Options merged
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_options":{"max_contexts_per_type":5,"include_metadata":false,"priority_threshold":0,"type_filters":[]}}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - About to call get_compiled_for_usage
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_compiled_for_usage - Method called
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_compiled_for_usage - DATA: {"usage":"content","type_filters":[],"memory_usage":89125104}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_compiled_for_usage - Starting method execution
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - Method called
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":"content","preserve_structure":true,"memory_usage":89125104}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - Added usage filter
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - DATA: {"usage":"content"}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL...[truncated]","params":["%content%"]}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - About to execute query
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - Query executed
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":true}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - Returning results with preserved structure
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_compiled_for_usage - Method completed for usage: content
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - get_compiled_for_usage completed
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"compiled_types":["general","products","seo","keywords","image"],"compiled_count":5}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Starting result processing loop
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Processing type: general
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for general
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Limited contexts for general
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Compiling content for general
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Completed processing for general
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Processing type: products
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for products
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Limited contexts for products
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Compiling content for products
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Completed processing for products
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Processing type: seo
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for seo
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Limited contexts for seo
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Compiling content for seo
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Completed processing for seo
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Processing type: keywords
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for keywords
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Limited contexts for keywords
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Compiling content for keywords
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Completed processing for keywords
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Processing type: image
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for image
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Limited contexts for image
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Compiling content for image
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Completed processing for image
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Processing loop completed
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","seo","keywords","image"]}
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - Method completing successfully
-2025-06-20 12:53:59 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","seo","keywords","image"],"total_types":5}
-2025-06-20 12:53:59 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 65
-  Update Data: {"generation_status":"Content contexts ready. Preparing for AI generation...","updated_at":"2025-06-20 12:53:59"}
+  Update Data: {"generation_status":"Initializing generation process...","updated_at":"2025-06-20 21:29:10"}
   Format: ["%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Content contexts ready. Preparing for AI generation...', `updated_at` = '2025-06-20 12:53:59' WHERE `id` = 65...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Initializing generation process...', `updated_at` = '2025-06-20 21:29:10' WHERE `id` = 65...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:53:59 - CONTENT_GENERATOR STATUS UPDATE:
+2025-06-20 21:29:10 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":65,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Initializing generation process...', `updated_at` = '2025-06-20 21:29:10' WHERE `id` = 65"}
+2025-06-20 21:29:10 - GENERATION_STATUS_UPDATED [INFO]: Generation status update completed (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:29:10 - COMPILING_CONTEXTS_START [INFO]: Starting context compilation (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:29:10 - COMPILE_CONTEXTS_ENHANCED_START [INFO]: Starting enhanced context compilation (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","options":{"max_contexts_per_type":5,"priority_threshold":0}}
+2025-06-20 21:29:10 - CONTEXT_OPTIONS_PREPARED [INFO]: Context options prepared (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","merged_options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":[],"include_metadata":false}}
+2025-06-20 21:29:10 - CALLING_CONTEXT_MODEL [INFO]: Calling context model get_for_prompt (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","context_model_class":"AI_Blog_Generator\\Models\\Context_Model"}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Method called
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"usage":"content","options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":[],"include_metadata":false},"memory_usage":89024880}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Starting method execution
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Setting up defaults
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Options merged
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_options":{"max_contexts_per_type":5,"include_metadata":false,"priority_threshold":0,"type_filters":[]}}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - About to call get_compiled_for_usage
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_compiled_for_usage - Method called
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_compiled_for_usage - DATA: {"usage":"content","type_filters":[],"memory_usage":89025256}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_compiled_for_usage - Starting method execution
+2025-06-20 21:29:10 - CONTEXT_GET_COMPILED_START [INFO]: Starting context compilation for usage - Context: {"usage":"content","type_filters":[]}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":"content","preserve_structure":true,"memory_usage":89025256}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-20 21:29:10 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":"content","preserve_structure":true}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - Added usage filter
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - DATA: {"usage":"content"}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL...[truncated]","params":["%content%"]}
+2025-06-20 21:29:10 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL OR usage_flags = '') ORDER BY type ASC, priority DESC, name ASC","params_count":1,"usage":"content","type":null}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-20 21:29:10 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":"content","type":null}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":true}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - Returning results with preserved structure
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6}
+2025-06-20 21:29:10 - CONTEXT_ENHANCED_ACTIVE_RECEIVED [INFO]: Enhanced active contexts received - Context: {"usage":"content","contexts_count":6,"contexts_is_array":true}
+2025-06-20 21:29:10 - CONTEXTS_COMPILED_FOR_USAGE [INFO]: Compiled contexts for specific usage - Context: {"usage":"content","types_included":["general","products","seo","keywords","image"],"total_contexts":5,"type_filters":[]}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_compiled_for_usage - Method completed for usage: content
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - get_compiled_for_usage completed
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"compiled_types":["general","products","seo","keywords","image"],"compiled_count":5}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Starting result processing loop
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Processing type: general
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for general
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Limited contexts for general
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Compiling content for general
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Completed processing for general
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Processing type: products
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for products
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Limited contexts for products
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Compiling content for products
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Completed processing for products
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Processing type: seo
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for seo
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Limited contexts for seo
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Compiling content for seo
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Completed processing for seo
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Processing type: keywords
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for keywords
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Limited contexts for keywords
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Compiling content for keywords
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Completed processing for keywords
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Processing type: image
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for image
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Limited contexts for image
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Compiling content for image
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Completed processing for image
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Processing loop completed
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","seo","keywords","image"]}
+2025-06-20 21:29:10 - CONTEXT_GET_FOR_PROMPT_SUCCESS [INFO]: Context retrieval for prompt completed - Context: {"usage":"content","result_types":["general","products","seo","keywords","image"],"total_contexts":5}
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - Method completing successfully
+2025-06-20 21:29:10 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","seo","keywords","image"],"total_types":5}
+2025-06-20 21:29:10 - CONTEXT_MODEL_SUCCESS [INFO]: Context model returned successfully (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","contexts_returned":5,"contexts_keys":["general","products","seo","keywords","image"]}
+2025-06-20 21:29:10 - CONVERTING_CONTEXTS [INFO]: Converting contexts to simple format (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","contexts_to_convert":5}
+2025-06-20 21:29:10 - CONTEXTS_CONVERTED [INFO]: Contexts converted successfully (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","original_count":5,"converted_count":5}
+2025-06-20 21:29:10 - CONTEXTS_COMPILED_ENHANCED [INFO]: Enhanced contexts compilation completed (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"content","types_included":["general","products","seo","keywords","image"],"total_context_types":5,"options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":[],"include_metadata":false}}
+2025-06-20 21:29:10 - COMPILING_CONTEXTS_SUCCESS [INFO]: Context compilation successful (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"context_types":["general","products","seo","keywords","image"],"context_count":5}
+2025-06-20 21:29:10 - EXTRACTING_SEO_KEYWORDS [INFO]: Extracting SEO keywords (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:29:10 - SEO_KEYWORDS_FILTERED [INFO]: Filtered SEO keywords for specific topic (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_title":"Middle School Fraction Mastery: Poster Making Machine Activities That Work","generic_keywords_count":10,"filtered_keywords_count":15,"keywords":["poster machine for schools","poster maker for schools","poster maker printer","poster makers for schools","poster print machine","poster printer machine","poster printer machines","poster printing machine","poster machine maker","poster maker machine","middle","middle school","middle school fraction","school","school fraction"]}
+2025-06-20 21:29:10 - ANTHROPIC_GENERATION_START [INFO]: Starting Anthropic content generation (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:29:10 - ANTHROPIC_SERVICE_VALIDATED [INFO]: Anthropic service is available (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"service_class":"AI_Blog_Generator\\Services\\Anthropic_Service"}
+2025-06-20 21:29:10 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-20 21:29:10 - PERSONA_FETCHED [INFO]: Persona data fetched successfully (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"persona_id":"5","persona_name":"Maya Morales"}
+2025-06-20 21:29:10 - ANTHROPIC_SERVICE: Starting blog content generation
+2025-06-20 21:29:10 - ANTHROPIC_CONTENT_GENERATION_START [INFO]: Starting blog content generation - Context: {"idea_id":"65","idea_title":"Middle School Fraction Mastery: Poster Making Machine Activities That Work","contexts_available":["general","products","seo","keywords","image"],"seo_keywords_count":15,"model":"claude-sonnet-4-20250514","persona_provided":true,"persona_name":"Maya Morales"}
+2025-06-20 21:29:10 - BUILDING_CONTENT_PROMPT [INFO]: Building content generation prompt - Context: {"idea_id":"65"}
+2025-06-20 21:29:10 - CONTENT_PROMPT_BUILT [INFO]: Content prompt built successfully - Context: {"idea_id":"65","prompt_length":26904}
+2025-06-20 21:29:10 - MAKING_ANTHROPIC_REQUEST [INFO]: Making request to Anthropic API - Context: {"idea_id":"65","model":"claude-sonnet-4-20250514","max_tokens":64000,"prompt_length":26904}
+2025-06-20 21:29:10 - ANTHROPIC_SERVICE: About to make API request
+2025-06-20 21:29:10 - ANTHROPIC_SERVICE: Memory before API call: 104857600 bytes
+2025-06-20 21:29:10 - SSL_VERIFICATION_DISABLED [INFO]: SSL verification disabled for local development (AI_Blog_Generator\Services\Anthropic_Service::make_request) - Context: {"host":"localhost","server_name":"localhost","abspath":"D:\\Dropbox\\poster website\/","php_sapi":"cgi-fcgi","is_local":true,"force_disabled":true}
+2025-06-20 21:29:10 - ANTHROPIC_SERVICE: SSL verification DISABLED for local environment
+2025-06-20 21:29:10 - ANTHROPIC_REQUEST_DETAILS [INFO]: Sending request to Anthropic API (AI_Blog_Generator\Services\Anthropic_Service::make_request) - Context: {"url":"https:\/\/api.anthropic.com\/v1\/messages","headers":{"Content-Type":"application\/json","x-api-key":"[REDACTED]","anthropic-version":"2023-06-01"},"model":"claude-sonnet-4-20250514","max_tokens":64000,"message_count":1,"request_size":28617}
+2025-06-20 21:32:02 - ANTHROPIC_RESPONSE_DETAILS [INFO]: Received response from Anthropic API (AI_Blog_Generator\Services\Anthropic_Service::make_request) - Context: {"response_code":200,"response_headers":{},"response_body_length":32226,"response_preview":"{\"id\":\"msg_01DP8hX68Dp5EHLMXnyRcgoo\",\"type\":\"message\",\"role\":\"assistant\",\"model\":\"claude-sonnet-4-20250514\",\"content\":[{\"type\":\"text\",\"text\":\"TITLE: Middle School Fraction Mastery: Poster Making Machine Activities\\n\\nMETA_DESCRIPTION: Discover hands-on fraction activities where students create mathematical posters using a poster machine for schools. Includes project templates, assessment rubrics, and equipment recommendations for grades 6-8.\\n\\nFOCUS_KEYPHRASE: middle school fraction activities\\..."}
+2025-06-20 21:32:02 - ANTHROPIC_RESPONSE_DECODED [INFO]: Successfully decoded API response (AI_Blog_Generator\Services\Anthropic_Service::make_request) - Context: {"response_keys":["id","type","role","model","content","stop_reason","stop_sequence","usage"],"has_content":true,"content_count":1,"usage":{"input_tokens":6860,"cache_creation_input_tokens":0,"cache_read_input_tokens":0,"output_tokens":8416,"service_tier":"standard"},"model":"claude-sonnet-4-20250514"}
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: API request completed in 172.07516217232 seconds
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Memory after API call: 104857600 bytes
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Response type: array
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Response keys: id, type, role, model, content, stop_reason, stop_sequence, usage
+2025-06-20 21:32:02 - ANTHROPIC_REQUEST_SUCCESS [INFO]: Anthropic API request successful - Context: {"idea_id":"65","response_keys":["id","type","role","model","content","stop_reason","stop_sequence","usage"],"has_content":true,"has_usage":true,"api_duration":172.0751621723175}
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Starting response validation
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Response validation passed, extracting content
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Content extracted, length: 30910
+2025-06-20 21:32:02 - ANTHROPIC_CONTENT_EXTRACTED [INFO]: Content extracted from API response - Context: {"idea_id":null,"content_length":30910,"content_preview":"TITLE: Middle School Fraction Mastery: Poster Making Machine Activities\n\nMETA_DESCRIPTION: Discover hands-on fraction activities where students create mathematical posters using a poster machine for s..."}
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Starting content parsing
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Memory before parsing: 104857600 bytes
+2025-06-20 21:32:02 - PARSING_CONTENT_RESPONSE [INFO]: Parsing content response - Context: {"idea_id":null,"content_length":30910}
+2025-06-20 21:32:02 - CONTENT_PARSED [INFO]: Parsed content from API response - Context: {"has_title":true,"has_meta":true,"has_focus_keyphrase":true,"tags_count":8,"html_length":28921,"images_count":2,"has_featured_image":true,"has_charts":true,"has_references":true}
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Content parsing completed in 0.00044083595275879 seconds
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Memory after parsing: 104857600 bytes
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Parsed fields: title, meta_description, focus_keyphrase, tags, html, images, featured_image, charts, references
+2025-06-20 21:32:02 - CONTENT_PARSING_SUCCESS [INFO]: Content parsed successfully - Context: {"idea_id":null,"parsed_fields":["title","meta_description","focus_keyphrase","tags","html","images","featured_image","charts","references"],"html_length":28921,"has_title":true,"has_meta_description":true,"parse_duration":0.00044083595275878906}
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Starting cost recording
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Cost calculated: 0.14682 USD, Tokens: 15276
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Cost recording completed successfully
+2025-06-20 21:32:02 - COST_RECORDED [INFO]: API cost recorded successfully - Context: {"idea_id":null,"cost":0.14682,"tokens_used":15276}
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Preparing final response
+2025-06-20 21:32:02 - ANTHROPIC_CONTENT_GENERATED [INFO]: Blog content generated successfully - Context: {"idea_id":null,"model":"claude-sonnet-4-20250514","max_tokens":64000,"word_count":3855,"tokens_used":15276,"input_tokens":6860,"output_tokens":8416,"cost":0.14682}
+2025-06-20 21:32:02 - ANTHROPIC_SERVICE: Blog content generation completed successfully, returning result
+2025-06-20 21:32:02 - ANTHROPIC_GENERATION_SUCCESS [INFO]: Anthropic content generation completed (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"success":true}
+2025-06-20 21:32:02 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":65,"stage":"content","message":"AI content generated successfully. Validating......","is_stage_change":false,"is_critical":false,"is_batch_update":true}
+2025-06-20 21:32:02 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
   Idea ID: 65
-  Stage: contexts
-  Message: Content contexts ready. Preparing for AI generation...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":65,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
+  Update Data: {"generation_status":"Generating blog content with AI...","updated_at":"2025-06-20 21:32:02"}
+  Format: ["%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating blog content with AI...', `updated_at` = '2025-06-20 21:32:02' WHERE `id` = 65...
+  SQL Error: None
   Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
 
-2025-06-20 12:53:59 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+2025-06-20 21:32:02 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":65,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating blog content with AI...', `updated_at` = '2025-06-20 21:32:02' WHERE `id` = 65"}
+2025-06-20 21:32:02 - CONTENT_GENERATOR: Content result success: 1
+2025-06-20 21:32:02 - CONTENT_GENERATOR: Content result keys: success, content, cost, tokens_used, usage
+2025-06-20 21:32:02 - CONTENT_GENERATOR: Content extracted, initializing cost calculation
+2025-06-20 21:32:02 - CONTENT_VALIDATION_WARNING [WARNING]: Meta description too long (AI_Blog_Generator\Services\Content_Generator::validate_generated_content) - Context: {"length":210}
+2025-06-20 21:32:02 - H1_TO_H2_CONVERSION [INFO]: Converted H1 headings to H2 headings (AI_Blog_Generator\Services\Content_Generator::convert_h1_to_h2) - Context: {"original_h1_count":0,"final_html_length":28921}
+2025-06-20 21:32:02 - IMAGE_GENERATION_START [INFO]: Starting image generation (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"total_image_count":3,"content_image_count":2,"has_featured_image":true}
+2025-06-20 21:32:02 - COMPILE_CONTEXTS_ENHANCED_START [INFO]: Starting enhanced context compilation (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","options":{"type_filters":["general","products","image"],"priority_threshold":0}}
+2025-06-20 21:32:02 - CONTEXT_OPTIONS_PREPARED [INFO]: Context options prepared (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","merged_options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":["general","products","image"],"include_metadata":false}}
+2025-06-20 21:32:02 - CALLING_CONTEXT_MODEL [INFO]: Calling context model get_for_prompt (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","context_model_class":"AI_Blog_Generator\\Models\\Context_Model"}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Method called
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"usage":"images","options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":["general","products","image"],"include_metadata":false},"memory_usage":89487712}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Starting method execution
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Setting up defaults
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Options merged
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_options":{"max_contexts_per_type":5,"include_metadata":false,"priority_threshold":0,"type_filters":["general","products","image"]}}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - About to call get_compiled_for_usage
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_compiled_for_usage - Method called
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_compiled_for_usage - DATA: {"usage":"images","type_filters":["general","products","image"],"memory_usage":89488088}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_compiled_for_usage - Starting method execution
+2025-06-20 21:32:02 - CONTEXT_GET_COMPILED_START [INFO]: Starting context compilation for usage - Context: {"usage":"images","type_filters":["general","products","image"]}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - Method called
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":"images","preserve_structure":true,"memory_usage":89488088}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
+2025-06-20 21:32:02 - CONTEXT_GET_ENHANCED_ACTIVE_START [INFO]: Starting enhanced active context query - Context: {"type":null,"usage":"images","preserve_structure":true}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - Added usage filter
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - DATA: {"usage":"images"}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL...[truncated]","params":["%images%"]}
+2025-06-20 21:32:02 - CONTEXT_EXECUTING_QUERY [INFO]: Executing context query - Context: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL OR usage_flags = '') ORDER BY type ASC, priority DESC, name ASC","params_count":1,"usage":"images","type":null}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - About to execute query
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - Query executed
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
+2025-06-20 21:32:02 - CONTEXT_QUERY_SUCCESS [INFO]: Context query executed successfully - Context: {"results_count":6,"usage":"images","type":null}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":true}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - Returning results with preserved structure
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6}
+2025-06-20 21:32:02 - CONTEXT_ENHANCED_ACTIVE_RECEIVED [INFO]: Enhanced active contexts received - Context: {"usage":"images","contexts_count":6,"contexts_is_array":true}
+2025-06-20 21:32:02 - CONTEXTS_COMPILED_FOR_USAGE [INFO]: Compiled contexts for specific usage - Context: {"usage":"images","types_included":["general","products","image"],"total_contexts":3,"type_filters":["general","products","image"]}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_compiled_for_usage - Method completed for usage: images
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - get_compiled_for_usage completed
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"compiled_types":["general","products","image"],"compiled_count":3}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Starting result processing loop
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Processing type: general
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for general
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Limited contexts for general
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Compiling content for general
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Completed processing for general
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Processing type: products
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for products
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Limited contexts for products
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Compiling content for products
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Completed processing for products
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Processing type: image
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for image
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Limited contexts for image
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Compiling content for image
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Completed processing for image
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Processing loop completed
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","image"]}
+2025-06-20 21:32:02 - CONTEXT_GET_FOR_PROMPT_SUCCESS [INFO]: Context retrieval for prompt completed - Context: {"usage":"images","result_types":["general","products","image"],"total_contexts":3}
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - Method completing successfully
+2025-06-20 21:32:02 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","image"],"total_types":3}
+2025-06-20 21:32:02 - CONTEXT_MODEL_SUCCESS [INFO]: Context model returned successfully (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","contexts_returned":3,"contexts_keys":["general","products","image"]}
+2025-06-20 21:32:02 - CONVERTING_CONTEXTS [INFO]: Converting contexts to simple format (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","contexts_to_convert":3}
+2025-06-20 21:32:02 - CONTEXTS_CONVERTED [INFO]: Contexts converted successfully (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","original_count":3,"converted_count":3}
+2025-06-20 21:32:02 - CONTEXTS_COMPILED_ENHANCED [INFO]: Enhanced contexts compilation completed (AI_Blog_Generator\Services\Content_Generator::compile_contexts_enhanced) - Context: {"usage":"images","types_included":["general","products","image"],"total_context_types":3,"options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":["general","products","image"],"include_metadata":false}}
+2025-06-20 21:32:02 - SEED_IMAGE_APPLIED [INFO]: Applied different seed image to requirement (AI_Blog_Generator\Services\Content_Generator::add_seed_images_to_requirements) - Context: {"requirement_index":0,"seed_index":0,"seed_id":"7","seed_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","product_name":"Studio Series 36","token":"{{featured}}"}
+2025-06-20 21:32:02 - SEED_IMAGE_APPLIED [INFO]: Applied different seed image to requirement (AI_Blog_Generator\Services\Content_Generator::add_seed_images_to_requirements) - Context: {"requirement_index":1,"seed_index":1,"seed_id":"6","seed_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c06258566.png","product_name":"Designjet Z6 24\\\"","token":"{{image1}}"}
+2025-06-20 21:32:02 - SEED_IMAGE_APPLIED [INFO]: Applied different seed image to requirement (AI_Blog_Generator\Services\Content_Generator::add_seed_images_to_requirements) - Context: {"requirement_index":2,"seed_index":0,"seed_id":"7","seed_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","product_name":"Studio Series 36","token":"{{image2}}"}
+2025-06-20 21:32:02 - SEQUENTIAL_IMAGE_GENERATION_START [INFO]: Starting sequential image generation - Context: {"total_images":3,"memory_usage":89520016,"generation_start_time":1750455122.956585}
+2025-06-20 21:32:02 - SEED_IMAGE_SELECTED [INFO]: Selected seed image for sequential processing - Context: {"seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png"}
+2025-06-20 21:32:02 - SEQUENTIAL_IMAGE_PROCESSING [INFO]: Processing image 1 of 3 - Context: {"index":0,"token":"{{featured}}","prompt_length":453,"has_seed_image":true,"using_seed_image":true,"progress_percentage":0,"memory_usage":89503200}
+2025-06-20 21:32:02 - SEQUENTIAL_SEED_IMAGE_EDIT [INFO]: Starting seed image edit for image 1 - Context: {"token":"{{featured}}","seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","prompt_preview":"Include this exact product if it makes sense for this image. Do not change the look of the product a"}
+2025-06-20 21:32:02 - OPENAI_IMAGE_EDIT_START [INFO]: Starting image edit with seed image - Context: {"seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","original_prompt_length":453,"enhanced_prompt_length":605}
+2025-06-20 21:32:02 - SEED_IMAGE_DOWNLOADED_TO_TEMP [INFO]: Seed image downloaded to temporary file - Context: {"url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","temp_file":"C:\\temp\\ai_6D8.tmp","file_size":708162}
+2025-06-20 21:32:02 - OPENAI_IMAGE_EDIT_REQUEST [INFO]: Making edit request to OpenAI - Context: {"model":"gpt-image-1","size":"1024x1024","temp_file":"C:\\temp\\ai_6D8.tmp"}
+2025-06-20 21:32:02 - OPENAI_MULTIPART_REQUEST [INFO]: Sending multipart request to OpenAI edits endpoint - Context: {"url":"https:\/\/api.openai.com\/v1\/images\/edits","form_data":{"model":"gpt-image-1","prompt":"Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. A vibrant middle school classroom scene showing diverse students working collaboratively on large fraction posters spread across desks, with colorful visual fraction representations, pie charts, and mathematical diagrams visible on their work, while a modern poster printer operates in the background.","size":"1024x1024","n":1},"body_size":709252}
+2025-06-20 21:32:54 - OPENAI_RESPONSE_DETAILS [INFO]: Received response from OpenAI API - Context: {"response_code":200,"response_headers":{},"response_body_length":2492109,"response_preview":"{\n  \"created\": 1750455176,\n  \"background\": \"opaque\",\n  \"data\": [\n    {\n      \"b64_json\": \"iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAIAAADwf7zUAAGkBWNhQlgAAaQFanVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANx..."}
+2025-06-20 21:32:54 - OPENAI_EDIT_RESPONSE_B64 [INFO]: Received base64 response from gpt-image-1 - Context: {"data_size":2491752}
+2025-06-20 21:32:54 - OPENAI_IMAGE_EDIT_SUCCESS [INFO]: Image edited successfully - Context: {"data_size":2491752,"cost":0.02,"format":"base64"}
+2025-06-20 21:32:54 - SEQUENTIAL_SEED_EDIT_RESULT [INFO]: Seed image edit completed for image 1 - Context: {"token":"{{featured}}","success":true,"error_message":"none"}
+2025-06-20 21:32:54 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":65,"stage":"images","message":"Saving image 1 of 3 to media library......","is_stage_change":false,"is_critical":false,"is_batch_update":true}
+2025-06-20 21:32:54 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
   Idea ID: 65
-  Update Data: {"generation_status":"Generating blog content with AI...","updated_at":"2025-06-20 12:53:59"}
+  Update Data: {"generation_status":"Generating image 1 of 3: Include this exact product if it makes sense for t...","updated_at":"2025-06-20 21:32:54"}
   Format: ["%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating blog content with AI...', `updated_at` = '2025-06-20 12:53:59' WHERE `id` = 65...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 1 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-20 21:32:54' WHERE `id` = 65...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:53:59 - CONTENT_GENERATOR STATUS UPDATE:
+2025-06-20 21:32:54 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":65,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 1 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-20 21:32:54' WHERE `id` = 65"}
+2025-06-20 21:32:56 - OPENAI_IMAGE_SAVED [INFO]: Image saved to media library - Context: {"attachment_id":419,"filename":"ai-blog-image-featured-1750455174-0.png","file_size":1868813,"format":"png"}
+2025-06-20 21:32:56 - SEQUENTIAL_IMAGE_SUCCESS [INFO]: Successfully generated and saved image 1 - Context: {"token":"{{featured}}","attachment_id":419,"cost":0.02,"method":"edit","duration_seconds":53.29386806488037}
+2025-06-20 21:32:58 - SEQUENTIAL_IMAGE_PROCESSING [INFO]: Processing image 2 of 3 - Context: {"index":1,"token":"{{image1}}","prompt_length":467,"has_seed_image":true,"using_seed_image":true,"progress_percentage":33,"memory_usage":94579944}
+2025-06-20 21:32:58 - SEQUENTIAL_SEED_IMAGE_EDIT [INFO]: Starting seed image edit for image 2 - Context: {"token":"{{image1}}","seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","prompt_preview":"Include this exact product if it makes sense for this image. Do not change the look of the product a"}
+2025-06-20 21:32:58 - OPENAI_IMAGE_EDIT_START [INFO]: Starting image edit with seed image - Context: {"seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","original_prompt_length":467,"enhanced_prompt_length":619}
+2025-06-20 21:32:58 - SEED_IMAGE_DOWNLOADED_TO_TEMP [INFO]: Seed image downloaded to temporary file - Context: {"url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","temp_file":"C:\\temp\\ai_DEEA.tmp","file_size":708162}
+2025-06-20 21:32:58 - OPENAI_IMAGE_EDIT_REQUEST [INFO]: Making edit request to OpenAI - Context: {"model":"gpt-image-1","size":"1024x1024","temp_file":"C:\\temp\\ai_DEEA.tmp"}
+2025-06-20 21:32:58 - OPENAI_MULTIPART_REQUEST [INFO]: Sending multipart request to OpenAI edits endpoint - Context: {"url":"https:\/\/api.openai.com\/v1\/images\/edits","form_data":{"model":"gpt-image-1","prompt":"Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. A close-up view of student-created fraction posters displayed on a classroom wall, featuring recipe conversion charts, sports statistics with fractions, and geometric art projects, all professionally printed with bright colors and clear mathematical content that demonstrates various approaches to fraction mastery.","size":"1024x1024","n":1},"body_size":709267}
+2025-06-20 21:33:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 21:33:41 - OPENAI_RESPONSE_DETAILS [INFO]: Received response from OpenAI API - Context: {"response_code":200,"response_headers":{},"response_body_length":2259749,"response_preview":"{\n  \"created\": 1750455223,\n  \"background\": \"opaque\",\n  \"data\": [\n    {\n      \"b64_json\": \"iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAIAAADwf7zUAAFqf2NhQlgAAWp\/anVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANx..."}
+2025-06-20 21:33:41 - OPENAI_EDIT_RESPONSE_B64 [INFO]: Received base64 response from gpt-image-1 - Context: {"data_size":2259392}
+2025-06-20 21:33:41 - PERFORMANCE [INFO]: Performance: database_insert took 0.003931999206543s (AI_Blog_Generator\Models\Database_Manager::end_timer) - Context: {"table":"cost_analytics","insert_id":433,"duration":0.003931999206542969,"operation":"database_insert"}
+2025-06-20 21:33:41 - OPENAI_IMAGE_EDIT_SUCCESS [INFO]: Image edited successfully - Context: {"data_size":2259392,"cost":0.02,"format":"base64"}
+2025-06-20 21:33:41 - SEQUENTIAL_SEED_EDIT_RESULT [INFO]: Seed image edit completed for image 2 - Context: {"token":"{{image1}}","success":true,"error_message":"none"}
+2025-06-20 21:33:41 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":65,"stage":"images","message":"Saving image 2 of 3 to media library......","is_stage_change":false,"is_critical":false,"is_batch_update":true}
+2025-06-20 21:33:41 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
   Idea ID: 65
-  Stage: content
-  Message: Generating blog content with AI...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":65,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - Method called
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - Parameters: table=personas, where=array[id], fields=*
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - About to get table name
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - Table name resolved: psec_ai_blog_personas
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - Building SQL query
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - Where clause: id = '5'
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - Final SQL: SELECT * FROM psec_ai_blog_personas WHERE id = '5' LIMIT 1
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - About to execute wpdb->get_row
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - wpdb->get_row completed
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - Result type: array
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - Result is null: false
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - WPDB last error: 
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - Result data: ARRAY[id, name, bio, expertise, writing_style, tone, active, created_at, updated_at]
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - Record found: true
-2025-06-20 12:53:59 - DATABASE_MANAGER::get - Method returning result
-2025-06-20 12:53:59 - ANTHROPIC_SERVICE: Starting blog content generation
-2025-06-20 12:53:59 - ANTHROPIC_SERVICE: About to make API request
-2025-06-20 12:53:59 - ANTHROPIC_SERVICE: Memory before API call: 106954752 bytes
-2025-06-20 12:53:59 - ANTHROPIC_SERVICE: SSL verification DISABLED for local environment
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: API request completed in 320.42181801796 seconds
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Memory after API call: 102760448 bytes
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Response type: array
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Response keys: id, type, role, model, content, stop_reason, stop_sequence, usage
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Starting response validation
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Response validation passed, extracting content
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Content extracted, length: 70103
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Starting content parsing
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Memory before parsing: 102760448 bytes
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Content parsing completed in 0.00060701370239258 seconds
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Memory after parsing: 102760448 bytes
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Parsed fields: title, meta_description, focus_keyphrase, tags, html, images, featured_image, charts, references
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Starting cost recording
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Cost calculated: 0.302772 USD, Tokens: 25488
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Cost recording completed successfully
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Preparing final response
-2025-06-20 12:58:19 - ANTHROPIC_SERVICE: Blog content generation completed successfully, returning result
-2025-06-20 12:58:19 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"generation_status":"AI content generated successfully. Validating...","updated_at":"2025-06-20 12:58:19"}
+  Update Data: {"generation_status":"Generating image 2 of 3: Include this exact product if it makes sense for t...","updated_at":"2025-06-20 21:33:41"}
   Format: ["%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'AI content generated successfully. Validating...', `updated_at` = '2025-06-20 12:58:19' WHERE `id` = 44...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 2 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-20 21:33:41' WHERE `id` = 65...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:58:19 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 44
-  Stage: content
-  Message: AI content generated successfully. Validating...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":44,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:58:19 - CONTENT_GENERATOR: Content result success: 1
-2025-06-20 12:58:19 - CONTENT_GENERATOR: Content result keys: success, content, cost, tokens_used, usage
-2025-06-20 12:58:19 - CONTENT_GENERATOR: Content extracted, initializing cost calculation
-2025-06-20 12:58:19 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"generation_status":"Content validated successfully. Preparing for image generation...","updated_at":"2025-06-20 12:58:19"}
-  Format: ["%s","%s"]
-  Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Content validated successfully. Preparing for image generation...', `updated_at` = '2025-06-20 12:58:19' WHERE `id` = 44...
-  SQL Error: None
-  Rows Affected: 1
-  Update Result: SUCCESS
-  Result Value: 1
-
-2025-06-20 12:58:19 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 44
-  Stage: content
-  Message: Content validated successfully. Preparing for image generation...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":44,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:58:19 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"generation_status":"Generating images...","updated_at":"2025-06-20 12:58:19"}
-  Format: ["%s","%s"]
-  Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating images...', `updated_at` = '2025-06-20 12:58:19' WHERE `id` = 44...
-  SQL Error: None
-  Rows Affected: 1
-  Update Result: SUCCESS
-  Result Value: 1
-
-2025-06-20 12:58:19 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 44
-  Stage: images
-  Message: Generating images...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":44,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Method called
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"usage":"images","options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":["general","products","image"],"include_metadata":false},"memory_usage":89625672}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Starting method execution
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Setting up defaults
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Options merged
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_options":{"max_contexts_per_type":5,"include_metadata":false,"priority_threshold":0,"type_filters":["general","products","image"]}}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - About to call get_compiled_for_usage
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_compiled_for_usage - Method called
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_compiled_for_usage - DATA: {"usage":"images","type_filters":["general","products","image"],"memory_usage":89625920}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_compiled_for_usage - Starting method execution
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - Method called
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":"images","preserve_structure":true,"memory_usage":89625920}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - Added usage filter
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - DATA: {"usage":"images"}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL...[truncated]","params":["%images%"]}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - About to execute query
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - Query executed
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":true}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - Returning results with preserved structure
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_compiled_for_usage - Method completed for usage: images
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - get_compiled_for_usage completed
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"compiled_types":["general","products","image"],"compiled_count":3}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Starting result processing loop
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Processing type: general
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for general
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Limited contexts for general
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Compiling content for general
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Completed processing for general
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Processing type: products
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for products
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Limited contexts for products
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Compiling content for products
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Completed processing for products
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Processing type: image
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for image
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Limited contexts for image
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Compiling content for image
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Completed processing for image
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Processing loop completed
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","image"]}
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - Method completing successfully
-2025-06-20 12:58:19 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","image"],"total_types":3}
-2025-06-20 12:58:19 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"generation_status":"Generating image 1 of 3: Include this exact product if it makes sense for t...","updated_at":"2025-06-20 12:58:19"}
-  Format: ["%s","%s"]
-  Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 1 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-20 12:58:19' WHERE `id` = 44...
-  SQL Error: None
-  Rows Affected: 1
-  Update Result: SUCCESS
-  Result Value: 1
-
-2025-06-20 12:58:19 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 44
-  Stage: images
-  Message: Generating image 1 of 3: Include this exact product if it makes sense for t...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":44,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:59:07 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"generation_status":"Saving image 1 of 3 to media library...","updated_at":"2025-06-20 12:59:07"}
-  Format: ["%s","%s"]
-  Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Saving image 1 of 3 to media library...', `updated_at` = '2025-06-20 12:59:07' WHERE `id` = 44...
-  SQL Error: None
-  Rows Affected: 1
-  Update Result: SUCCESS
-  Result Value: 1
-
-2025-06-20 12:59:07 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 44
-  Stage: images
-  Message: Saving image 1 of 3 to media library...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":44,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:59:09 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"generation_status":"Image 1 of 3 completed successfully!","updated_at":"2025-06-20 12:59:09"}
-  Format: ["%s","%s"]
-  Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Image 1 of 3 completed successfully!', `updated_at` = '2025-06-20 12:59:09' WHERE `id` = 44...
-  SQL Error: None
-  Rows Affected: 1
-  Update Result: SUCCESS
-  Result Value: 1
-
-2025-06-20 12:59:09 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 44
-  Stage: images
-  Message: Image 1 of 3 completed successfully!
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":44,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:59:11 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 44
-  Update Data: {"generation_status":"Generating image 2 of 3: Include this exact product if it makes sense for t...","updated_at":"2025-06-20 12:59:11"}
-  Format: ["%s","%s"]
-  Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 2 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-20 12:59:11' WHERE `id` = 44...
-  SQL Error: None
-  Rows Affected: 1
-  Update Result: SUCCESS
-  Result Value: 1
-
-2025-06-20 12:59:11 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 44
-  Stage: images
-  Message: Generating image 2 of 3: Include this exact product if it makes sense for t...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":44,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: API request completed in 316.61886692047 seconds
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Memory after API call: 106954752 bytes
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Response type: array
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Response keys: id, type, role, model, content, stop_reason, stop_sequence, usage
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Starting response validation
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Response validation passed, extracting content
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Content extracted, length: 69477
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Starting content parsing
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Memory before parsing: 106954752 bytes
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Content parsing completed in 0.00062799453735352 seconds
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Memory after parsing: 106954752 bytes
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Parsed fields: title, meta_description, focus_keyphrase, tags, html, images, featured_image, charts, references
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Starting cost recording
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Cost calculated: 0.300765 USD, Tokens: 25315
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Cost recording completed successfully
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Preparing final response
-2025-06-20 12:59:16 - ANTHROPIC_SERVICE: Blog content generation completed successfully, returning result
-2025-06-20 12:59:16 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+2025-06-20 21:33:41 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":65,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 2 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-20 21:33:41' WHERE `id` = 65"}
+2025-06-20 21:33:43 - OPENAI_IMAGE_SAVED [INFO]: Image saved to media library - Context: {"attachment_id":420,"filename":"ai-blog-image-image1-1750455221-1.png","file_size":1694542,"format":"png"}
+2025-06-20 21:33:43 - SEQUENTIAL_IMAGE_SUCCESS [INFO]: Successfully generated and saved image 2 - Context: {"token":"{{image1}}","attachment_id":420,"cost":0.02,"method":"edit","duration_seconds":45.237030029296875}
+2025-06-20 21:33:45 - SEQUENTIAL_IMAGE_PROCESSING [INFO]: Processing image 3 of 3 - Context: {"index":2,"token":"{{image2}}","prompt_length":459,"has_seed_image":true,"using_seed_image":true,"progress_percentage":67,"memory_usage":94588784}
+2025-06-20 21:33:45 - SEQUENTIAL_SEED_IMAGE_EDIT [INFO]: Starting seed image edit for image 3 - Context: {"token":"{{image2}}","seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","prompt_preview":"Include this exact product if it makes sense for this image. Do not change the look of the product a"}
+2025-06-20 21:33:45 - OPENAI_IMAGE_EDIT_START [INFO]: Starting image edit with seed image - Context: {"seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","original_prompt_length":459,"enhanced_prompt_length":611}
+2025-06-20 21:33:45 - SEED_IMAGE_DOWNLOADED_TO_TEMP [INFO]: Seed image downloaded to temporary file - Context: {"url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png","temp_file":"C:\\temp\\ai_977D.tmp","file_size":708162}
+2025-06-20 21:33:45 - OPENAI_IMAGE_EDIT_REQUEST [INFO]: Making edit request to OpenAI - Context: {"model":"gpt-image-1","size":"1024x1024","temp_file":"C:\\temp\\ai_977D.tmp"}
+2025-06-20 21:33:45 - OPENAI_MULTIPART_REQUEST [INFO]: Sending multipart request to OpenAI edits endpoint - Context: {"url":"https:\/\/api.openai.com\/v1\/images\/edits","form_data":{"model":"gpt-image-1","prompt":"Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. An action shot of middle school students presenting their fraction poster projects to classmates, with one student pointing to a large sports statistics poster showing basketball shooting percentages converted between fractions, decimals, and percentages, while engaged peers sit listening and taking notes.","size":"1024x1024","n":1},"body_size":709259}
+2025-06-20 21:34:15 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-20 21:34:31 - OPENAI_RESPONSE_DETAILS [INFO]: Received response from OpenAI API - Context: {"response_code":200,"response_headers":{},"response_body_length":2305277,"response_preview":"{\n  \"created\": 1750455273,\n  \"background\": \"opaque\",\n  \"data\": [\n    {\n      \"b64_json\": \"iVBORw0KGgoAAAANSUhEUgAABAAAAAQACAIAAADwf7zUAAFXT2NhQlgAAVdPanVtYgAAAB5qdW1kYzJwYQARABCAAACqADibcQNjMnBhAAAANx..."}
+2025-06-20 21:34:31 - OPENAI_EDIT_RESPONSE_B64 [INFO]: Received base64 response from gpt-image-1 - Context: {"data_size":2304920}
+2025-06-20 21:34:31 - OPENAI_IMAGE_EDIT_SUCCESS [INFO]: Image edited successfully - Context: {"data_size":2304920,"cost":0.02,"format":"base64"}
+2025-06-20 21:34:31 - SEQUENTIAL_SEED_EDIT_RESULT [INFO]: Seed image edit completed for image 3 - Context: {"token":"{{image2}}","success":true,"error_message":"none"}
+2025-06-20 21:34:31 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":65,"stage":"images","message":"Saving image 3 of 3 to media library......","is_stage_change":false,"is_critical":false,"is_batch_update":true}
+2025-06-20 21:34:31 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
   Idea ID: 65
-  Update Data: {"generation_status":"AI content generated successfully. Validating...","updated_at":"2025-06-20 12:59:16"}
+  Update Data: {"generation_status":"Generating image 3 of 3: Include this exact product if it makes sense for t...","updated_at":"2025-06-20 21:34:31"}
   Format: ["%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'AI content generated successfully. Validating...', `updated_at` = '2025-06-20 12:59:16' WHERE `id` = 65...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 3 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-20 21:34:31' WHERE `id` = 65...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:59:16 - CONTENT_GENERATOR STATUS UPDATE:
+2025-06-20 21:34:31 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":65,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 3 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-20 21:34:31' WHERE `id` = 65"}
+2025-06-20 21:34:33 - OPENAI_IMAGE_SAVED [INFO]: Image saved to media library - Context: {"attachment_id":421,"filename":"ai-blog-image-image2-1750455271-2.png","file_size":1728689,"format":"png"}
+2025-06-20 21:34:33 - SEQUENTIAL_IMAGE_SUCCESS [INFO]: Successfully generated and saved image 3 - Context: {"token":"{{image2}}","attachment_id":421,"cost":0.02,"method":"edit","duration_seconds":47.76783204078674}
+2025-06-20 21:34:33 - SEQUENTIAL_IMAGE_GENERATION_COMPLETE [INFO]: Sequential image generation completed - Context: {"total":3,"successful":3,"failed":0,"total_cost":0.06,"total_duration_seconds":150.3292200565338,"used_seed_image":true,"seed_image_url":"http:\/\/localhost\/wp-content\/uploads\/2025\/06\/c08763401.png"}
+2025-06-20 21:34:33 - IMAGE_GENERATION_COMPLETE [INFO]: Image generation completed (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"successful":3,"failed":0,"cost":0.06}
+2025-06-20 21:34:33 - CONTENT_GENERATOR: Post data prepared, calling wp_insert_post
+2025-06-20 21:34:33 - STARTING_SAVE_TRANSACTION [INFO]: Starting transaction for critical saves (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65}
+2025-06-20 21:34:33 - Entering start_transaction method
+2025-06-20 21:34:33 - Checking MySQL connection status
+2025-06-20 21:34:33 - Connection check result: SUCCESS
+2025-06-20 21:34:33 - About to execute START TRANSACTION query
+2025-06-20 21:34:33 - START TRANSACTION completed with result: SUCCESS in 8.1062316894531E-5 seconds
+2025-06-20 21:34:33 - Setting in_transaction to true
+2025-06-20 21:34:33 - start_transaction completed successfully, returning true
+2025-06-20 21:34:33 - SAVE_TRANSACTION_STARTED [INFO]: Save transaction started (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"result":true}
+2025-06-20 21:34:33 - BLOG_MODEL::create - Method called
+2025-06-20 21:34:33 - BLOG_MODEL::create - DATA: {"data":{"idea_id":65,"post_id":422,"title":"Middle School Fraction Mastery: Poster Making Machine Activities","status":"draft","generation_cost":0.20682},"data_keys":["idea_id","post_id","title","status","generation_cost"],"memory_usage":90595392}
+2025-06-20 21:34:33 - BLOG_MODEL::create - Calling parent::create method
+2025-06-20 21:34:33 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"ideas","where_conditions":1,"sql_length":56,"raw_sql":"SELECT * FROM psec_ai_blog_ideas WHERE id = '65' LIMIT 1","where_clause":"id = '65'","fields":"*"}
+2025-06-20 21:34:33 - BLOG_MODEL::create - Parent create method completed
+2025-06-20 21:34:33 - BLOG_MODEL::create - DATA: {"result":37,"result_type":"integer"}
+2025-06-20 21:34:33 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
   Idea ID: 65
-  Stage: content
-  Message: AI content generated successfully. Validating...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":65,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:59:16 - CONTENT_GENERATOR: Content result success: 1
-2025-06-20 12:59:16 - CONTENT_GENERATOR: Content result keys: success, content, cost, tokens_used, usage
-2025-06-20 12:59:16 - CONTENT_GENERATOR: Content extracted, initializing cost calculation
-2025-06-20 12:59:16 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 65
-  Update Data: {"generation_status":"Content validated successfully. Preparing for image generation...","updated_at":"2025-06-20 12:59:16"}
+  Update Data: {"status":"generated","updated_at":"2025-06-20 21:34:33"}
   Format: ["%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Content validated successfully. Preparing for image generation...', `updated_at` = '2025-06-20 12:59:16' WHERE `id` = 65...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `status` = 'generated', `updated_at` = '2025-06-20 21:34:33' WHERE `id` = 65...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:59:16 - CONTENT_GENERATOR STATUS UPDATE:
+2025-06-20 21:34:33 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":65,"updated_fields":["status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `status` = 'generated', `updated_at` = '2025-06-20 21:34:33' WHERE `id` = 65"}
+2025-06-20 21:34:33 - COMMIT executed in 0.001168966293335 seconds, result: SUCCESS
+2025-06-20 21:34:33 - COMMIT successful, transaction flags cleared
+2025-06-20 21:34:33 - CONTENT_GENERATOR: Transaction commit attempt completed in 0.0013868808746338s, result: SUCCESS
+2025-06-20 21:34:33 - BLOG_GENERATION_COMPLETE [INFO]: Successfully generated blog post (AI_Blog_Generator\Services\Content_Generator::generate_blog_post) - Context: {"idea_id":65,"post_id":422,"blog_id":37,"total_cost":0.20682}
+2025-06-20 21:34:33 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
   Idea ID: 65
-  Stage: content
-  Message: Content validated successfully. Preparing for image generation...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":65,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:59:16 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 65
-  Update Data: {"generation_status":"Generating images...","updated_at":"2025-06-20 12:59:16"}
+  Update Data: {"generation_status":"WordPress post created successfully. Finalizing...","updated_at":"2025-06-20 21:34:33"}
   Format: ["%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating images...', `updated_at` = '2025-06-20 12:59:16' WHERE `id` = 65...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'WordPress post created successfully. Finalizing...', `updated_at` = '2025-06-20 21:34:33' WHERE `id` = 65...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:59:16 - CONTENT_GENERATOR STATUS UPDATE:
+2025-06-20 21:34:33 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":65,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'WordPress post created successfully. Finalizing...', `updated_at` = '2025-06-20 21:34:33' WHERE `id` = 65"}
+2025-06-20 21:34:33 - GENERATION_STATUS_DB_UPDATE [INFO]: Updating generation status in database (AI_Blog_Generator\Services\Content_Generator::update_generation_status) - Context: {"idea_id":65,"stage":"complete","message":"Blog post generated successfully!...","is_stage_change":false,"is_critical":true,"is_batch_update":false}
+2025-06-20 21:34:33 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
   Idea ID: 65
-  Stage: images
-  Message: Generating images...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":65,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
-  Rows Affected: 1
-
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Method called
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"usage":"images","options":{"max_contexts_per_type":5,"priority_threshold":0,"type_filters":["general","products","image"],"include_metadata":false},"memory_usage":89624648}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Starting method execution
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Setting up defaults
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Options merged
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_options":{"max_contexts_per_type":5,"include_metadata":false,"priority_threshold":0,"type_filters":["general","products","image"]}}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - About to call get_compiled_for_usage
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_compiled_for_usage - Method called
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_compiled_for_usage - DATA: {"usage":"images","type_filters":["general","products","image"],"memory_usage":89624896}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_compiled_for_usage - Starting method execution
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - Method called
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - DATA: {"type":null,"usage":"images","preserve_structure":true,"memory_usage":89624896}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - Starting method execution
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - Checking table existence
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - Table name resolved
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - DATA: {"table":"psec_ai_blog_contexts"}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - Table existence check completed
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - DATA: {"exists":true,"table_exists_result":"psec_ai_blog_contexts"}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - Building SQL query
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - Added usage filter
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - DATA: {"usage":"images"}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - Final SQL built
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - DATA: {"sql":"SELECT * FROM psec_ai_blog_contexts WHERE active = 1 AND (usage_flags LIKE %s OR usage_flags IS NULL...[truncated]","params":["%images%"]}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - About to execute query
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - Query executed
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6,"results_type":"array","wpdb_last_error":""}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - Checking preserve_structure flag
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - DATA: {"preserve_structure":true}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - Returning results with preserved structure
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_enhanced_active - DATA: {"results_count":6}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_compiled_for_usage - Method completed for usage: images
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - get_compiled_for_usage completed
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"compiled_types":["general","products","image"],"compiled_count":3}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Starting result processing loop
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Processing type: general
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for general
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Limited contexts for general
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Compiling content for general
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Completed processing for general
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Processing type: products
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for products
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Limited contexts for products
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Compiling content for products
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Completed processing for products
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Processing type: image
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"data_keys":["contexts","content","count"]}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Filtered contexts for image
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"count":1}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Limited contexts for image
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"final_count":1}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Compiling content for image
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Completed processing for image
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Processing loop completed
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","image"]}
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - Method completing successfully
-2025-06-20 12:59:16 - CONTEXT_MODEL::get_for_prompt - DATA: {"result_types":["general","products","image"],"total_types":3}
-2025-06-20 12:59:16 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
-  Idea ID: 65
-  Update Data: {"generation_status":"Generating image 1 of 3: Include this exact product if it makes sense for t...","updated_at":"2025-06-20 12:59:16"}
+  Update Data: {"generation_status":"Blog post generated successfully!","updated_at":"2025-06-20 21:34:33"}
   Format: ["%s","%s"]
   Table: psec_ai_blog_ideas
-  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Generating image 1 of 3: Include this exact product if it makes sense for t...', `updated_at` = '2025-06-20 12:59:16' WHERE `id` = 65...
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Blog post generated successfully!', `updated_at` = '2025-06-20 21:34:33' WHERE `id` = 65...
   SQL Error: None
   Rows Affected: 1
   Update Result: SUCCESS
   Result Value: 1
 
-2025-06-20 12:59:16 - CONTENT_GENERATOR STATUS UPDATE:
-  Idea ID: 65
-  Stage: images
-  Message: Generating image 1 of 3: Include this exact product if it makes sense for t...
-  Update Result: SUCCESS
-  Last SQL Query: INSERT INTO `psec_ai_blog_logs` (`action`, `message`, `level`, `context`) VALUES ('idea_updated', 'Idea updated successfully', 'info', '{\"idea_id\":65,\"updated_fields\":[\"generation_status\",\"upda...
-  Last SQL Error: None
+2025-06-20 21:34:33 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":65,"updated_fields":["generation_status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = 'Blog post generated successfully!', `updated_at` = '2025-06-20 21:34:33' WHERE `id` = 65"}
+2025-06-20 21:34:33 - BACKGROUND_PROCESSOR: Content generation completed in 322.6010260582s for idea_id: 65
+2025-06-20 21:34:33 - BACKGROUND_PROCESSOR_SUCCESS [INFO]: Blog post generated successfully via cron - Context: {"idea_id":65,"post_id":422,"generation_duration":322.601026058197,"total_duration":322.60374212265015}
+2025-06-20 21:34:33 - BACKGROUND_PROCESSOR: SUCCESS for idea_id: 65
+2025-06-20 21:39:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 21:45:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 21:49:32 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-20 21:51:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 21:57:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 22:03:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 22:04:13 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-20 22:07:32 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-20 22:09:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 22:15:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 22:19:32 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-20 22:21:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 22:27:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 22:33:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 22:34:28 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-20 22:39:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 22:44:32 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 22:49:32 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-20 22:50:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 22:56:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:01:45 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:04:32 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-20 23:07:16 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:07:17 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-20 23:12:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:18:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:19:32 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-20 23:24:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:30:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:34:32 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-20 23:36:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:42:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:47:32 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:49:32 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-20 23:53:06 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:53:06 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-20 23:58:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 00:04:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 00:04:32 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 00:07:14 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 00:10:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 00:16:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 00:19:20 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 00:22:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 00:28:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 00:34:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 00:34:32 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 00:40:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 00:45:32 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 00:45:32 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 00:49:32 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 00:51:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 00:57:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 01:03:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 01:04:32 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 01:07:32 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 01:09:31 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 01:13:42 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:13:42 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-21 01:13:43 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-21 01:13:43 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-21 01:13:43 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":2}
+2025-06-21 01:13:43 - CLEANUP_RESETTING_STUCK_IDEA [INFO]: Resetting stuck idea - Context: {"idea_id":"69","title":"Geometry in Action: 8th Grade Math Poster Projects Using School Banner Printers","stuck_duration_minutes":232.1,"generation_status":"Initializing generation process..."}
+2025-06-21 01:13:43 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 69
+  Update Data: {"generation_status":null,"status":"approved","updated_at":"2025-06-21 01:13:43"}
+  Format: ["%s","%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = NULL, `status` = 'approved', `updated_at` = '2025-06-21 01:13:43' WHERE `id` = 69...
+  SQL Error: None
   Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
 
+2025-06-21 01:13:43 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":"69","updated_fields":["generation_status","status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = NULL, `status` = 'approved', `updated_at` = '2025-06-21 01:13:43' WHERE `id` = 69"}
+2025-06-21 01:13:43 - CLEANUP_IDEA_RESET_SUCCESS [INFO]: Successfully reset stuck idea - Context: {"idea_id":"69"}
+2025-06-21 01:13:43 - CLEANUP_RESETTING_STUCK_IDEA [INFO]: Resetting stuck idea - Context: {"idea_id":"26","title":"Student-Led Learning: Poster Making Machines Empower Middle Schoolers","stuck_duration_minutes":234.2,"generation_status":"Starting..."}
+2025-06-21 01:13:43 - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:
+  Idea ID: 26
+  Update Data: {"generation_status":null,"status":"approved","updated_at":"2025-06-21 01:13:43"}
+  Format: ["%s","%s","%s"]
+  Table: psec_ai_blog_ideas
+  SQL Query: UPDATE `psec_ai_blog_ideas` SET `generation_status` = NULL, `status` = 'approved', `updated_at` = '2025-06-21 01:13:43' WHERE `id` = 26...
+  SQL Error: None
+  Rows Affected: 1
+  Update Result: SUCCESS
+  Result Value: 1
+
+2025-06-21 01:13:43 - IDEA_UPDATED [INFO]: Idea updated successfully (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::update_idea) - Context: {"idea_id":"26","updated_fields":["generation_status","status","updated_at"],"rows_affected":1,"sql_query":"UPDATE `psec_ai_blog_ideas` SET `generation_status` = NULL, `status` = 'approved', `updated_at` = '2025-06-21 01:13:43' WHERE `id` = 26"}
+2025-06-21 01:13:43 - CLEANUP_IDEA_RESET_SUCCESS [INFO]: Successfully reset stuck idea - Context: {"idea_id":"26"}
+2025-06-21 01:13:43 - CLEANUP_COMPLETED [INFO]: Cleanup completed, reset stuck ideas - Context: {"total_generating":2,"cleaned_count":2}
+2025-06-21 01:13:43 - AJAX_CLEANUP_PERFORMED [INFO]: Automatic cleanup performed before fetching ideas - Context: {"cleaned_count":2}
+2025-06-21 01:13:43 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":37}
+2025-06-21 01:13:43 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-21 01:13:43 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":34}
+2025-06-21 01:13:43 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":37,"generating_count":0,"generated_count":34,"approved_ids":["26","69","62","61","66","67","70","71","72","73","74","75","76","78","79","80","38","41","43","45","39","40","37","36","34","31","32","33","30","27","28","25","23","24","22","35","21"],"generating_ids":[],"generated_ids":["65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-21 01:13:43 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":71,"approved_count":37,"generating_count":0,"generated_count":34}
+2025-06-21 01:14:27 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:14:32 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 01:14:32 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 01:14:32 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":3}
+2025-06-21 01:14:32 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 01:14:38 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:14:42 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 01:14:42 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":1}
+2025-06-21 01:14:42 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 01:15:01 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:15:04 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 01:15:04 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":1}
+2025-06-21 01:15:04 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}

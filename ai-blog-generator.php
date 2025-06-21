@@ -284,6 +284,14 @@ class AI_Blog_Generator {
 	 * @return array Modified cron schedules.
 	 */
 	public function add_custom_cron_schedules( $schedules ) {
+		// Add 5-minute schedule.
+		if ( ! isset( $schedules['five_minutes'] ) ) {
+			$schedules['five_minutes'] = [
+				'interval' => 5 * MINUTE_IN_SECONDS,
+				'display'  => __( 'Every 5 minutes', 'ai-blog-generator' ),
+			];
+		}
+		
 		// Add 15-minute schedule.
 		if ( ! isset( $schedules['fifteen_minutes'] ) ) {
 			$schedules['fifteen_minutes'] = [

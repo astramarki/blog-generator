@@ -69,6 +69,21 @@ class OpenAI_Service {
 	}
 
 	/**
+	 * Check if running in local environment.
+	 *
+	 * @return bool True if local environment.
+	 */
+	private function is_local_environment() {
+		$site_url = get_site_url();
+		return (
+			strpos( $site_url, 'localhost' ) !== false ||
+			strpos( $site_url, '127.0.0.1' ) !== false ||
+			strpos( $site_url, '.local' ) !== false ||
+			( defined( 'WP_LOCAL_DEV' ) && WP_LOCAL_DEV )
+		);
+	}
+
+	/**
 	 * Test API connection.
 	 *
 	 * @return array Test result.
@@ -352,9 +367,16 @@ class OpenAI_Service {
 	 */
 	private function download_seed_image_to_temp( $image_url ) {
 		try {
-			$response = wp_remote_get( $image_url, [
-				'timeout' => 60,
-			] );
+					$args = [
+			'timeout' => 60,
+		];
+		
+		// Disable SSL verification for local environments
+		if ( $this->is_local_environment() ) {
+			$args['sslverify'] = false;
+		}
+		
+		$response = wp_remote_get( $image_url, $args );
 
 			if ( is_wp_error( $response ) ) {
 				Logger::error( 'seed_image_download_failed', 'Failed to download seed image', [
@@ -447,6 +469,11 @@ class OpenAI_Service {
 			'body' => $body,
 			'timeout' => 300, // 5 minute timeout for image editing
 		];
+		
+		// Disable SSL verification for local environments
+		if ( $this->is_local_environment() ) {
+			$args['sslverify'] = false;
+		}
 
 		Logger::info( 'openai_multipart_request', 'Sending multipart request to OpenAI edits endpoint', [
 			'url' => $this->api_edit_url,
@@ -688,9 +715,16 @@ class OpenAI_Service {
 	 */
 	private function download_image_as_base64( $url ) {
 		try {
-			$response = wp_remote_get( $url, [
-				'timeout' => 60,
-			] );
+					$args = [
+			'timeout' => 60,
+		];
+		
+		// Disable SSL verification for local environments
+		if ( $this->is_local_environment() ) {
+			$args['sslverify'] = false;
+		}
+		
+		$response = wp_remote_get( $url, $args );
 
 			if ( is_wp_error( $response ) ) {
 				Logger::error( 'openai_image_download_failed', 'Failed to download image from URL', [
@@ -1189,6 +1223,12 @@ class OpenAI_Service {
 			'body' => wp_json_encode( $data ),
 			'timeout' => 300, // 5 minute timeout for image generation
 		];
+		
+		// Disable SSL verification for local environments
+		if ( $this->is_local_environment() ) {
+			$args['sslverify'] = false;
+			Logger::info( 'openai_ssl_disabled', 'SSL verification DISABLED for local environment' );
+		}
 
 		// Check for global cancellation before making request
 		if ( get_transient( 'ai_blog_global_cancel_flag' ) ) {
@@ -1337,6 +1377,11 @@ class OpenAI_Service {
 				'body' => wp_json_encode( $request_data ),
 				'timeout' => 300,
 			];
+			
+			// Disable SSL verification for local environments
+			if ( $this->is_local_environment() ) {
+				$args['sslverify'] = false;
+			}
 
 			Logger::info( 'openai_text_request', 'Sending text generation request to OpenAI', [
 				'url' => $text_api_url,

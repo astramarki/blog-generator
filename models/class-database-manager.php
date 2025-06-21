@@ -594,13 +594,45 @@ class Database_Manager {
 
 		$this->log_database( 'insert', $table, $data );
 
-		$result = $this->wpdb->insert( $table_name, $data );
-		
+		// Retry-aware insert – handles transient deadlocks / lock waits when multiple generators run in parallel.
+		$max_attempts = 3;
+		$attempt      = 0;
+		$result       = false;
+
+		do {
+			$attempt++;
+			$result = $this->wpdb->insert( $table_name, $data );
+
+			if ( false !== $result ) {
+				// Success, break out of retry loop.
+				break;
+			}
+
+			// If the error is a lock wait timeout or deadlock we retry; otherwise fail immediately.
+			$last_error = strtolower( $this->wpdb->last_error );
+			if ( strpos( $last_error, 'lock wait timeout' ) === false && strpos( $last_error, 'deadlock found' ) === false ) {
+				break; // Non-retryable error.
+			}
+
+			// Log the retry attempt.
+			$this->log_warning( 'database_insert_retry', 'Retrying insert after lock wait/deadlock', [
+				'table'        => $table,
+				'attempt'      => $attempt,
+				'max_attempts' => $max_attempts,
+				'error'        => $this->wpdb->last_error,
+			] );
+
+			// Exponential back-off: 0.1s, 0.2s …
+			usleep( 100000 * $attempt );
+
+		} while ( $attempt < $max_attempts );
+
 		if ( false === $result ) {
 			$this->log_error( 'database_insert_failed', 'Insert operation failed', [
-				'table' => $table,
-				'error' => $this->wpdb->last_error,
-				'data_size' => count( $data )
+				'table'      => $table,
+				'error'      => $this->wpdb->last_error,
+				'data_size'  => count( $data ),
+				'attempts'   => $attempt,
 			] );
 			$this->log_function_exit( false );
 			return false;
@@ -628,14 +660,6 @@ class Database_Manager {
 	 * @return int|false Number of rows updated on success, false on failure.
 	 */
 	public function update( $table, $data, $where ) {
-		// Log to debug file for comprehensive debugging
-		$debug_log = __DIR__ . '/../debug-transaction.log';
-		$timestamp = date( 'Y-m-d H:i:s' );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Method called\n", FILE_APPEND );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Parameters: table=$table\n", FILE_APPEND );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Data: " . implode(', ', array_keys($data)) . "\n", FILE_APPEND );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Where: " . implode(', ', array_keys($where)) . "\n", FILE_APPEND );
-
 		$start_time = $this->start_timer();
 		$this->log_function_entry( [ 
 			'table' => $table, 
@@ -643,12 +667,9 @@ class Database_Manager {
 			'where_keys' => array_keys( $where )
 		] );
 
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Getting table name\n", FILE_APPEND );
 		$table_name = $this->get_table_name( $table );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Table name: $table_name\n", FILE_APPEND );
 		
 		if ( ! $table_name ) {
-			file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Invalid table name\n", FILE_APPEND );
 			$this->log_error( 'database_update_invalid_table', 'Invalid table name provided', [ 
 				'table' => $table,
 				'valid_tables' => array_keys( $this->get_table_map() )
@@ -657,17 +678,37 @@ class Database_Manager {
 			return false;
 		}
 
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Calling log_database\n", FILE_APPEND );
 		$this->log_database( 'update', $table, [ 'data' => $data, 'where' => $where ] );
+		// Retry-aware update to mitigate deadlocks / lock waits when multiple generators run.
+		$max_attempts = 3;
+		$attempt      = 0;
+		$result       = false;
 
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - About to call wpdb->update\n", FILE_APPEND );
-		$result = $this->wpdb->update( $table_name, $data, $where );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - wpdb->update completed\n", FILE_APPEND );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Result: " . (is_numeric($result) ? "rows_affected=$result" : "boolean=" . ($result ? 'true' : 'false')) . "\n", FILE_APPEND );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - WPDB last error: " . $this->wpdb->last_error . "\n", FILE_APPEND );
+		do {
+			$attempt++;
+			$result = $this->wpdb->update( $table_name, $data, $where );
+
+			if ( false !== $result ) {
+				break; // success
+			}
+
+			$last_error = strtolower( $this->wpdb->last_error );
+			if ( strpos( $last_error, 'lock wait timeout' ) === false && strpos( $last_error, 'deadlock found' ) === false ) {
+				break; // non-retryable error
+			}
+
+			$this->log_warning( 'database_update_retry', 'Retrying update after lock wait/deadlock', [
+				'table'        => $table,
+				'attempt'      => $attempt,
+				'max_attempts' => $max_attempts,
+				'error'        => $this->wpdb->last_error,
+			] );
+
+			usleep( 100000 * $attempt );
+
+		} while ( $attempt < $max_attempts );
 		
 		if ( false === $result ) {
-			file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Update failed\n", FILE_APPEND );
 			$this->log_error( 'database_update_failed', 'Update operation failed', [
 				'table' => $table,
 				'error' => $this->wpdb->last_error,
@@ -678,8 +719,6 @@ class Database_Manager {
 			return false;
 		}
 
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Update successful, rows affected: $result\n", FILE_APPEND );
-
 		$this->log_debug( 'database_update_success', 'Records updated successfully', [
 			'table' => $table,
 			'rows_affected' => $result,
@@ -689,7 +728,6 @@ class Database_Manager {
 		$this->end_timer( $start_time, 'database_update', [ 'table' => $table, 'rows_affected' => $result ] );
 		$this->log_function_exit( $result );
 
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::update - Method returning result: $result\n", FILE_APPEND );
 		return $result;
 	}
 
@@ -752,12 +790,6 @@ class Database_Manager {
 	 * @return object|null Row object on success, null on failure.
 	 */
 	public function get( $table, $where = [], $fields = '*' ) {
-		// Log to debug file for comprehensive debugging
-		$debug_log = __DIR__ . '/../debug-transaction.log';
-		$timestamp = date( 'Y-m-d H:i:s' );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Method called\n", FILE_APPEND );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Parameters: table=$table, where=" . (is_array($where) ? 'array[' . implode(',', array_keys($where)) . ']' : $where) . ", fields=$fields\n", FILE_APPEND );
-
 		$start_time = $this->start_timer();
 		$this->log_function_entry( [ 
 			'table' => $table,
@@ -765,12 +797,9 @@ class Database_Manager {
 			'fields' => $fields
 		] );
 
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - About to get table name\n", FILE_APPEND );
 		$table_name = $this->get_table_name( $table );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Table name resolved: $table_name\n", FILE_APPEND );
 		
 		if ( ! $table_name ) {
-			file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Invalid table name\n", FILE_APPEND );
 			$this->log_error( 'database_get_invalid_table', 'Invalid table name provided', [ 
 				'table' => $table,
 				'valid_tables' => array_keys( $this->get_table_map() )
@@ -779,17 +808,14 @@ class Database_Manager {
 			return null;
 		}
 
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Building SQL query\n", FILE_APPEND );
 		$sql = "SELECT $fields FROM $table_name";
 		$where_clause = $this->build_where_clause( $where );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Where clause: $where_clause\n", FILE_APPEND );
 		
 		if ( $where_clause ) {
 			$sql .= " WHERE $where_clause";
 		}
 
 		$sql .= " LIMIT 1";
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Final SQL: $sql\n", FILE_APPEND );
 
 		$this->log_info( 'database_get_query', 'Executing get query', [
 			'table' => $table,
@@ -800,16 +826,9 @@ class Database_Manager {
 			'fields' => $fields
 		] );
 
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - About to execute wpdb->get_row\n", FILE_APPEND );
 		$result = $this->wpdb->get_row( $sql, ARRAY_A );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - wpdb->get_row completed\n", FILE_APPEND );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Result type: " . gettype( $result ) . "\n", FILE_APPEND );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Result is null: " . (is_null( $result ) ? 'true' : 'false') . "\n", FILE_APPEND );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - WPDB last error: " . $this->wpdb->last_error . "\n", FILE_APPEND );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Result data: " . (is_array($result) ? 'ARRAY[' . implode(', ', array_keys($result)) . ']' : 'NULL') . "\n", FILE_APPEND );
 		
 		if ( $this->wpdb->last_error ) {
-			file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Database error detected\n", FILE_APPEND );
 			$this->log_error( 'database_get_failed', 'Get query failed', [
 				'table' => $table,
 				'error' => $this->wpdb->last_error,
@@ -820,7 +839,6 @@ class Database_Manager {
 		}
 
 		$found_record = ! is_null( $result );
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Record found: " . ($found_record ? 'true' : 'false') . "\n", FILE_APPEND );
 		
 		$this->log_info( 'database_get_success', 'Get query completed', [
 			'table' => $table,
@@ -833,7 +851,6 @@ class Database_Manager {
 		$this->end_timer( $start_time, 'database_get', [ 'table' => $table, 'found' => $found_record ] );
 		$this->log_function_exit( $found_record ? 'record_found' : 'no_record' );
 
-		file_put_contents( $debug_log, "$timestamp - DATABASE_MANAGER::get - Method returning result\n", FILE_APPEND );
 		return $result;
 	}
 

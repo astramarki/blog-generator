@@ -100,6 +100,48 @@ class Content_Generator {
 	private $generation_logger;
 
 	/**
+	 * Last time a status update was sent (for throttling)
+	 *
+	 * @var int
+	 */
+	private $last_status_update_time = 0;
+	
+	/**
+	 * Minimum interval between status updates (in seconds)
+	 *
+	 * @var int
+	 */
+	private $status_update_interval = 3; // Only update every 3 seconds
+
+	/**
+	 * Batch interval for database status updates (in seconds)
+	 *
+	 * @var int
+	 */
+	private $batch_update_interval = 30;
+
+	/**
+	 * Last database update time for batched updates
+	 *
+	 * @var int
+	 */
+	private $last_db_update_time = 0;
+
+	/**
+	 * Current generation stage for tracking stage changes
+	 *
+	 * @var string
+	 */
+	private $current_stage = '';
+
+	/**
+	 * Pending status update data for batching
+	 *
+	 * @var array
+	 */
+	private $pending_status_update = null;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -358,6 +400,9 @@ class Content_Generator {
 	 * @return array Result with success status and post data.
 	 */
 	public function generate_blog_post( $idea_id ) {
+		$transaction_started = false; // Track if we started a transaction
+		$debug_log = __DIR__ . '/../debug-transaction.log'; // Debug log path
+		
 		try {
 			// Prevent multiple simultaneous generations for the same idea
 			$generation_lock = "ai_blog_generation_lock_{$idea_id}";
@@ -491,123 +536,8 @@ class Content_Generator {
 			
 			$this->log_info( 'content_generator_generate_blog_post', 'All idea validations passed, starting transaction', ['idea_id' => $idea_id]);
 			
-			// Start transaction.
-			$this->log_info( 'content_generator_generate_blog_post', 'Starting database transaction', ['idea_id' => $idea_id]);
-			
-			// Validate database manager before transaction
-			$this->log_info( 'validating_db_manager', 'Validating database manager before transaction', [
-				'idea_id' => $idea_id,
-				'db_manager_exists' => isset( $this->database_manager ),
-				'db_manager_is_object' => is_object( $this->database_manager ),
-				'db_manager_class' => is_object( $this->database_manager ) ? get_class( $this->database_manager ) : 'not_object'
-			]);
-			
-			if ( ! $this->database_manager ) {
-				$this->log_error( 'db_manager_missing', 'Database manager is not available', [ 'idea_id' => $idea_id ] );
-				throw new \Exception( 'Database manager is not available' );
-			}
-			
-			// Check if method exists
-			if ( ! method_exists( $this->database_manager, 'start_transaction' ) ) {
-				$this->log_error( 'start_transaction_method_missing', 'start_transaction method does not exist', [ 
-					'idea_id' => $idea_id,
-					'available_methods' => get_class_methods( $this->database_manager )
-				] );
-				throw new \Exception( 'start_transaction method not available' );
-			}
-			
-			//$this->log_info( 'db_manager_validated', 'Database manager validation passed', [ 'idea_id' => $idea_id ] );
-			
-			// Simple test log to verify logging is still working
-			/*$this->log_info( 'test_log_before_transaction', 'Test log message before transaction', [ 
-				'idea_id' => $idea_id,
-				'time' => microtime( true ),
-				'memory' => memory_get_usage(),
-				'simple_test' => 'working'
-			] );
-			*/
-			try {
-				$this->log_info( 'calling_start_transaction', 'About to call start_transaction', [ 'idea_id' => $idea_id ] );
-				
-				// Set error handler to catch any PHP errors
-				set_error_handler( function( $severity, $message, $file, $line ) use ( $idea_id ) {
-					$this->log_error( 'php_error_during_transaction', 'PHP error during start_transaction', [
-						'idea_id' => $idea_id,
-						'severity' => $severity,
-						'message' => $message,
-						'file' => $file,
-						'line' => $line
-					]);
-					throw new \ErrorException( $message, 0, $severity, $file, $line );
-				});
-				
-				try {
-					$transaction_result = $this->database_manager->start_transaction();
-					
-									// Log to same debug file for correlation
-				$debug_log = __DIR__ . '/../debug-transaction.log';
-				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: start_transaction call returned with result: " . ($transaction_result ? 'SUCCESS' : 'FAILED') . "\n", FILE_APPEND );
-					
-					$this->log_info( 'start_transaction_call_completed', 'start_transaction call completed', [
-						'idea_id' => $idea_id,
-						'transaction_result' => $transaction_result,
-						'result_type' => gettype( $transaction_result )
-					]);
-				} finally {
-					// Restore previous error handler
-					restore_error_handler();
-				}
-				
-				$this->log_info( 'database_transaction_started', 'Database transaction started', [
-					'idea_id' => $idea_id,
-					'transaction_result' => $transaction_result
-				]);
-			} catch ( \Exception $e ) {
-				$this->log_error( 'database_transaction_failed', 'Failed to start database transaction', [
-					'idea_id' => $idea_id,
-					'error' => $e->getMessage(),
-					'trace' => $e->getTraceAsString(),
-					'error_type' => get_class( $e )
-				]);
-				throw new \Exception( 'Failed to start database transaction: ' . $e->getMessage() );
-			} catch ( \Error $e ) {
-				$this->log_error( 'database_transaction_fatal_error', 'Fatal error during database transaction', [
-					'idea_id' => $idea_id,
-					'error' => $e->getMessage(),
-					'trace' => $e->getTraceAsString(),
-					'error_type' => get_class( $e )
-				]);
-				throw new \Exception( 'Fatal error during database transaction: ' . $e->getMessage() );
-			}
-			
-			// Immediate status check right after transaction
-			$this->log_info( 'post_transaction_immediate', 'Immediate status after transaction', [
-				'idea_id' => $idea_id,
-				'time_now' => microtime(true),
-				'step' => 'right_after_transaction'
-			]);
-			
-			// Test if we can still log
-			error_log( "[AI_BLOG_GENERATOR] Debug: Post-transaction immediate log test for idea $idea_id" );
-			
-			try {
-				// Check PHP error status and resources
-				$this->log_info( 'php_status_check', 'PHP status after transaction start', [
-					'idea_id' => $idea_id,
-					'memory_usage' => memory_get_usage(true),
-					'memory_peak' => memory_get_peak_usage(true),
-					'memory_limit' => ini_get('memory_limit'),
-					'max_execution_time' => ini_get('max_execution_time'),
-					'time_limit' => ini_get('max_execution_time'),
-					'last_error' => error_get_last()
-				]);
-			} catch ( \Exception $e ) {
-				error_log( "[AI_BLOG_GENERATOR] Error during php_status_check: " . $e->getMessage() );
-				throw $e;
-			} catch ( \Error $e ) {
-				error_log( "[AI_BLOG_GENERATOR] Fatal error during php_status_check: " . $e->getMessage() );
-				throw $e;
-			}
+			// Note: Transaction will only be started when saving the post to minimize lock time
+			$this->log_info( 'content_generator_generate_blog_post', 'Ready to begin generation process', ['idea_id' => $idea_id]);
 			
 			try {
 				// Check for cancellation before starting generation
@@ -1173,7 +1103,6 @@ class Content_Generator {
 						} catch ( \Exception $img_e ) {
 							// Log detailed error information
 							$elapsed_time = time() - $image_timeout_start;
-							$debug_log = __DIR__ . '/../debug-transaction.log';
 							file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - IMAGE_GENERATION_ERROR: " . $img_e->getMessage() . " (elapsed: {$elapsed_time}s)\n", FILE_APPEND );
 							
 							$this->log_error( 'image_generation_critical_error', 'Critical error during image generation - FAILING ENTIRE GENERATION', [
@@ -1199,7 +1128,6 @@ class Content_Generator {
 					} catch ( \Exception $timeout_e ) {
 						// Log timeout details
 						$elapsed_time = time() - $image_timeout_start;
-						$debug_log = __DIR__ . '/../debug-transaction.log';
 						file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - IMAGE_GENERATION_TIMEOUT: " . $timeout_e->getMessage() . " (elapsed: {$elapsed_time}s)\n", FILE_APPEND );
 						
 						$this->log_error( 'image_generation_timeout_critical', 'CRITICAL: Image generation timeout - FAILING ENTIRE GENERATION', [
@@ -1376,6 +1304,26 @@ class Content_Generator {
 					$this->generation_logger->debug( 'Creating blog model record' );
 				}
 				
+				// Start transaction only for critical database operations
+				$this->log_info( 'starting_save_transaction', 'Starting transaction for critical saves', ['idea_id' => $idea_id]);
+				
+				$transaction_started = false;
+				try {
+					if ( $this->database_manager && method_exists( $this->database_manager, 'start_transaction' ) ) {
+						$transaction_started = $this->database_manager->start_transaction();
+						$this->log_info( 'save_transaction_started', 'Save transaction started', [
+							'idea_id' => $idea_id,
+							'result' => $transaction_started
+						]);
+					}
+				} catch ( \Exception $e ) {
+					$this->log_warning( 'save_transaction_failed', 'Failed to start save transaction', [
+						'idea_id' => $idea_id,
+						'error' => $e->getMessage()
+					]);
+					// Continue without transaction
+				}
+				
 				$blog_id = $this->blog_model->create([
 					'idea_id' => $idea_id,
 					'post_id' => $post_id,
@@ -1446,45 +1394,48 @@ class Content_Generator {
 				}
 				
 				try {
-					// Check for transaction timeout before committing
-					if ( $this->database_manager->is_transaction_timed_out() ) {
-						$this->log_error( 'transaction_timeout_before_commit', 'Transaction timed out before commit', [
-							'idea_id' => $idea_id,
-							'blog_id' => $blog_id,
-							'post_id' => $post_id
-						] );
-						// Force rollback and throw exception
-						$this->database_manager->rollback();
-						throw new \Exception( 'Transaction timeout detected before commit' );
-					}
-					
-					$commit_start = microtime(true);
-					$commit_result = $this->database_manager->commit();
-					$commit_duration = microtime(true) - $commit_start;
-					
-					$debug_log = __DIR__ . '/../debug-transaction.log';
-					file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Transaction commit attempt completed in {$commit_duration}s, result: " . ($commit_result ? 'SUCCESS' : 'FAILED') . "\n", FILE_APPEND );
-					
-					if ( $this->generation_logger ) {
-						$this->generation_logger->info( 'Transaction commit completed', [
-							'duration_seconds' => $commit_duration,
-							'result' => $commit_result ? 'SUCCESS' : 'FAILED'
-						] );
-					}
-					
-					if (!$commit_result) {
-						if ( $this->generation_logger ) {
-							$this->generation_logger->warning( 'Transaction commit failed, but generation is complete' );
+					// Only commit if we actually started a transaction
+					if ( ! $transaction_started ) {
+						$this->log_info( 'no_transaction_to_commit', 'No transaction to commit', ['idea_id' => $idea_id]);
+					} else {
+						// Check for transaction timeout before committing
+						if ( $this->database_manager->is_transaction_timed_out() ) {
+							$this->log_error( 'transaction_timeout_before_commit', 'Transaction timed out before commit', [
+								'idea_id' => $idea_id,
+								'blog_id' => $blog_id,
+								'post_id' => $post_id
+							] );
+							// Force rollback and throw exception
+							$this->database_manager->rollback();
+							throw new \Exception( 'Transaction timeout detected before commit' );
 						}
-						$this->log_warning( 'transaction_commit_failed', 'Transaction commit failed but generation completed', [
-							'idea_id' => $idea_id,
-							'blog_id' => $blog_id,
-							'post_id' => $post_id
-						] );
+						
+						$commit_start = microtime(true);
+						$commit_result = $this->database_manager->commit();
+						$commit_duration = microtime(true) - $commit_start;
+						
+						file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Transaction commit attempt completed in {$commit_duration}s, result: " . ($commit_result ? 'SUCCESS' : 'FAILED') . "\n", FILE_APPEND );
+						
+						if ( $this->generation_logger ) {
+							$this->generation_logger->info( 'Transaction commit completed', [
+								'duration_seconds' => $commit_duration,
+								'result' => $commit_result ? 'SUCCESS' : 'FAILED'
+							]);
+						}
+						
+						if (!$commit_result) {
+							if ( $this->generation_logger ) {
+								$this->generation_logger->warning( 'Transaction commit failed, but generation is complete' );
+							}
+							$this->log_warning( 'transaction_commit_failed', 'Transaction commit failed but generation completed', [
+								'idea_id' => $idea_id,
+								'blog_id' => $blog_id,
+								'post_id' => $post_id
+							] );
+						}
 					}
 					
 				} catch ( \Exception $e ) {
-					$debug_log = __DIR__ . '/../debug-transaction.log';
 					file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Exception during commit: " . $e->getMessage() . "\n", FILE_APPEND );
 					
 					if ( $this->generation_logger ) {
@@ -1513,6 +1464,8 @@ class Content_Generator {
 				if ( $this->generation_logger ) {
 					$this->generation_logger->info( 'Updating generation status to complete' );
 				}
+				// Flush any pending status updates before final update
+				$this->flush_pending_status_updates( $idea_id );
 				$this->update_generation_status( $idea_id, 'complete', 'Blog post generated successfully!' );
 				
 				// Force clear any stuck generation locks
@@ -1551,7 +1504,6 @@ class Content_Generator {
 				
 			} catch ( \Exception $e ) {
 				// Log to debug file immediately
-				$debug_log = __DIR__ . '/../debug-transaction.log';
 				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Generation failed with exception: " . $e->getMessage() . "\n", FILE_APPEND );
 				
 				// Clear generation lock using closure
@@ -1576,7 +1528,7 @@ class Content_Generator {
 				
 				// Enhanced rollback with timeout detection
 				try {
-					if ( $this->database_manager ) {
+					if ( $this->database_manager && $transaction_started ) {
 						$rollback_start = microtime( true );
 						$rollback_result = $this->database_manager->rollback();
 						$rollback_duration = microtime( true ) - $rollback_start;
@@ -1587,6 +1539,8 @@ class Content_Generator {
 							file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Rollback failed, attempting emergency cleanup\n", FILE_APPEND );
 							$this->database_manager->emergency_transaction_cleanup();
 						}
+					} else if ( ! $transaction_started ) {
+						$this->log_info( 'no_transaction_to_rollback', 'No transaction to rollback', ['idea_id' => $idea_id]);
 					}
 				} catch ( \Exception $rollback_exception ) {
 					file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Rollback exception: " . $rollback_exception->getMessage() . "\n", FILE_APPEND );
@@ -1628,6 +1582,8 @@ class Content_Generator {
 				
 				// Clear any stuck generation status
 				try {
+					// Flush any pending updates before failure
+					$this->flush_pending_status_updates( $idea_id );
 					$this->update_generation_status( $idea_id, 'failed', 'Generation failed: ' . substr( $e->getMessage(), 0, 100 ) );
 				} catch ( \Exception $status_update_exception ) {
 					// Ignore - this is cleanup
@@ -2265,6 +2221,89 @@ class Content_Generator {
 	 * @param string $message  Status message.
 	 */
 	private function update_generation_status( $idea_id, $stage, $message ) {
+		$current_time = time();
+		
+		// Determine if this is a stage change
+		$is_stage_change = ( $this->current_stage !== '' && $stage !== $this->current_stage );
+		$is_critical_stage = in_array( $stage, [ 'complete', 'failed', 'cancelled' ], true );
+		
+		// Determine if this is a minor progress update
+		$is_minor_progress = ( 
+			strpos( $message, 'Generating image' ) !== false ||
+			strpos( $message, 'Processing' ) !== false ||
+			strpos( $message, 'Waiting' ) !== false
+		);
+		
+		// Skip minor progress updates entirely for database writes
+		if ( $is_minor_progress && ! $is_stage_change && ! $is_critical_stage ) {
+			// Only update memory (transient) for real-time display
+			$status_data = [
+				'idea_id' => $idea_id,
+				'stage' => $stage,
+				'message' => $message,
+				'progress' => $this->get_stage_progress( $stage ),
+				'updated_at' => current_time( 'mysql' ),
+				'updated_timestamp' => $current_time
+			];
+			set_transient( "ai_blog_generation_status_{$idea_id}", $status_data, HOUR_IN_SECONDS );
+			
+			// Store as pending update for batch processing
+			$this->pending_status_update = [
+				'idea_id' => $idea_id,
+				'message' => $message,
+				'time' => $current_time
+			];
+			
+			$this->log_debug( 'status_update_memory_only', 'Status update stored in memory only', [
+				'idea_id' => $idea_id,
+				'stage' => $stage,
+				'message' => substr( $message, 0, 50 ) . '...',
+				'is_minor_progress' => true
+			] );
+			
+			return;
+		}
+		
+		// Check if we should batch this update (non-critical updates)
+		$time_since_last_db_update = $current_time - $this->last_db_update_time;
+		$should_batch = ! $is_critical_stage && ! $is_stage_change && $time_since_last_db_update < $this->batch_update_interval;
+		
+		if ( $should_batch ) {
+			// Store for batch update
+			$this->pending_status_update = [
+				'idea_id' => $idea_id,
+				'message' => $message,
+				'time' => $current_time
+			];
+			
+			// Update memory only
+			$status_data = [
+				'idea_id' => $idea_id,
+				'stage' => $stage,
+				'message' => $message,
+				'progress' => $this->get_stage_progress( $stage ),
+				'updated_at' => current_time( 'mysql' ),
+				'updated_timestamp' => $current_time
+			];
+			set_transient( "ai_blog_generation_status_{$idea_id}", $status_data, HOUR_IN_SECONDS );
+			
+			$this->log_debug( 'status_update_batched', 'Status update batched for later', [
+				'idea_id' => $idea_id,
+				'stage' => $stage,
+				'time_until_batch' => $this->batch_update_interval - $time_since_last_db_update
+			] );
+			
+			return;
+		}
+		
+		// Update current stage
+		if ( $is_stage_change ) {
+			$this->current_stage = $stage;
+		}
+		
+		// Update last database update time
+		$this->last_db_update_time = $current_time;
+		
 		// Update transient for quick access
 		$status_data = [
 			'idea_id' => $idea_id,
@@ -2272,98 +2311,95 @@ class Content_Generator {
 			'message' => $message,
 			'progress' => $this->get_stage_progress( $stage ),
 			'updated_at' => current_time( 'mysql' ),
-			'updated_timestamp' => time()
+			'updated_timestamp' => $current_time
 		];
 		
 		set_transient( "ai_blog_generation_status_{$idea_id}", $status_data, HOUR_IN_SECONDS );
 		
-		// CRITICAL: Also update the database generation_status field using the model
-		try {
-			// Log the update attempt
-			$this->log_info( 'generation_status_update_attempt', 'Starting generation status update', [
-				'idea_id' => $idea_id,
-				'stage' => $stage,
-				'message' => $message,
-				'method' => 'Content_Generator::update_generation_status'
-			] );
-			
-			// Use the Blog_Ideas_Model_V2 for consistent database operations
-			$update_result = $this->idea_model->update_idea( $idea_id, [
-				'generation_status' => $message,
-				'updated_at' => current_time( 'mysql' )
-			] );
-			
-			// Also log the raw SQL query for debugging
-			global $wpdb;
-			$last_query = $wpdb->last_query;
-			$last_error = $wpdb->last_error;
-			
-			// Log to both system and debug file with safe data
-			$debug_log = __DIR__ . '/../debug-transaction.log';
-			$safe_query = $last_query ? substr( preg_replace( '/[^\x20-\x7E]/', '?', $last_query ), 0, 200 ) . '...' : 'None';
-			$safe_error = $last_error ? preg_replace( '/[^\x20-\x7E]/', '?', $last_error ) : 'None';
-			
-			$log_entry = date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR STATUS UPDATE:\n";
-			$log_entry .= "  Idea ID: $idea_id\n";
-			$log_entry .= "  Stage: $stage\n";
-			$log_entry .= "  Message: " . preg_replace( '/[^\x20-\x7E]/', '?', $message ) . "\n";
-			$log_entry .= "  Update Result: " . ($update_result ? 'SUCCESS' : 'FAILED') . "\n";
-			$log_entry .= "  Last SQL Query: $safe_query\n";
-			$log_entry .= "  Last SQL Error: $safe_error\n";
-			$log_entry .= "  Rows Affected: " . intval( $wpdb->rows_affected ) . "\n\n";
-			file_put_contents( $debug_log, $log_entry, FILE_APPEND );
-			
-			if ( $update_result ) {
-				// Log the status update
-				$this->log_debug( 'generation_status_updated', 'Updated generation status in database via model', [
+		// Only update database for stage changes or critical updates
+		if ( $is_stage_change || $is_critical_stage || ! $should_batch ) {
+			try {
+				// Log the update attempt
+				$this->log_info( 'generation_status_db_update', 'Updating generation status in database', [
 					'idea_id' => $idea_id,
 					'stage' => $stage,
-					'message' => $message,
-					'progress' => $status_data['progress'],
-					'sql_query' => $last_query,
-					'rows_affected' => $wpdb->rows_affected
+					'message' => substr( $message, 0, 100 ) . '...',
+					'is_stage_change' => $is_stage_change,
+					'is_critical' => $is_critical_stage,
+					'is_batch_update' => ( $this->pending_status_update !== null )
 				] );
-			} else {
-				$this->log_error( 'generation_status_update_failed', 'Model update returned false', [
+				
+				// Use the most recent message (either current or pending)
+				$db_message = $this->pending_status_update ? $this->pending_status_update['message'] : $message;
+				
+				// Use the Blog_Ideas_Model_V2 for consistent database operations
+				$update_result = $this->idea_model->update_idea( $idea_id, [
+					'generation_status' => $db_message,
+					'updated_at' => current_time( 'mysql' )
+				] );
+				
+				// Clear pending update
+				$this->pending_status_update = null;
+				
+				if ( $update_result ) {
+					$this->log_debug( 'generation_status_db_updated', 'Database status update successful', [
+						'idea_id' => $idea_id,
+						'stage' => $stage,
+						'is_stage_change' => $is_stage_change
+					] );
+				} else {
+					$this->log_error( 'generation_status_db_update_failed', 'Database status update failed', [
+						'idea_id' => $idea_id,
+						'stage' => $stage,
+						'message' => $db_message
+					] );
+				}
+				
+				// If we have a generation logger, update it too
+				if ( $this->generation_logger ) {
+					$this->generation_logger->log_phase( $stage, $status_data['progress'], [
+						'message' => $message,
+						'status_updated' => $update_result,
+						'is_db_update' => true
+					] );
+				}
+				
+			} catch ( \Exception $e ) {
+				$this->log_error( 'status_update_exception', 'Exception during status update', [
 					'idea_id' => $idea_id,
 					'stage' => $stage,
-					'message' => $message,
-					'sql_query' => $last_query,
-					'sql_error' => $last_error,
-					'rows_affected' => $wpdb->rows_affected
+					'error' => $e->getMessage()
 				] );
 			}
-			
-			// If we have a generation logger, update it too
-			if ( $this->generation_logger ) {
-				$this->generation_logger->log_phase( $stage, $status_data['progress'], [
-					'message' => $message,
-					'status_updated' => $update_result,
-					'sql_query' => $last_query
+		}
+	}
+
+	/**
+	 * Force flush any pending status updates to database
+	 *
+	 * @param int $idea_id Idea ID
+	 */
+	private function flush_pending_status_updates( $idea_id ) {
+		if ( $this->pending_status_update && $this->pending_status_update['idea_id'] === $idea_id ) {
+			try {
+				$this->log_debug( 'flushing_pending_status', 'Flushing pending status update', [
+					'idea_id' => $idea_id,
+					'message' => $this->pending_status_update['message']
+				] );
+				
+				$update_result = $this->idea_model->update_idea( $idea_id, [
+					'generation_status' => $this->pending_status_update['message'],
+					'updated_at' => current_time( 'mysql' )
+				] );
+				
+				$this->pending_status_update = null;
+				
+			} catch ( \Exception $e ) {
+				$this->log_error( 'flush_status_failed', 'Failed to flush pending status update', [
+					'idea_id' => $idea_id,
+					'error' => $e->getMessage()
 				] );
 			}
-			
-		} catch ( \Exception $e ) {
-			// Log exception details with safe data
-			$debug_log = __DIR__ . '/../debug-transaction.log';
-			$safe_exception = preg_replace( '/[^\x20-\x7E]/', '?', $e->getMessage() );
-			$safe_trace = substr( preg_replace( '/[^\x20-\x7E]/', '?', $e->getTraceAsString() ), 0, 500 ) . '...';
-			
-			$log_entry = date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR STATUS UPDATE EXCEPTION:\n";
-			$log_entry .= "  Idea ID: $idea_id\n";
-			$log_entry .= "  Stage: $stage\n";
-			$log_entry .= "  Message: " . preg_replace( '/[^\x20-\x7E]/', '?', $message ) . "\n";
-			$log_entry .= "  Exception: $safe_exception\n";
-			$log_entry .= "  Trace: $safe_trace\n\n";
-			file_put_contents( $debug_log, $log_entry, FILE_APPEND );
-			
-			$this->log_error( 'status_update_failed', 'Failed to update generation status in database', [
-				'idea_id' => $idea_id,
-				'stage' => $stage,
-				'message' => $message,
-				'error' => $e->getMessage(),
-				'trace' => $e->getTraceAsString()
-			] );
 		}
 	}
 
@@ -2417,6 +2453,9 @@ class Content_Generator {
 			'idea_id' => $idea_id,
 			'stage' => $stage
 		] );
+		
+		// Flush any pending updates before cancellation
+		$this->flush_pending_status_updates( $idea_id );
 		
 		// Update status
 		$this->update_generation_status( $idea_id, 'cancelled', 'Generation cancelled by user' );

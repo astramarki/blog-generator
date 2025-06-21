@@ -5,6 +5,77 @@ All notable changes to the AI Blog Generator WordPress plugin will be documented
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased] - 2025-06-20
+
+### Removed
+- **Database Logging System**: Completely removed database-based logging to improve performance
+  - **Problem**: Database logging was causing insert failures and performance issues during generation
+  - **Solution**: Replaced with file-based logging to `debug-transaction.log`
+  - **Changes**:
+    - Removed logs page from admin menu
+    - Removed all logs-related AJAX handlers
+    - Removed `admin/views/logs.php` view file
+    - Removed `admin/assets/js/logs.js` JavaScript file
+    - Replaced `Logger` class to use file-based logging instead of database
+    - Removed fallback logs cron job that was causing fatal errors
+    - All logging now writes to `debug-transaction.log` file
+  - **Impact**: Improved generation performance and eliminated database contention issues
+
+### Fixed
+- **CRITICAL: Concurrent Generation Hang Issue - RESOLVED**
+  - **Root Cause**: Long-running database transactions (8-10 minutes) were holding table locks, causing concurrent generations to block on INSERT operations
+  - **Problem**: When multiple blog generations ran simultaneously, the second job would hang waiting for locks on `psec_ai_blog_logs` table
+  - **Solution**: 
+    - Removed early transaction start that was wrapping the entire generation process
+    - Moved transaction scope to only wrap critical database operations (blog record creation and idea status update)
+    - Added retry logic with exponential backoff for transient database deadlocks in insert() and update() methods
+    - Ensured WordPress transients (used for status updates) are called outside of database transactions
+    - Implemented fallback logging mechanism that writes to a file when database inserts fail
+    - Added automatic recovery system that processes fallback logs every 5 minutes
+    - Prevents "recursion prevented" errors caused by logging failures during concurrent operations
+    - Added throttling for status updates during image generation to reduce database writes
+      - **Files Modified**: 
+            - `services/class-content-generator.php` - Removed early transaction start, moved to critical operations only, added status update throttling
+      - `models/class-database-manager.php` - Added retry logic for transient deadlocks
+      - `utilities/class-logger.php` - Added fallback file logging when database inserts fail
+      - `services/class-scheduler-service.php` - Added periodic fallback log processing
+      - `ai-blog-generator.php` - Added 5-minute cron schedule for fallback processing
+  - **Impact**: Now supports up to 5 concurrent blog generations without database lock conflicts
+  - **Testing**: Successfully tested 2 concurrent generations without hanging
+
+- **Database Insert Failures from Large Log Context**: Fixed "Processing the value for the following field failed: context" errors
+  - **Problem**: Anthropic service was logging full API responses (15,000+ tokens) to database, exceeding field limits
+  - **Solution**: Limited log context data to prevent database insert failures
+    - Modified `anthropic_response_details` to only log first 500 chars of response body
+    - Modified `anthropic_response_decoded` to log metadata only (no full content)
+    - Modified `anthropic_request_details` to log request metadata without full prompt
+  - **Impact**: Eliminated database insert failures and fallback log accumulation
+  - **Files Modified**: `services/class-anthropic-service.php`
+
+### Changed
+- **Database Manager Improvements**:
+  - Added 3-attempt retry loop with exponential backoff (1s, 2s, 4s) for INSERT operations
+  - Added similar retry logic for UPDATE operations
+  - Enhanced error logging to track retry attempts and deadlock occurrences
+  - Retry logic specifically handles MySQL error codes 1205 (lock wait timeout) and 1213 (deadlock)
+
+### Optimized
+- **Status Update Performance**: Significantly reduced database writes during generation
+  - **Problem**: Excessive status updates (15-20+ per generation) causing database contention during concurrent operations
+  - **Solution**: Implemented intelligent batching and filtering of status updates
+    - Minor progress updates (e.g., "Generating image 2 of 3") now update memory-only (transients)
+    - Database updates only occur for stage changes (e.g., contexts → content → images → complete)
+    - Critical status updates (complete, failed, cancelled) always update database immediately
+    - Added 30-second batch interval for non-critical updates
+    - Implemented pending update flushing at critical points
+  - **Impact**: 
+    - Reduced database writes from ~20 updates to ~5-7 updates per generation
+    - Improved concurrent generation performance
+    - Frontend still sees real-time updates via transient polling
+  - **Files Modified**:
+    - `services/class-content-generator.php` - Added batched status updates with memory-first approach
+    - `changelog.md` - Documented optimization changes
+
 ## Version 1.2.11 - 2025-06-19
 
 ### Fixed
@@ -3600,3 +3671,34 @@ foreach ($contexts as $context) {
 - **Detailed Error Messages**: Specific error messages for generation vs. save failures
 - **Timeout Protection**: Stops early if overall generation time exceeds 9 minutes
 - **No Automatic Retries**: Failed images require manual retry as per system design
+
+## [Date: 2025-06-20] - Fixed Daily Limit Option Name
+
+### Fixed
+- **Background Processor**: Fixed incorrect option name for daily limit
+  - Changed from `ai_blog_generator_daily_limit` to `ai_blog_generator_posts_per_day`
+  - This was causing the daily limit to always default to 5 instead of using the configured value
+  - Now correctly reads the posts per day setting from admin settings
+
+## [Date: 2025-06-20] - Reduced Verbose Logging
+
+### Changed
+- **Logger Filtering**: Added filtering mechanism to exclude routine operations from file-based logging
+- **Excluded Actions**: Filtered out verbose logs for:
+  - Model and controller initialization
+  - AJAX handler registration
+  - Routine cron job checks
+  - SSL fix applications
+  - Frequent status update checks
+  - Database query logging
+  - Function entry/exit tracking
+  - AJAX duplicate idea removal warnings (occurring every 5 seconds)
+- **Database Manager**: Removed verbose file_put_contents() debug logging from:
+  - `update()` method
+  - `get()` method
+- **Important Milestones Only**: Now only logs:
+  - Blog generation start/complete/failed
+  - Critical errors
+  - Image generation progress
+  - Post creation events
+  - API errors and important service events
