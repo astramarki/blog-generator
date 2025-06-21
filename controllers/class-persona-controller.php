@@ -129,7 +129,18 @@ class Persona_Controller {
 				'bio' => 'sanitize_textarea_field',
 				'expertise' => 'sanitize_textarea_field',
 				'writing_style' => 'sanitize_textarea_field',
-				'tone' => 'sanitize_key',
+				'tone' => function( $value ) {
+					// Handle multiple tones separated by commas
+					if ( strpos( $value, ',' ) !== false ) {
+						$tones = explode( ',', $value );
+						$sanitized_tones = array_map( 'sanitize_key', $tones );
+						return implode( ',', array_filter( $sanitized_tones ) );
+					}
+					return sanitize_key( $value );
+				},
+				'layout_style' => 'sanitize_textarea_field',
+				'layout_rules' => 'sanitize_text_field',
+				'wordpress_user_id' => function( $value ) { return $value ? absint( $value ) : null; },
 				'active' => function( $value ) { return (int) (bool) $value; },
 			] );
 
@@ -201,7 +212,18 @@ class Persona_Controller {
 				'bio' => 'sanitize_textarea_field',
 				'expertise' => 'sanitize_textarea_field',
 				'writing_style' => 'sanitize_textarea_field',
-				'tone' => 'sanitize_key',
+				'tone' => function( $value ) {
+					// Handle multiple tones separated by commas
+					if ( strpos( $value, ',' ) !== false ) {
+						$tones = explode( ',', $value );
+						$sanitized_tones = array_map( 'sanitize_key', $tones );
+						return implode( ',', array_filter( $sanitized_tones ) );
+					}
+					return sanitize_key( $value );
+				},
+				'layout_style' => 'sanitize_textarea_field',
+				'layout_rules' => 'sanitize_text_field',
+				'wordpress_user_id' => function( $value ) { return $value ? absint( $value ) : null; },
 				'active' => function( $value ) { return (int) (bool) $value; },
 			] );
 

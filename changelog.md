@@ -5,6 +5,31 @@ All notable changes to the AI Blog Generator WordPress plugin will be documented
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.7.0] - 2025-01-21
+
+### Added
+- New persona database fields: layout_style, layout_rules, wordpress_user_id
+- Card-based UI for personas management page
+- Modal-based editing for personas
+- Multiple tone selection capability for personas (checkboxes instead of single select)
+- Automatic WordPress user creation for personas without associated users
+  - Creates author-level user accounts automatically
+  - Generates unique usernames based on persona names
+  - Sets display name and bio from persona data
+  - Adds user meta tags for AI persona identification
+
+### Changed
+- Redesigned personas page from table to modern card layout
+- Improved modal styling with better form controls and responsive design
+- Tones now stored as comma-separated values to support multiple selections
+- WordPress user dropdown now shows "Auto-create User" as default option
+
+### Fixed
+- JavaScript error with undefined ai_blog_admin variable
+- Modal display issues with opacity and visibility
+- Form control styling and focus states
+- Persona validation to properly handle multiple comma-separated tone values
+
 ## [Unreleased] - 2025-06-20
 
 ### Removed
@@ -3671,6 +3696,83 @@ foreach ($contexts as $context) {
 - **Detailed Error Messages**: Specific error messages for generation vs. save failures
 - **Timeout Protection**: Stops early if overall generation time exceeds 9 minutes
 - **No Automatic Retries**: Failed images require manual retry as per system design
+
+## [Date: 2025-06-20] - Multiple Tones Support for Personas
+
+### Added
+- **Multiple Tones Selection**: Personas can now have multiple tones selected
+  - Changed from single select dropdown to checkboxes
+  - Tones are stored as comma-separated values in the database
+  - Display multiple tone badges on persona cards
+  - Proper handling in edit mode to restore selected tones
+
+### Changed
+- **Tone Field UI**: Replaced single select with checkbox fieldset
+- **Model Updates**: Enhanced tone field sanitization to handle comma-separated values
+- **Controller Updates**: Added custom sanitization for tone field in both create and update methods
+- **Card Display**: Shows all selected tones as individual badges with proper spacing
+
+### Technical Details
+- Tones stored as comma-separated string (e.g., "casual,analytical")
+- Backwards compatible with existing single-tone personas
+- Sanitization ensures only valid tone keys are stored
+- JavaScript properly handles checkbox data collection and population
+
+## [Date: 2025-06-20] - Redesigned Personas UI with Card Layout
+
+### Changed
+- **Personas UI Redesign**: Switched from table layout to modern card-based grid
+  - Each persona displayed as a card showing name and tone
+  - Icon-based actions (edit, toggle status, delete) instead of buttons
+  - Visual distinction for inactive personas (opacity and red "Inactive" badge)
+  - Responsive grid layout that adapts to screen size
+  - Improved hover effects and visual feedback
+  - Cleaner, more modern aesthetic matching contemporary WordPress design
+
+### UI Features
+- **Card Layout**: 
+  - Grid system with auto-fill columns (minimum 280px width)
+  - Cards show persona name prominently with tone badge below
+  - Hover effects for better interactivity
+- **Icon Actions**:
+  - Edit icon (pencil) - Opens edit modal
+  - Toggle icon (eye/hidden) - Activates/deactivates persona
+  - Delete icon (trash) - Removes persona with confirmation
+- **Modal Improvements**:
+  - Better styled close button
+  - Improved form layout with proper spacing
+  - Responsive design for mobile devices
+
+## [Date: 2025-06-20] - Enhanced Personas Management with New Fields
+
+### Added
+- **New Persona Fields**: Added support for new database fields in personas:
+  - `layout_style`: Textarea field for content layout and structure preferences
+  - `layout_rules`: Text field for specific layout rules or guidelines
+  - `wordpress_user_id`: Dropdown to associate personas with WordPress user accounts
+- **Comprehensive Personas Admin Page**: Complete rewrite of personas management interface
+  - Changed from card-based layout to WordPress standard table layout
+  - Added modal-based editing for better user experience
+  - Displays WordPress user association in the table
+  - Shows persona expertise snippet in the table
+  - Inline notices for user feedback
+  - Full CRUD operations support
+
+### Changed
+- **Persona Model**: Updated to handle new fields with proper sanitization
+- **Persona Controller**: Updated AJAX handlers to process new fields
+- **Admin Interface**: Modern table-based layout with improved usability
+  - ID column for reference
+  - Bio preview (150 chars) in table
+  - WordPress user display with fallback for missing users
+  - Status badges for active/inactive states
+  - Action buttons for edit, toggle status, and delete
+
+### Technical Details
+- Added proper field sanitization for all new fields
+- WordPress user ID accepts null values for unassociated personas
+- Layout rules field uses text sanitization
+- Layout style field uses textarea sanitization
 
 ## [Date: 2025-06-20] - Fixed Daily Limit Option Name
 

@@ -42,6 +42,9 @@ class Persona_Model extends Model {
 		'expertise',
 		'writing_style',
 		'tone',
+		'layout_style',
+		'layout_rules',
+		'wordpress_user_id',
 		'active',
 	];
 
@@ -167,7 +170,7 @@ class Persona_Model extends Model {
 	 * Check if tone is appropriate for the idea topic.
 	 *
 	 * @param array  $idea Idea data.
-	 * @param string $tone Persona tone.
+	 * @param string $tone Persona tone (can be comma-separated for multiple tones).
 	 * @return bool
 	 */
 	private function is_tone_appropriate( $idea, $tone ) {
@@ -183,13 +186,20 @@ class Persona_Model extends Model {
 			'academic' => [ 'education', 'learning', 'study', 'research', 'academic' ],
 		];
 
-		if ( ! isset( $tone_mappings[ $tone ] ) ) {
-			return true; // Default to appropriate if tone not mapped
-		}
+		// Handle multiple tones
+		$tones = strpos( $tone, ',' ) !== false ? explode( ',', $tone ) : [ $tone ];
+		
+		foreach ( $tones as $single_tone ) {
+			$single_tone = trim( $single_tone );
+			
+			if ( ! isset( $tone_mappings[ $single_tone ] ) ) {
+				continue; // Skip unmapped tones
+			}
 
-		foreach ( $tone_mappings[ $tone ] as $keyword ) {
-			if ( strpos( $idea_text, $keyword ) !== false ) {
-				return true;
+			foreach ( $tone_mappings[ $single_tone ] as $keyword ) {
+				if ( strpos( $idea_text, $keyword ) !== false ) {
+					return true;
+				}
 			}
 		}
 
@@ -298,14 +308,32 @@ class Persona_Model extends Model {
 		}
 
 		// Validate tone if provided
-		if ( isset( $data['tone'] ) ) {
+		if ( isset( $data['tone'] ) && ! empty( $data['tone'] ) ) {
 			$valid_tones = array_keys( $this->get_tone_options() );
-			if ( ! in_array( $data['tone'], $valid_tones, true ) ) {
-				Logger::error( 'persona_validation_failed', 'Invalid tone value', [
-					'provided_tone' => $data['tone'],
-					'valid_tones' => $valid_tones,
-				] );
-				return false;
+			
+			// Handle multiple tones separated by commas
+			if ( strpos( $data['tone'], ',' ) !== false ) {
+				$tones = explode( ',', $data['tone'] );
+				foreach ( $tones as $tone ) {
+					$tone = trim( $tone );
+					if ( ! empty( $tone ) && ! in_array( $tone, $valid_tones, true ) ) {
+						Logger::error( 'persona_validation_failed', 'Invalid tone value', [
+							'invalid_tone' => $tone,
+							'provided_tone' => $data['tone'],
+							'valid_tones' => $valid_tones,
+						] );
+						return false;
+					}
+				}
+			} else {
+				// Single tone validation
+				if ( ! in_array( $data['tone'], $valid_tones, true ) ) {
+					Logger::error( 'persona_validation_failed', 'Invalid tone value', [
+						'provided_tone' => $data['tone'],
+						'valid_tones' => $valid_tones,
+					] );
+					return false;
+				}
 			}
 		}
 
@@ -322,15 +350,26 @@ class Persona_Model extends Model {
 	protected function sanitize_field( $field, $value ) {
 		switch ( $field ) {
 			case 'name':
+			case 'layout_rules':
 				return sanitize_text_field( $value );
 				
 			case 'bio':
 			case 'expertise':
 			case 'writing_style':
+			case 'layout_style':
 				return sanitize_textarea_field( $value );
 				
 			case 'tone':
+				// Handle multiple tones separated by commas
+				if ( strpos( $value, ',' ) !== false ) {
+					$tones = explode( ',', $value );
+					$sanitized_tones = array_map( 'sanitize_key', $tones );
+					return implode( ',', array_filter( $sanitized_tones ) );
+				}
 				return sanitize_key( $value );
+				
+			case 'wordpress_user_id':
+				return $value ? absint( $value ) : null;
 				
 			case 'active':
 				return (int) (bool) $value;
@@ -359,5 +398,111 @@ class Persona_Model extends Model {
 		}
 
 		return $formatted;
+	}
+
+	/**
+	 * Create WordPress user for persona if needed.
+	 *
+	 * @param array $persona_data Persona data.
+	 * @return int|null WordPress user ID or null on failure.
+	 */
+	public function create_wordpress_user_for_persona( $persona_data ) {
+		// Generate username from persona name
+		$base_username = sanitize_user( strtolower( str_replace( ' ', '_', $persona_data['name'] ) ), true );
+		$username = $base_username;
+		$counter = 1;
+		
+		// Ensure unique username
+		while ( username_exists( $username ) ) {
+			$username = $base_username . '_' . $counter;
+			$counter++;
+		}
+		
+		// Generate email
+		$domain = parse_url( home_url(), PHP_URL_HOST );
+		$email = $username . '@' . $domain;
+		
+		// Create user data
+		$user_data = [
+			'user_login' => $username,
+			'user_email' => $email,
+			'user_pass' => wp_generate_password( 12, true ),
+			'display_name' => $persona_data['name'],
+			'nickname' => $persona_data['name'],
+			'first_name' => explode( ' ', $persona_data['name'] )[0],
+			'last_name' => count( explode( ' ', $persona_data['name'] ) ) > 1 ? explode( ' ', $persona_data['name'] )[1] : '',
+			'description' => $persona_data['bio'],
+			'role' => 'author',
+		];
+		
+		// Create the user
+		$user_id = wp_insert_user( $user_data );
+		
+		if ( is_wp_error( $user_id ) ) {
+			Logger::error( 'wordpress_user_creation_failed', 'Failed to create WordPress user for persona', [
+				'persona_name' => $persona_data['name'],
+				'error' => $user_id->get_error_message(),
+			] );
+			return null;
+		}
+		
+		// Add user meta for AI persona identification
+		update_user_meta( $user_id, 'ai_blog_generator_persona', true );
+		update_user_meta( $user_id, 'ai_blog_generator_persona_name', $persona_data['name'] );
+		
+		Logger::info( 'wordpress_user_created', 'WordPress user created for persona', [
+			'persona_name' => $persona_data['name'],
+			'user_id' => $user_id,
+			'username' => $username,
+		] );
+		
+		return $user_id;
+	}
+
+	/**
+	 * Override create method to handle WordPress user creation.
+	 *
+	 * @param array $data Data to create.
+	 * @return int|false Insert ID or false on failure.
+	 */
+	public function create( $data ) {
+		// Check if WordPress user ID is provided
+		if ( empty( $data['wordpress_user_id'] ) ) {
+			// Create WordPress user
+			$user_id = $this->create_wordpress_user_for_persona( $data );
+			if ( $user_id ) {
+				$data['wordpress_user_id'] = $user_id;
+			}
+		}
+		
+		// Call parent create method
+		return parent::create( $data );
+	}
+
+	/**
+	 * Override update method to handle WordPress user creation.
+	 *
+	 * @param int   $id   Record ID.
+	 * @param array $data Data to update.
+	 * @return bool Success status.
+	 */
+	public function update( $id, $data ) {
+		// Get existing persona
+		$existing = $this->find( $id );
+		
+		// Check if we need to create a WordPress user
+		if ( $existing && empty( $existing->wordpress_user_id ) && empty( $data['wordpress_user_id'] ) ) {
+			// Get full persona data for user creation
+			$persona_data = array_merge( (array) $existing, $data );
+			
+			// Create WordPress user
+			$user_id = $this->create_wordpress_user_for_persona( $persona_data );
+			if ( $user_id ) {
+				$data['wordpress_user_id'] = $user_id;
+			}
+		}
+		
+		// Call parent update method
+		return parent::update( $id, $data );
 	}
 } 

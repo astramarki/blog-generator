@@ -809,3 +809,83 @@
 2025-06-21 01:15:04 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
 2025-06-21 01:15:04 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":1}
 2025-06-21 01:15:04 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 01:19:49 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 01:19:50 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 01:25:53 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 01:27:49 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:31:56 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 01:33:10 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:34:12 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 01:36:09 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:36:13 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '5' LIMIT 1","where_clause":"id = '5'","fields":"*"}
+2025-06-21 01:36:13 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":5}
+2025-06-21 01:36:13 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 01:36:20 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 01:36:20 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":3}
+2025-06-21 01:36:20 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 01:36:26 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:36:32 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:36:38 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 01:36:38 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":3}
+2025-06-21 01:36:38 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 01:36:47 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:37:49 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 01:43:50 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 01:44:48 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:49:26 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 01:49:26 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 01:49:30 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:49:34 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:50:46 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:50:52 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:51:30 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-06-21 01:51:30 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":1}
+2025-06-21 01:51:30 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 01:54:29 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 01:56:21 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 01:56:25 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 01:56:25 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":4}
+2025-06-21 01:56:25 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 01:57:46 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-06-21 01:57:46 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":4}
+2025-06-21 01:57:46 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 02:00:09 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:00:09 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:04:12 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 02:06:12 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:06:44 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 02:06:47 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 02:06:47 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":2}
+2025-06-21 02:06:47 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 02:07:11 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-21 02:07:11 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '2' LIMIT 1","where_clause":"id = '2'","fields":"*"}
+2025-06-21 02:07:11 - PERSONA_VALIDATION_FAILED [ERROR]: Invalid tone value - Context: {"provided_tone":"friendly,analytical,inspirational","valid_tones":["professional","friendly","analytical","inspirational","casual","academic"]}
+2025-06-21 02:10:44 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 02:10:44 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":3}
+2025-06-21 02:10:44 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 02:10:47 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 02:10:47 - PERSONA_UPDATED [INFO]: Persona updated - Context: {"persona_id":3,"name":"Marcus"}
+2025-06-21 02:10:47 - AJAX_SUCCESS_UPDATE_PERSONA [INFO]: Persona updated successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona_id"],"response_size":1}
+2025-06-21 02:10:49 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 02:10:53 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 02:10:53 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":3}
+2025-06-21 02:10:53 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 02:11:14 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:11:14 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 02:11:14 - PERSONA_UPDATED [INFO]: Persona updated - Context: {"persona_id":3,"name":"Marcus"}
+2025-06-21 02:11:14 - AJAX_SUCCESS_UPDATE_PERSONA [INFO]: Persona updated successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona_id"],"response_size":1}
+2025-06-21 02:11:16 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":5}
+2025-06-21 02:11:18 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-06-21 02:11:18 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":3}
+2025-06-21 02:11:18 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 02:16:17 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:16:17 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-21 02:19:21 - WORDPRESS_USER_CREATED [INFO]: WordPress user created for persona - Context: {"persona_name":"Jason","user_id":4,"username":"jason"}
+2025-06-21 02:19:21 - PERSONA_CREATED [INFO]: New persona created - Context: {"persona_id":6,"name":"Jason"}
+2025-06-21 02:19:21 - AJAX_SUCCESS_CREATE_PERSONA [INFO]: Persona created successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona_id"],"response_size":1}
+2025-06-21 02:19:21 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-21 02:19:23 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-21 02:19:27 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"personas","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_personas WHERE id = '6' LIMIT 1","where_clause":"id = '6'","fields":"*"}
+2025-06-21 02:19:27 - PERSONA_RETRIEVED [INFO]: Persona data retrieved - Context: {"persona_id":6}
+2025-06-21 02:19:27 - AJAX_SUCCESS_GET_PERSONA [INFO]: Persona loaded successfully. (AI_Blog_Generator\Controllers\Persona_Controller::send_ajax_success) - Context: {"data_keys":["persona"],"response_size":1}
+2025-06-21 02:21:24 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
