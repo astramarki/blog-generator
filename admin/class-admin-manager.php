@@ -89,21 +89,11 @@ class Admin_Manager {
 			[ $this, 'render_settings_page' ]
 		);
 
-		// Blog Ideas submenu.
+		// Idea Generator submenu.
 		add_submenu_page(
 			$this->menu_slug,
-			__( 'Blog Ideas', 'ai-blog-generator' ),
-			__( 'Blog Ideas', 'ai-blog-generator' ),
-			$this->capability,
-			$this->menu_slug . '-ideas',
-			[ $this, 'render_blog_ideas_page' ]
-		);
-
-		// Blog Ideas V2 submenu.
-		add_submenu_page(
-			$this->menu_slug,
-			__( 'Blog Ideas V2', 'ai-blog-generator' ),
-			__( 'Blog Ideas V2', 'ai-blog-generator' ),
+			__( 'Idea Generator', 'ai-blog-generator' ),
+			__( 'Idea Generator', 'ai-blog-generator' ),
 			$this->capability,
 			$this->menu_slug . '-ideas-v2',
 			[ $this, 'render_blog_ideas_v2_page' ]
@@ -117,16 +107,6 @@ class Admin_Manager {
 			$this->capability,
 			$this->menu_slug . '-approved-ideas-v2',
 			[ $this, 'render_approved_ideas_v2_page' ]
-		);
-
-		// Approved Blogs submenu.
-		add_submenu_page(
-			$this->menu_slug,
-			__( 'Approved Blogs', 'ai-blog-generator' ),
-			__( 'Approved Blogs', 'ai-blog-generator' ),
-			$this->capability,
-			$this->menu_slug . '-approved',
-			[ $this, 'render_approved_blogs_page' ]
 		);
 
 		// Drafted Posts submenu.
@@ -251,7 +231,7 @@ class Admin_Manager {
 	 * Localize scripts with necessary data and translations.
 	 */
 	private function localize_scripts() {
-		// Check if we're on the Blog Ideas V2 page specifically
+		// Check if we're on the Idea Generator page specifically
 		$current_page = isset( $_GET['page'] ) ? $_GET['page'] : '';
 		$is_ideas_v2_page = ( $current_page === $this->menu_slug . '-ideas-v2' );
 		
@@ -271,7 +251,7 @@ class Admin_Manager {
 			}
 		}
 		
-		// Exclude Approved Ideas V2 page from Blog Ideas V2 detection
+		// Exclude Approved Ideas V2 page from Idea Generator detection
 		if ( $is_ideas_v2_page && $current_page === $this->menu_slug . '-approved-ideas-v2' ) {
 			$is_ideas_v2_page = false;
 		}
@@ -378,10 +358,10 @@ class Admin_Manager {
 		wp_localize_script( 'ai-blog-generator-brand-features', 'aiBlogAjax', $localized_data );
 
 		
-		// Debug Blog Ideas V2 script localization
+		// Debug Idea Generator script localization
 		$script_registered = wp_script_is( 'ai-blog-ideas-v2', 'registered' );
 		$script_enqueued = wp_script_is( 'ai-blog-ideas-v2', 'enqueued' );
-		Logger::debug( 'script_localization_debug', 'Blog Ideas V2 script status check', [
+		Logger::debug( 'script_localization_debug', 'Idea Generator script status check', [
 			'script_registered' => $script_registered,
 			'script_enqueued' => $script_enqueued,
 			'nonce' => $localized_data['nonce']
@@ -400,9 +380,9 @@ class Admin_Manager {
 		
 		wp_localize_script( 'ai-approved-ideas-v2', 'ai_blog_admin', $localized_data );
 		
-		// If we're on the Blog Ideas V2 page but the script wasn't enqueued, enqueue it now
+		// If we're on the Idea Generator page but the script wasn't enqueued, enqueue it now
 		if ( $is_ideas_v2_page && ! wp_script_is( 'ai-blog-ideas-v2', 'enqueued' ) ) {
-					Logger::debug( 'force_script_enqueue', 'Blog Ideas V2 script not enqueued, forcing enqueue', [
+					Logger::debug( 'force_script_enqueue', 'Idea Generator script not enqueued, forcing enqueue', [
 			'is_ideas_v2_page' => $is_ideas_v2_page,
 			'script_enqueued_before' => wp_script_is( 'ai-blog-ideas-v2', 'enqueued' ),
 			'script_registered_before' => wp_script_is( 'ai-blog-ideas-v2', 'registered' ),
@@ -434,7 +414,7 @@ class Admin_Manager {
 				'6.4.0'
 			);
 			
-			// Enqueue the Blog Ideas V2 script
+			// Enqueue Idea Generator JavaScript
 			wp_enqueue_script(
 				'ai-blog-ideas-v2',
 				AI_BLOG_GENERATOR_PLUGIN_URL . 'assets/js/blog-ideas-v2.js',
@@ -545,9 +525,7 @@ class Admin_Manager {
 			);
 		}
 
-
-
-		// Blog Ideas V2 page - Bootstrap 5 and modern assets
+		// Idea Generator page - Bootstrap 5 and modern assets
 		// WordPress admin hooks can be: ai-blog-generator_page_ai-blog-generator-ideas-v2
 		$ideas_v2_patterns = [
 			$this->menu_slug . '-ideas-v2',
@@ -567,14 +545,14 @@ class Admin_Manager {
 			$is_ideas_v2_page = ( $_GET['page'] === $this->menu_slug . '-ideas-v2' );
 		}
 		
-		// Exclude Approved Ideas V2 page from Blog Ideas V2 detection
+		// Exclude Approved Ideas V2 page from Idea Generator detection
 		if ( $is_ideas_v2_page && isset( $_GET['page'] ) && $_GET['page'] === $this->menu_slug . '-approved-ideas-v2' ) {
 			$is_ideas_v2_page = false;
 		}
 		
 		if ( $is_ideas_v2_page ) {
-			// Debug logging for Blog Ideas V2 page detection
-			Logger::debug( 'page_specific_scripts', 'Blog Ideas V2 page detected, enqueuing scripts', [
+			// Debug logging for Idea Generator page detection
+			Logger::debug( 'page_specific_scripts', 'Idea Generator page detected, enqueuing scripts', [
 				'hook' => $hook,
 				'menu_slug' => $this->menu_slug,
 				'matched_pattern' => $pattern ?? 'page_parameter',
@@ -604,7 +582,7 @@ class Admin_Manager {
 				'6.4.0'
 			);
 			
-			// Enqueue Blog Ideas V2 JavaScript
+			// Enqueue Idea Generator JavaScript
 			wp_enqueue_script(
 				'ai-blog-ideas-v2',
 				AI_BLOG_GENERATOR_PLUGIN_URL . 'assets/js/blog-ideas-v2.js',
@@ -868,30 +846,7 @@ class Admin_Manager {
 	}
 
 	/**
-	 * Render the blog ideas page.
-	 */
-	public function render_blog_ideas_page() {
-		// Check user capabilities.
-		if ( ! current_user_can( $this->capability ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'ai-blog-generator' ) );
-		}
-
-		// Get ideas.
-		$idea_model = new Idea_Model();
-		$ideas = $idea_model->get_with_category( [ 'status' => 'pending' ], 'created_at DESC' );
-		
-		// Get statistics.
-		$statistics = $idea_model->get_statistics();
-		
-		// Get categories for dropdown.
-		$categories = get_categories( [ 'hide_empty' => false ] );
-
-		// Load the view.
-		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'admin/views/blog-ideas.php';
-	}
-
-	/**
-	 * Render the Blog Ideas V2 page.
+	 * Render the Idea Generator page.
 	 */
 	public function render_blog_ideas_v2_page() {
 		// Check user capabilities.
@@ -915,50 +870,6 @@ class Admin_Manager {
 		// Use the dedicated controller instead of loading the view directly
 		$controller = new \AI_Blog_Generator\Controllers\Approved_Ideas_Controller_V2();
 		$controller->render_page();
-	}
-
-	/**
-	 * Render the approved blogs page.
-	 */
-	public function render_approved_blogs_page() {
-		try {
-		// Check user capabilities.
-		if ( ! current_user_can( $this->capability ) ) {
-			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'ai-blog-generator' ) );
-		}
-
-		// Get approved ideas.
-		$idea_model = new Idea_Model();
-		$approved_ideas = $idea_model->get_with_category( [ 'status' => 'approved' ], 'created_at ASC' );
-		
-		// Get generation settings.
-		$posts_per_day = intval( get_option( 'ai_blog_generator_posts_per_day', 999 ) ); // High default instead of hardcoded 2
-		$blog_model = new Blog_Model();
-		$today_generated = $blog_model->count_generated_today();
-		
-		// Check if generation is paused.
-		$generation_paused = get_option( 'ai_blog_generator_generation_paused', false );
-
-			// Get personas for dropdown.
-			$persona_model = new \AI_Blog_Generator\Models\Persona_Model();
-			$personas = $persona_model->get_active_personas();
-			
-			// Get categories for dropdown.
-			$categories = get_categories( [ 'hide_empty' => false ] );
-
-			// Debug logging
-			if ( defined( 'AI_BLOG_GENERATOR_DEBUG' ) && AI_BLOG_GENERATOR_DEBUG ) {
-				error_log( 'Approved blogs page: personas count = ' . ( is_array( $personas ) ? count( $personas ) : 'not array' ) );
-				error_log( 'Approved blogs page: categories count = ' . ( is_array( $categories ) ? count( $categories ) : 'not array' ) );
-			}
-
-		// Load the view.
-		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'admin/views/approved-blogs.php';
-			
-		} catch ( Exception $e ) {
-			error_log( 'Error in render_approved_blogs_page: ' . $e->getMessage() );
-			wp_die( 'An error occurred while loading the approved blogs page. Please check the error logs.' );
-		}
 	}
 
 	/**
@@ -1140,23 +1051,10 @@ class Admin_Manager {
 		add_action( 'wp_ajax_ai_blog_save_settings', [ $this, 'ajax_save_settings' ] );
 		add_action( 'wp_ajax_ai_blog_test_api_connection', [ $this, 'ajax_test_api_connection' ] );
 		
-		// Blog ideas handlers.
-		add_action( 'wp_ajax_ai_blog_approve_idea', [ $this, 'ajax_approve_idea' ] );
-		add_action( 'wp_ajax_ai_blog_deny_idea', [ $this, 'ajax_deny_idea' ] );
-		add_action( 'wp_ajax_ai_blog_bulk_approve_ideas', [ $this, 'ajax_bulk_approve_ideas' ] );
-		add_action( 'wp_ajax_ai_blog_bulk_deny_ideas', [ $this, 'ajax_bulk_deny_ideas' ] );
-		
 		// Blog generation handlers.
 		add_action( 'wp_ajax_ai_blog_generate_post', [ $this, 'ajax_generate_post' ] );
 		add_action( 'wp_ajax_ai_blog_schedule_post', [ $this, 'ajax_schedule_post' ] );
 		add_action( 'wp_ajax_ai_blog_publish_post', [ $this, 'ajax_publish_post' ] );
-		
-		// Approved blogs handlers.
-		add_action( 'wp_ajax_ai_blog_get_approved_ideas', [ $this, 'ajax_get_approved_ideas' ] );
-		add_action( 'wp_ajax_ai_blog_get_idea_for_edit', [ $this, 'ajax_get_idea_for_edit' ] );
-		add_action( 'wp_ajax_ai_blog_update_approved_idea', [ $this, 'ajax_update_approved_idea' ] );
-		add_action( 'wp_ajax_ai_blog_generate_from_approved_idea', [ $this, 'ajax_generate_from_approved_idea' ] );
-		// Removed duplicate handler: add_action( 'wp_ajax_ai_blog_get_generation_status', [ $this, 'ajax_get_generation_status' ] );
 		
 		// Context handlers.
 		add_action( 'wp_ajax_ai_blog_save_context', [ $this, 'ajax_save_context' ] );
@@ -1458,439 +1356,6 @@ class Admin_Manager {
 			] );
 			wp_send_json_error( sprintf( __( 'Connection test failed: %s', 'ai-blog-generator' ), $e->getMessage() ) );
 		}
-	}
-
-
-
-
-
-	/**
-	 * AJAX handler for getting approved ideas.
-	 */
-	public function ajax_get_approved_ideas() {
-		$start_time = $this->start_timer();
-
-		try {
-			// Verify security
-			if ( ! $this->verify_ajax_security() ) {
-				return;
-			}
-
-			$this->log_info( 'get_approved_ideas_start', 'Getting approved ideas for admin page', [
-				'user_id' => get_current_user_id()
-			] );
-
-			// Get approved ideas
-			$idea_model = new \AI_Blog_Generator\Models\Idea_Model();
-			$approved_ideas = $idea_model->get_with_category( [ 'status' => 'approved' ], 'created_at ASC', 100 );
-
-			$this->log_info( 'model_loaded', 'Model Loaded', [
-				'user_id' => get_current_user_id(),
-				'ideas_count' => count( $approved_ideas )
-			] );
-
-			// Get personas for display
-			$persona_model = new \AI_Blog_Generator\Models\Persona_Model();
-			$personas_raw = $persona_model->get_all( [], 'name ASC' );
-			$personas = [];
-			foreach ( $personas_raw as $persona ) {
-				$personas[ $persona->id ] = $persona;
-			}
-
-			// Get categories for display
-			$categories = get_categories();
-			$categories_indexed = [];
-			foreach ( $categories as $category ) {
-				$categories_indexed[ $category->term_id ] = $category->name;
-			}
-
-			// Format ideas for JSON response
-			$formatted_ideas = [];
-			foreach ( $approved_ideas as $idea ) {
-				$id = is_array( $idea ) ? $idea['id'] : $idea->id;
-				$title = is_array( $idea ) ? $idea['title'] : $idea->title;
-				$description = is_array( $idea ) ? $idea['description'] : $idea->description;
-				$category_id = is_array( $idea ) ? $idea['category_id'] : $idea->category_id;
-				$persona_id = is_array( $idea ) ? $idea['persona_id'] : $idea->persona_id;
-				$created_at = is_array( $idea ) ? $idea['created_at'] : $idea->created_at;
-				
-				$category_name = isset( $categories_indexed[ $category_id ] ) ? $categories_indexed[ $category_id ] : __( 'Uncategorized', 'ai-blog-generator' );
-				$persona_name = '';
-				
-				if ( $persona_id && isset( $personas[ $persona_id ] ) ) {
-					$persona = $personas[ $persona_id ];
-					$persona_name = is_array( $persona ) ? $persona['name'] : $persona->name;
-				}
-
-				$formatted_ideas[] = [
-					'id' => $id,
-					'title' => $title,
-					'description' => $description,
-					'category' => $category_name,
-					'category_id' => $category_id,
-					'persona_name' => $persona_name,
-					'persona_id' => $persona_id,
-					'created_at' => $created_at,
-					'date_formatted' => wp_date( get_option( 'date_format' ), strtotime( $created_at ) )
-				];
-			}
-
-			// Get generation statuses (placeholder for now)
-			$generation_statuses = [];
-
-			$this->log_info( 'get_approved_ideas_success', 'Approved ideas retrieved successfully', [
-				'ideas_count' => count( $formatted_ideas )
-			] );
-
-			$this->send_ajax_success( [
-				'ideas' => $formatted_ideas,
-				'generation_statuses' => $generation_statuses,
-				'total_count' => count( $formatted_ideas )
-			], __( 'Approved ideas loaded successfully.', 'ai-blog-generator' ), 'get_approved_ideas' );
-
-		} catch ( \Exception $e ) {
-			$this->handle_ajax_exception( $e, 'get_approved_ideas', [] );
-		}
-
-		$this->end_timer( $start_time, 'get_approved_ideas' );
-	}
-
-	/**
-	 * AJAX handler for getting idea data for editing.
-	 */
-	public function ajax_get_idea_for_edit() {
-		$start_time = $this->start_timer();
-
-		try {
-			// Verify security
-			if ( ! $this->verify_ajax_security() ) {
-				return;
-			}
-
-			// Get idea ID
-			$idea_id = isset( $_POST['idea_id'] ) ? absint( $_POST['idea_id'] ) : 0;
-			if ( ! $idea_id ) {
-				$this->send_ajax_error( __( 'Invalid idea ID.', 'ai-blog-generator' ), [], 'get_idea_for_edit', 'invalid_id' );
-				return;
-			}
-
-			$this->log_info( 'get_idea_for_edit_start', 'Getting idea for editing', [
-				'idea_id' => $idea_id,
-				'user_id' => get_current_user_id()
-			] );
-
-			// Get the idea
-			$idea_model = new \AI_Blog_Generator\Models\Idea_Model();
-			$idea = $idea_model->get( $idea_id );
-
-			if ( ! $idea ) {
-				$this->send_ajax_error( __( 'Idea not found.', 'ai-blog-generator' ), [ 'idea_id' => $idea_id ], 'get_idea_for_edit', 'idea_not_found' );
-				return;
-			}
-
-			if ( $idea['status'] !== 'approved' ) {
-				$this->send_ajax_error( __( 'Only approved ideas can be edited.', 'ai-blog-generator' ), [ 'idea_id' => $idea_id, 'status' => $idea['status'] ], 'get_idea_for_edit', 'not_approved' );
-				return;
-			}
-
-			$this->log_info( 'get_idea_for_edit_success', 'Idea retrieved for editing', [
-				'idea_id' => $idea_id,
-				'idea_title' => $idea['title']
-			] );
-
-			$this->send_ajax_success( [
-				'id' => $idea['id'],
-				'title' => $idea['title'],
-				'description' => $idea['description'],
-				'category_id' => $idea['category_id'],
-				'persona_id' => $idea['persona_id'],
-				'primary_keyword' => isset( $idea['primary_keyword'] ) ? $idea['primary_keyword'] : ''
-			], __( 'Idea data loaded successfully.', 'ai-blog-generator' ), 'get_idea_for_edit' );
-
-		} catch ( \Exception $e ) {
-			$this->handle_ajax_exception( $e, 'get_idea_for_edit', [
-				'idea_id' => $idea_id ?? 0
-			] );
-		}
-
-		$this->end_timer( $start_time, 'get_idea_for_edit' );
-	}
-
-	/**
-	 * AJAX handler for updating approved idea.
-	 */
-	public function ajax_update_approved_idea() {
-		$start_time = $this->start_timer();
-
-		try {
-			// Verify security
-			if ( ! $this->verify_ajax_security() ) {
-				return;
-			}
-
-			// Validate required parameters
-			$params = $this->validate_ajax_params( [ 'idea_id', 'title', 'description' ] );
-			if ( false === $params ) {
-				return;
-			}
-
-			$idea_id = absint( $params['idea_id'] );
-			$generate_after = isset( $_POST['generate_after'] ) && $_POST['generate_after'] === '1';
-
-			// DEBUG: Log the generate_after parameter value
-			$this->log_info( 'debug_generate_after', 'Generate after parameter check', [
-				'generate_after_raw' => $_POST['generate_after'] ?? 'NOT_SET',
-				'generate_after_boolean' => $generate_after,
-				'all_post_data' => $_POST
-			] );
-
-			$this->log_info( 'update_approved_idea_start', 'Starting approved idea update', [
-				'idea_id' => $idea_id,
-				'generate_after' => $generate_after,
-				'user_id' => get_current_user_id()
-			] );
-
-			// Get the idea
-			$idea_model = new \AI_Blog_Generator\Models\Idea_Model();
-			$idea = $idea_model->get( $idea_id );
-
-			if ( ! $idea || $idea['status'] !== 'approved' ) {
-				$this->send_ajax_error( __( 'Idea not found or not approved.', 'ai-blog-generator' ), [ 'idea_id' => $idea_id ], 'update_approved_idea', 'idea_not_found' );
-				return;
-			}
-
-			// Sanitize update data
-			$update_data = [
-				'title' => sanitize_text_field( $params['title'] ),
-				'description' => sanitize_textarea_field( $params['description'] ),
-				'category_id' => isset( $_POST['category_id'] ) ? absint( $_POST['category_id'] ) : null,
-				'persona_id' => isset( $_POST['persona_id'] ) ? absint( $_POST['persona_id'] ) : null,
-				'updated_at' => current_time( 'mysql' )
-			];
-
-			// Remove null values
-			$update_data = array_filter( $update_data, function( $value ) {
-				return $value !== null && $value !== '';
-			} );
-
-			// Update the idea
-			$updated = $idea_model->update( $idea_id, $update_data );
-
-			if ( ! $updated ) {
-				$this->send_ajax_error( __( 'Failed to update idea.', 'ai-blog-generator' ), [ 'idea_id' => $idea_id ], 'update_approved_idea', 'update_failed' );
-				return;
-			}
-
-			$this->log_info( 'approved_idea_updated', 'Approved idea updated successfully', [
-				'idea_id' => $idea_id,
-				'updated_fields' => array_keys( $update_data ),
-				'updated_by' => get_current_user_id()
-			] );
-
-			// Generate blog post if requested
-			if ( $generate_after ) {
-				$this->log_info( 'generate_after_update', 'Starting generation after idea update', [
-					'idea_id' => $idea_id
-				] );
-
-				$blog_controller = new \AI_Blog_Generator\Controllers\Blog_Controller();
-				$generation_result = $blog_controller->generate_from_approved_idea( $idea_id );
-
-				if ( is_wp_error( $generation_result ) ) {
-					$this->log_error( 'generate_after_update_failed', 'Generation failed after idea update', [
-						'idea_id' => $idea_id,
-						'error' => $generation_result->get_error_message()
-					] );
-					
-					// Still return success for the update, but mention generation failure
-					$this->send_ajax_success( [
-						'updated' => true,
-						'generated' => false,
-						'generation_error' => $generation_result->get_error_message()
-					], __( 'Idea updated successfully, but generation failed.', 'ai-blog-generator' ), 'update_approved_idea' );
-				} else {
-					$this->log_info( 'generate_after_update_success', 'Generation started after idea update', [
-						'idea_id' => $idea_id,
-						'blog_id' => $generation_result
-					] );
-
-					$this->send_ajax_success( [
-						'updated' => true,
-						'generated' => true,
-						'blog_id' => $generation_result
-					], __( 'Idea updated and blog generation started successfully.', 'ai-blog-generator' ), 'update_approved_idea' );
-				}
-			} else {
-				$this->send_ajax_success( [
-					'updated' => true,
-					'generated' => false
-				], __( 'Idea updated successfully.', 'ai-blog-generator' ), 'update_approved_idea' );
-			}
-
-		} catch ( \Exception $e ) {
-			$this->handle_ajax_exception( $e, 'update_approved_idea', [
-				'idea_id' => $idea_id ?? 0
-			] );
-		}
-
-		$this->end_timer( $start_time, 'update_approved_idea' );
-	}
-
-	/**
-	 * AJAX handler for generating blog from approved idea.
-	 */
-	public function ajax_generate_from_approved_idea() {
-		$start_time = $this->start_timer();
-
-		try {
-			// Verify security
-			if ( ! $this->verify_ajax_security() ) {
-				return;
-			}
-
-			// Get idea ID
-			$idea_id = isset( $_POST['idea_id'] ) ? absint( $_POST['idea_id'] ) : 0;
-			
-			// DEBUG: Log all POST data to see what's being received
-			$this->log_info( 'debug_ajax_post_data', 'Received POST data for generate_from_approved_idea', [
-				'all_post_data' => $_POST,
-				'extracted_idea_id' => $idea_id,
-				'user_id' => get_current_user_id()
-			] );
-			
-			if ( ! $idea_id ) {
-				$this->send_ajax_error( __( 'Invalid idea ID.', 'ai-blog-generator' ), [], 'generate_from_approved_idea', 'invalid_id' );
-				return;
-			}
-
-			$this->log_info( 'generate_from_approved_idea_start', 'Starting blog generation from approved idea', [
-				'idea_id' => $idea_id,
-				'user_id' => get_current_user_id()
-			] );
-
-			// Use the blog controller to handle the generation
-			$blog_controller = new \AI_Blog_Generator\Controllers\Blog_Controller();
-			$this->log_info( 'blog_controller_initialized', 'Blog Controller Initialized', [
-				'idea_id' => $idea_id,
-				'user_id' => get_current_user_id()
-			] );
-			$result = $blog_controller->generate_from_approved_idea( $idea_id );
-
-			if ( is_wp_error( $result ) ) {
-				$this->log_error( 'generate_from_approved_idea_failed', 'Blog generation failed', [
-					'idea_id' => $idea_id,
-					'error' => $result->get_error_message()
-				] );
-
-				$this->send_ajax_error( $result->get_error_message(), [ 'idea_id' => $idea_id ], 'generate_from_approved_idea', 'generation_failed' );
-				return;
-			}
-
-			$this->log_info( 'generate_from_approved_idea_success', 'Blog generation started successfully', [
-				'idea_id' => $idea_id,
-				'blog_id' => $result
-			] );
-
-			$this->send_ajax_success( [
-				'blog_id' => $result,
-				'idea_id' => $idea_id,
-				'debug_received_idea_id' => $idea_id,
-				'debug_post_data' => $_POST
-			], __( 'Blog generation started successfully. The idea will be removed from this queue once generation is complete.', 'ai-blog-generator' ), 'generate_from_approved_idea' );
-
-		} catch ( \Exception $e ) {
-			$this->handle_ajax_exception( $e, 'generate_from_approved_idea', [
-				'idea_id' => $idea_id ?? 0
-			] );
-		}
-
-		$this->end_timer( $start_time, 'generate_from_approved_idea' );
-	}
-
-	/**
-	 * AJAX handler for getting real-time generation status.
-	 */
-	public function ajax_get_generation_status() {
-		$start_time = $this->start_timer();
-
-		try {
-			// Verify security
-			if ( ! $this->verify_ajax_security() ) {
-				return;
-			}
-
-			// Get idea IDs (can be single or multiple)
-			$idea_ids = isset( $_POST['idea_ids'] ) ? $_POST['idea_ids'] : [];
-			if ( isset( $_POST['idea_id'] ) ) {
-				$idea_ids = [ absint( $_POST['idea_id'] ) ];
-			}
-
-			if ( empty( $idea_ids ) ) {
-				$this->send_ajax_error( __( 'No idea IDs provided.', 'ai-blog-generator' ), [], 'get_generation_status', 'missing_ids' );
-				return;
-			}
-
-			// Sanitize idea IDs
-			$idea_ids = array_map( 'absint', $idea_ids );
-			$idea_ids = array_filter( $idea_ids );
-
-			$this->log_debug( 'get_generation_status_request', 'Generation status requested', [
-				'idea_ids' => $idea_ids,
-				'user_id' => get_current_user_id()
-			] );
-
-			// Get generation status for each idea
-			$content_generator = new \AI_Blog_Generator\Services\Content_Generator();
-			$status_data = [];
-			$completed_ideas = [];
-
-			foreach ( $idea_ids as $idea_id ) {
-				$status = $content_generator->get_generation_status( $idea_id );
-				
-				if ( $status ) {
-					$status_data[ $idea_id ] = $status;
-					
-					// Check if generation is complete
-					if ( $status['stage'] === 'complete' ) {
-						$completed_ideas[] = $idea_id;
-						// Clear the status since it's complete
-						$content_generator->clear_generation_status( $idea_id );
-					}
-				} else {
-					// Check if idea status changed to 'generated' (completed)
-					$idea_model = new \AI_Blog_Generator\Models\Idea_Model();
-					$idea = $idea_model->get( $idea_id );
-					
-					if ( $idea && $idea['status'] === 'generated' ) {
-						$completed_ideas[] = $idea_id;
-						$status_data[ $idea_id ] = [
-							'idea_id' => $idea_id,
-							'stage' => 'complete',
-							'message' => 'Blog post generated successfully!',
-							'progress' => 100,
-							'timestamp' => current_time( 'mysql' )
-						];
-					}
-				}
-			}
-
-			$this->log_debug( 'get_generation_status_response', 'Generation status response prepared', [
-				'statuses_found' => count( $status_data ),
-				'completed_ideas' => $completed_ideas
-			] );
-
-			$this->send_ajax_success( [
-				'statuses' => $status_data,
-				'completed_ideas' => $completed_ideas
-			], 'Generation status retrieved', 'get_generation_status' );
-
-		} catch ( \Exception $e ) {
-			$this->handle_ajax_exception( $e, 'get_generation_status', [
-				'idea_ids' => $idea_ids ?? []
-			] );
-		}
-
-		$this->end_timer( $start_time, 'get_generation_status' );
 	}
 } 
 

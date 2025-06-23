@@ -91,6 +91,8 @@ class Context_Controller {
 		$active = isset( $_POST['active'] ) ? (bool) $_POST['active'] : true;
 		$always_include_content = isset( $_POST['always_include_content'] ) ? (bool) $_POST['always_include_content'] : false;
 		$always_include_images = isset( $_POST['always_include_images'] ) ? (bool) $_POST['always_include_images'] : false;
+		$always_include_avada = isset( $_POST['always_include_avada'] ) ? (bool) $_POST['always_include_avada'] : false;
+		$always_include_html = isset( $_POST['always_include_html'] ) ? (bool) $_POST['always_include_html'] : false;
 
 		if ( empty( $name ) || empty( $type ) || empty( $content ) ) {
 			wp_send_json_error( [ 'message' => __( 'Name, type, and content are required.', 'ai-blog-generator' ) ] );
@@ -119,6 +121,8 @@ class Context_Controller {
 			'active' => $active,
 			'always_include_content' => $always_include_content,
 			'always_include_images' => $always_include_images,
+			'always_include_avada' => $always_include_avada,
+			'always_include_html' => $always_include_html,
 		] );
 
 		if ( ! $context_id ) {
@@ -175,6 +179,8 @@ class Context_Controller {
 				'content' => 'sanitize_textarea_field',
 				'always_include_content' => function( $value ) { return (int) (bool) $value; },
 				'always_include_images' => function( $value ) { return (int) (bool) $value; },
+				'always_include_avada' => function( $value ) { return (int) (bool) $value; },
+				'always_include_html' => function( $value ) { return (int) (bool) $value; },
 			] );
 
 			$context_id = $sanitized_data['context_id'];
@@ -255,6 +261,8 @@ class Context_Controller {
 			// Always include checkbox fields in update data since they're always sent from JS (as 0 or 1)
 			$update_data['always_include_content'] = isset( $_POST['always_include_content'] ) ? (int) $_POST['always_include_content'] : 0;
 			$update_data['always_include_images'] = isset( $_POST['always_include_images'] ) ? (int) $_POST['always_include_images'] : 0;
+			$update_data['always_include_avada'] = isset( $_POST['always_include_avada'] ) ? (int) $_POST['always_include_avada'] : 0;
+			$update_data['always_include_html'] = isset( $_POST['always_include_html'] ) ? (int) $_POST['always_include_html'] : 0;
 
 			// Add updated timestamp
 			$update_data['updated_at'] = current_time( 'mysql' );
@@ -471,53 +479,66 @@ class Context_Controller {
 	 * Get a single context.
 	 */
 	public function get_context() {
-		// Start output buffering to prevent any warnings from contaminating JSON response
-		ob_start();
-		
-		// Verify nonce
-		if ( ! check_ajax_referer( 'ai_blog_admin_nonce', 'nonce', false ) ) {
-			ob_end_clean();
-			wp_send_json_error( [ 'message' => __( 'Security check failed.', 'ai-blog-generator' ) ] );
-		}
-
-		// Check capabilities
-		if ( ! current_user_can( 'manage_options' ) ) {
-			ob_end_clean();
-			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'ai-blog-generator' ) ] );
-		}
-
-		// Validate input
-		$context_id = isset( $_POST['context_id'] ) ? absint( $_POST['context_id'] ) : 0;
-		if ( ! $context_id ) {
-			ob_end_clean();
-			wp_send_json_error( [ 'message' => __( 'Invalid context ID.', 'ai-blog-generator' ) ] );
-		}
+		$start_time = $this->start_timer();
 
 		try {
+			// Verify security using the trait method
+			if ( ! $this->verify_ajax_security() ) {
+				return; // verify_ajax_security already sends the error response
+			}
+
+			// Validate required parameters
+			$params = $this->validate_ajax_params( [ 'context_id' ] );
+			if ( false === $params ) {
+				return; // validate_ajax_params already sends the error response
+			}
+
+			// Sanitize input data
+			$context_id = absint( $params['context_id'] );
+			if ( ! $context_id ) {
+				$this->send_ajax_error( 
+					__( 'Invalid context ID.', 'ai-blog-generator' ),
+					[ 'provided_id' => $params['context_id'] ],
+					'get_context',
+					'invalid_id'
+				);
+				return;
+			}
+
+			$this->log_info( 'get_context_start', 'Starting get context process', [
+				'context_id' => $context_id,
+				'user_id' => get_current_user_id()
+			] );
+
 			// Get context
 			$context = $this->context_model->get( $context_id );
 			if ( ! $context ) {
-				ob_end_clean();
-				wp_send_json_error( [ 'message' => __( 'Context not found.', 'ai-blog-generator' ) ] );
+				$this->send_ajax_error( 
+					__( 'Context not found.', 'ai-blog-generator' ),
+					[ 'context_id' => $context_id ],
+					'get_context',
+					'context_not_found'
+				);
+				return;
 			}
 
-
-
-			// Clean any output buffer content and send success
-			ob_end_clean();
-			wp_send_json_success( [
-				'context' => $context,
-			] );
-			
-		} catch ( Exception $e ) {
-			ob_end_clean();
-			Logger::error( 'Failed to get context', [
+			$this->log_info( 'context_retrieved', 'Context retrieved successfully', [
 				'context_id' => $context_id,
-				'error' => $e->getMessage(),
-				'action' => 'get_context',
+				'context_name' => $context->name,
+				'context_type' => $context->type
 			] );
-			wp_send_json_error( [ 'message' => __( 'Failed to retrieve context.', 'ai-blog-generator' ) ] );
+
+			$this->send_ajax_success( [
+				'context' => $context,
+			], __( 'Context loaded successfully.', 'ai-blog-generator' ), 'get_context' );
+			
+		} catch ( \Exception $e ) {
+			$this->handle_ajax_exception( $e, 'get_context', [
+				'context_id' => $context_id ?? 'unknown'
+			] );
 		}
+
+		$this->end_timer( $start_time, 'get_context' );
 	}
 
 	/**

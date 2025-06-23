@@ -14,6 +14,8 @@ CREATE TABLE psec_ai_blog_contexts (
   usage_flags varchar(255) DEFAULT 'content',
   always_include_content tinyint(1) DEFAULT 0,
   always_include_images tinyint(1) DEFAULT 0,
+  always_include_avada tinyint(1) DEFAULT 0,
+  always_include_html tinyint(1) DEFAULT 0,
   created_at datetime DEFAULT current_timestamp,
   updated_at datetime DEFAULT current_timestamp ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (id)

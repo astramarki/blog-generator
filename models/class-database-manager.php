@@ -712,23 +712,24 @@ class Database_Manager {
 			}
 		}
 
-		// Check if Blog Ideas V2 categories table exists and create it if missing
-		$categories_table_exists = $this->wpdb->get_var( "SHOW TABLES LIKE '" . AI_BLOG_GENERATOR_TABLE_IDEA_CATEGORIES . "'" );
+		// Check if Idea Generator categories table exists and create it if missing
+		$categories_table_exists = $this->wpdb->get_var( "SHOW TABLES LIKE '{$this->wpdb->prefix}ai_blog_idea_categories'" ) === "{$this->wpdb->prefix}ai_blog_idea_categories";
 		
 		if ( ! $categories_table_exists ) {
-			$idea_categories_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_IDEA_CATEGORIES . " (
-				blog_idea_id int(11) DEFAULT NULL,
-				category_id int(11) DEFAULT NULL,
-				KEY blog_idea_id (blog_idea_id),
-				KEY category_id (category_id)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-
-			if ( ! $this->execute_query( $idea_categories_table_sql ) ) {
-				$success = false;
-				Logger::error( 'schema_update', 'Failed to create blog idea categories table', [ 'error' => $this->wpdb->last_error ] );
-			} else {
-				Logger::info( 'schema_update', 'Created blog idea categories table for Blog Ideas V2 functionality' );
-			}
+			$charset_collate = $this->wpdb->get_charset_collate();
+			
+			$sql = "CREATE TABLE {$this->wpdb->prefix}ai_blog_idea_categories (
+				idea_id BIGINT(20) UNSIGNED NOT NULL,
+				category_id BIGINT(20) UNSIGNED NOT NULL,
+				PRIMARY KEY (idea_id, category_id),
+				KEY idx_idea (idea_id),
+				KEY idx_category (category_id)
+			) $charset_collate;";
+			
+			require_once ABSPATH . 'wp-admin/includes/upgrade.php';
+			dbDelta( $sql );
+			
+			Logger::info( 'schema_update', 'Created blog idea categories table for Idea Generator functionality' );
 		}
 
 		return $success;

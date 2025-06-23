@@ -194,10 +194,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<div class="text-center py-5 d-none" id="emptyState">
 							<i class="fas fa-check-circle text-muted" style="font-size: 3rem;"></i>
 							<h5 class="mt-3 text-muted">No approved ideas</h5>
-							<p class="text-muted">Head over to Blog Ideas V2 to approve some ideas for generation!</p>
+							<p class="text-muted">Head over to Idea Generator to approve some ideas for generation!</p>
 							<a href="<?php echo admin_url( 'admin.php?page=ai-blog-generator-ideas-v2' ); ?>" class="btn btn-success">
 								<i class="fas fa-lightbulb me-2"></i>
-								Go to Blog Ideas
+								Go to Idea Generator
 							</a>
 						</div>
 					</div>

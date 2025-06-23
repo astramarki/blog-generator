@@ -315,7 +315,7 @@
                     // Update UI based on action
                     if (action === 'approve') {
                         // Show success message with link to approved blogs page
-                        var approvedPageUrl = self.config.adminUrl + 'admin.php?page=ai-blog-generator-approved-blogs';
+                        var approvedPageUrl = self.config.adminUrl + 'admin.php?page=ai-blog-generator-approved-ideas-v2';
                         var message = data.message + ' <a href="' + approvedPageUrl + '" class="button button-small">View Approved Ideas</a>';
                         self.showSuccess(message);
                         

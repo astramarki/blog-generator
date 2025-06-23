@@ -318,13 +318,12 @@ class AI_Blog_Generator {
 		$idea_controller = new AI_Blog_Generator\Controllers\Idea_Controller();
 		$idea_controller->register_ajax_handlers();
 		
-		// Blog Ideas V2 controller.
-		$blog_ideas_v2_controller = new AI_Blog_Generator\Controllers\Blog_Ideas_Controller_V2();
-		
-		// Log controller initialization for debugging
-		\AI_Blog_Generator\Utilities\Logger::debug( 'controller_initialization', 'Initializing Blog Ideas V2 Controller', [], __CLASS__, __METHOD__ );
-		
-		$blog_ideas_v2_controller->register_ajax_handlers();
+		// Idea Generator controller.
+		if ( class_exists( '\AI_Blog_Generator\Controllers\Blog_Ideas_Controller_V2' ) ) {
+			$blog_ideas_v2_controller = new \AI_Blog_Generator\Controllers\Blog_Ideas_Controller_V2();
+			$blog_ideas_v2_controller->register_ajax_handlers();
+			\AI_Blog_Generator\Utilities\Logger::debug( 'controller_initialization', 'Initializing Idea Generator Controller', [], __CLASS__, __METHOD__ );
+		}
 		
 		// Approved Ideas V2 controller.
 		$approved_ideas_v2_controller = new AI_Blog_Generator\Controllers\Approved_Ideas_Controller_V2();

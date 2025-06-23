@@ -83,7 +83,7 @@ class Blog_Ideas_Controller_V2 {
 	 */
 	public function register_ajax_handlers() {
 		// Log that registration is starting
-		Logger::debug( 'ajax_handlers_registration', 'Starting Blog Ideas V2 AJAX handlers registration', [], __CLASS__, __METHOD__ );
+		Logger::debug( 'ajax_handlers_registration', 'Starting Idea Generator AJAX handlers registration', [], __CLASS__, __METHOD__ );
 
 		// Data retrieval
 		add_action( 'wp_ajax_ai_blog_v2_get_pending_ideas', [ $this, 'ajax_get_pending_ideas' ] );
@@ -103,9 +103,9 @@ class Blog_Ideas_Controller_V2 {
 		add_action( 'wp_ajax_ai_blog_v2_bulk_deny_ideas', [ $this, 'ajax_bulk_deny_ideas' ] );
 
 		// Log that registration completed
-		Logger::debug( 'ajax_handlers_registration_completed', 'Blog Ideas V2 AJAX handlers registered successfully', [], __CLASS__, __METHOD__ );
+		Logger::debug( 'ajax_handlers_registration_completed', 'Idea Generator AJAX handlers registered successfully', [], __CLASS__, __METHOD__ );
 
-		Logger::info( 'blog_ideas_v2_ajax_registered', 'All Blog Ideas V2 AJAX handlers registered' );
+		Logger::info( 'blog_ideas_v2_ajax_registered', 'All Idea Generator AJAX handlers registered' );
 	}
 
 	/**

@@ -3805,34 +3805,61 @@ foreach ($contexts as $context) {
 - Always include checkboxes now only show for their respective usage categories
 - Contexts are now specific to their usage category to prevent mixing incompatible contexts
 
-## [Unreleased]
-
-### Fixed
-- Fixed fatal error in Product Controller: changed `verify_ajax_request()` to `verify_ajax_security()` to match the Ajax_Handler trait method name
-- Fixed product modals not showing: changed from `.show()` to `.addClass('ai-blog-modal-active')` to match the CSS implementation
-- Fixed fatal error in Product_Model: replaced non-existent `get_by()` method calls with direct database queries in validate() and import_from_woocommerce() methods
-- Fixed Product_Model table name: changed from `$table_name` to `$table` property to match base Model class, and use the correct table constant AI_BLOG_GENERATOR_TABLE_PRODUCTS
-- Fixed Product_Model database operations: overrode create(), update(), delete(), get(), get_all(), and count() methods to use direct wpdb queries since Database_Manager doesn't include products tables in its table map
-- Fixed method signature compatibility: updated get_all() and count() methods to match parent Model class signatures, added get_all_with_args() for custom query arguments
-
-## [1.7.1] - 2024-01-XX
-
-### Added
-- Product seed images management system
-  - New database table `wp_ai_blog_generator_product_seed_images` for storing product-specific seed images
-  - Seed images must be PNG files (enforced validation)
-  - Support for multiple seed images per product with drag-and-drop ordering
-  - AJAX handlers for adding, removing, and reordering seed images
-  - Integration with WordPress media library
-  - Automatic thumbnail generation for seed images
+## [Unreleased] - 2025-01-21
 
 ### Changed
-- Updated Product_Model with seed image management methods
-- Enhanced Product_Controller with seed image AJAX handlers
-- Modified plugin activator to create seed images table on activation
+- Renamed "Blog Ideas V2" page to "Idea Generator"
+  - Updated menu title and page header
+  - Updated all comments and documentation references
+  - Maintained same URL slug (?page=ai-blog-generator-ideas-v2) for backward compatibility
+  - Updated JavaScript console logs to reflect new name
 
-### Technical
-- Added `get_product_seed_images()`, `add_seed_image()`, `remove_seed_image()`, and `update_seed_image_order()` methods to Product_Model
-- Added `get_all_seed_images()` method for retrieving all seed images across products
-- Implemented PNG file validation at both model and controller levels
-- Added proper logging for all seed image operations
+### Removed
+- Removed "Approved Blogs" page at ?page=ai-blog-generator-approved
+  - Deleted menu item from Admin_Manager
+  - Removed render_approved_blogs_page() method
+  - Removed AJAX handlers: ajax_get_approved_ideas(), ajax_get_idea_for_edit(), ajax_update_approved_idea(), ajax_generate_from_approved_idea(), ajax_get_generation_status()
+  - Deleted view files: approved-blogs.php and approved-blogs-new.php
+  - Updated JavaScript redirect to point to Approved Ideas V2 page instead
+  - Note: Approved Ideas V2 page at ?page=ai-blog-generator-approved-ideas-v2 remains unchanged
+
+- Removed "Blog Ideas" page at ?page=ai-blog-generator-ideas (old version)
+  - Deleted menu item from Admin_Manager
+  - Removed render_blog_ideas_page() method
+  - Removed AJAX handler registrations: ajax_approve_idea(), ajax_deny_idea(), ajax_bulk_approve_ideas(), ajax_bulk_deny_ideas() (methods didn't exist)
+  - Deleted view file: blog-ideas.php
+  - Note: Blog Ideas V2 page at ?page=ai-blog-generator-ideas-v2 remains unchanged
+
+## [Latest] - 2024-01-16
+
+### Changed
+- Updated personas edit modal to use mutually exclusive radio buttons for content generation format (HTML or Avada)
+  - Replaced separate checkboxes with radio button group
+  - Added modern styling for radio buttons with visual feedback
+  - Made content format selection required
+  - Added validation to ensure one format is always selected
+  - Updated JavaScript to properly handle radio button values when saving/loading
+
+### Added
+- Format-specific context requirements for Avada and HTML layouts
+  - New database fields: `always_include_avada` and `always_include_html` in contexts table
+  - Contexts can be marked as required for specific content formats
+  - When selecting Avada or HTML format in personas, required contexts are automatically checked
+  - Required contexts are visually indicated and cannot be unchecked
+  - AJAX endpoint to fetch format-specific required contexts
+
+### Fixed
+- Fixed security check failure in contexts edit functionality by updating get_context method to use Ajax_Handler trait
+- Made Avada and HTML context options mutually exclusive - checking one automatically unchecks the other
+
+### Added
+- Added debugging to contexts.js to investigate context update failures
+  - Added console logging to track context ID field value in saveContext
+  - Added console logging to verify context ID is set correctly in populateModal
+  - Added validation to prevent sending update request without context_id
+  - Added extra logging for form data keys and context_id value
+  - Issue: Context updates failing with "Failed to update context" error due to missing context_id parameter
+- Added automatic checkbox management for context generation options
+  - When "Always include in content generation" is checked, both Avada and HTML options are automatically checked and disabled
+  - When unchecked, both options are re-enabled and maintain their mutual exclusivity
+  - Form reset and modal population properly handle the disabled states

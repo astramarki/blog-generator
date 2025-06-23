@@ -275,19 +275,26 @@ $contexts = $context_model->get_active();
 							
 							<tr>
 								<th scope="row">
-									<label><?php esc_html_e( 'Layout Settings', 'ai-blog-generator' ); ?></label>
+									<label><?php esc_html_e( 'Content Generation Format', 'ai-blog-generator' ); ?> <span class="required">*</span></label>
 								</th>
 								<td>
 									<fieldset>
-										<label style="display: block; margin-bottom: 10px;">
-											<input type="checkbox" id="persona-uses-avada-layouts" name="uses_avada_layouts" value="1">
-											<?php esc_html_e( 'Use Avada layouts', 'ai-blog-generator' ); ?>
-										</label>
-										<label style="display: block; margin-bottom: 10px;">
-											<input type="checkbox" id="persona-uses-plain-html" name="uses_plain_html" value="1">
-											<?php esc_html_e( 'Use plain HTML (no page builder)', 'ai-blog-generator' ); ?>
-										</label>
+										<legend class="screen-reader-text"><?php esc_html_e( 'Select Content Generation Format', 'ai-blog-generator' ); ?></legend>
+										<div class="content-format-options">
+											<input type="radio" id="persona-uses-plain-html" name="content_format" value="html" checked>
+											<label for="persona-uses-plain-html">
+												<strong><?php esc_html_e( 'HTML Format', 'ai-blog-generator' ); ?></strong>
+												<span style="color: #646970; font-size: 12px; display: block; margin-top: 4px;"><?php esc_html_e( 'Generate standard HTML content without page builder elements', 'ai-blog-generator' ); ?></span>
+											</label>
+											
+											<input type="radio" id="persona-uses-avada-layouts" name="content_format" value="avada">
+											<label for="persona-uses-avada-layouts">
+												<strong><?php esc_html_e( 'Avada Layout', 'ai-blog-generator' ); ?></strong>
+												<span style="color: #646970; font-size: 12px; display: block; margin-top: 4px;"><?php esc_html_e( 'Generate content with Avada page builder elements and shortcodes', 'ai-blog-generator' ); ?></span>
+											</label>
+										</div>
 									</fieldset>
+									<p class="description"><?php esc_html_e( 'Choose how content should be generated. This setting is required and determines the output format.', 'ai-blog-generator' ); ?></p>
 								</td>
 							</tr>
 							
@@ -859,14 +866,11 @@ $contexts = $context_model->get_active();
 .form-table input[type="text"],
 .form-table select,
 .form-table textarea {
-	width: 100%;
-	max-width: 700px;
-	padding: 12px 16px;
-	font-size: 15px;
-	line-height: 1.5;
-	border: 2px solid #e2e8f0;
-	border-radius: 10px;
-	background: #ffffff;
+	background: #f8fafc;
+	border: 2px solid #e5e7eb;
+	border-radius: 8px;
+	padding: 10px 14px;
+	font-size: 14px;
 	transition: all 0.2s ease;
 	color: #1e293b;
 }
@@ -1254,6 +1258,70 @@ body.wp-admin::-webkit-scrollbar-thumb:hover {
 		border-bottom: 1px solid #f1f5f9;
 	}
 }
+
+/* Content Format Radio Buttons */
+input[name="content_format"] {
+	display: none;
+}
+
+input[name="content_format"] + label {
+	display: block;
+	padding: 16px 20px;
+	background: #f8fafc;
+	border: 2px solid #e5e7eb;
+	border-radius: 12px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+	position: relative;
+	padding-left: 48px;
+	margin-bottom: 12px;
+}
+
+input[name="content_format"] + label::before {
+	content: '';
+	position: absolute;
+	left: 20px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 20px;
+	height: 20px;
+	border: 2px solid #cbd5e1;
+	border-radius: 50%;
+	background: white;
+	transition: all 0.2s ease;
+}
+
+input[name="content_format"] + label::after {
+	content: '';
+	position: absolute;
+	left: 26px;
+	top: 50%;
+	transform: translateY(-50%);
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: #3b82f6;
+	opacity: 0;
+	transition: all 0.2s ease;
+}
+
+input[name="content_format"]:checked + label {
+	background: #eff6ff;
+	border-color: #3b82f6;
+}
+
+input[name="content_format"]:checked + label::before {
+	border-color: #3b82f6;
+}
+
+input[name="content_format"]:checked + label::after {
+	opacity: 1;
+}
+
+input[name="content_format"] + label:hover {
+	background: #f1f5f9;
+	border-color: #94a3b8;
+}
 </style>
 
 <script>
@@ -1280,6 +1348,67 @@ jQuery(document).ready(function($) {
 	
 	console.log('Modal element found:', $modal.length > 0);
 	console.log('Add button found:', $('#add-new-persona').length > 0);
+
+	// Handle content format change
+	$(document).on('change', 'input[name="content_format"]', function() {
+		updateRequiredContexts($(this).val());
+	});
+
+	// Function to update required contexts based on format selection
+	function updateRequiredContexts(format) {
+		console.log('Updating required contexts for format:', format);
+		
+		// Make AJAX call to get required contexts
+		$.post(ajaxurl, {
+			action: 'ai_blog_get_format_contexts',
+			format: format,
+			nonce: aiBlogAjax.nonce
+		})
+		.done(function(response) {
+			if (response.success && response.data.contexts) {
+				// First, uncheck and enable all context checkboxes
+				$('.persona-context-checkbox').each(function() {
+					var $label = $(this).closest('label');
+					// Only modify if not already manually checked
+					if (!$(this).data('manually-checked')) {
+						$(this).prop('disabled', false);
+						$label.removeClass('required-context').css('opacity', '1');
+					}
+				});
+				
+				// Then check and disable the required contexts
+				response.data.contexts.forEach(function(contextId) {
+					var $checkbox = $(`.persona-context-checkbox[value="${contextId}"]`);
+					if ($checkbox.length) {
+						$checkbox.prop('checked', true).prop('disabled', true);
+						var $label = $checkbox.closest('label');
+						$label.addClass('required-context').css({
+							'opacity': '0.8',
+							'background-color': '#f0f0f0',
+							'padding': '4px 8px',
+							'border-radius': '4px',
+							'display': 'block',
+							'margin-bottom': '8px'
+						});
+						// Add a note about why it's required
+						if (!$label.find('.required-note').length) {
+							$label.append('<span class="required-note" style="font-size: 11px; color: #666; display: block; margin-top: 4px;">(Required for ' + (format === 'avada' ? 'Avada' : 'HTML') + ' format)</span>');
+						}
+					}
+				});
+			}
+		})
+		.fail(function() {
+			console.error('Failed to fetch required contexts');
+		});
+	}
+
+	// Track manually checked contexts
+	$(document).on('change', '.persona-context-checkbox', function() {
+		if (!$(this).prop('disabled')) {
+			$(this).data('manually-checked', $(this).prop('checked'));
+		}
+	});
 
 	// Show add new persona modal
 	$('#add-new-persona').on('click', function(e) {
@@ -1385,6 +1514,12 @@ jQuery(document).ready(function($) {
 			return;
 		}
 		
+		// Validate content format selection
+		if (!$('input[name="content_format"]:checked').length) {
+			showNotice('error', 'Please select a content generation format (HTML or Avada).');
+			return;
+		}
+		
 		$button.prop('disabled', true).text('Saving...');
 		
 		const formData = {
@@ -1396,7 +1531,7 @@ jQuery(document).ready(function($) {
 		$form.find('input, textarea, select').each(function() {
 			const $field = $(this);
 			const name = $field.attr('name');
-			if (name && name !== 'tones[]' && name !== 'contexts[]') {
+			if (name && name !== 'tones[]' && name !== 'contexts[]' && name !== 'content_format') {
 				if ($field.attr('type') === 'checkbox') {
 					formData[name] = $field.is(':checked') ? 1 : 0;
 				} else if ($field.attr('type') === 'number') {
@@ -1420,6 +1555,11 @@ jQuery(document).ready(function($) {
 			selectedContexts.push($(this).val());
 		});
 		formData.include_contexts = selectedContexts.join(',');
+		
+		// Handle content format radio buttons
+		const contentFormat = $('input[name="content_format"]:checked').val();
+		formData.uses_plain_html = contentFormat === 'html' ? 1 : 0;
+		formData.uses_avada_layouts = contentFormat === 'avada' ? 1 : 0;
 		
 		$.post(ajaxurl, formData)
 		.done(function(response) {
@@ -1461,6 +1601,8 @@ jQuery(document).ready(function($) {
 			$modalTitle.text('Add New Persona');
 			$form[0].reset();
 			$personaId.val('');
+			// Update required contexts for default HTML format
+			updateRequiredContexts('html');
 			// Force show the modal
 			$modal.show();
 			$modal.css({
@@ -1515,8 +1657,15 @@ jQuery(document).ready(function($) {
 					$('#persona-uses-seed-images').prop('checked', persona.uses_seed_mages);
 					$('#persona-number-of-images').val(persona.number_of_images || '');
 					$('#persona-uses-charts').prop('checked', persona.uses_charts);
-					$('#persona-uses-avada-layouts').prop('checked', persona.uses_avada_layouts);
-					$('#persona-uses-plain-html').prop('checked', persona.uses_plain_html);
+					
+					// Set content format radio button
+					if (persona.uses_avada_layouts) {
+						$('input[name="content_format"][value="avada"]').prop('checked', true);
+						updateRequiredContexts('avada');
+					} else {
+						$('input[name="content_format"][value="html"]').prop('checked', true);
+						updateRequiredContexts('html');
+					}
 					
 					// Handle contexts
 					$('.persona-context-checkbox').prop('checked', false);

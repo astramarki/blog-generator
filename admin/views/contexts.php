@@ -215,6 +215,26 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<?php esc_html_e( 'When checked, this context will be included in all image generation, regardless of persona selection.', 'ai-blog-generator' ); ?>
 					</p>
 				</div>
+
+				<div class="ai-blog-form-group">
+					<label class="ai-blog-checkbox-label">
+						<input type="checkbox" id="context-always-avada" name="always_include_avada" value="1">
+						<?php esc_html_e( 'Always include with Avada Builder Layouts', 'ai-blog-generator' ); ?>
+					</label>
+					<p class="description">
+						<?php esc_html_e( 'When checked, this context will be automatically included when generating content with Avada layouts.', 'ai-blog-generator' ); ?>
+					</p>
+				</div>
+				
+				<div class="ai-blog-form-group">
+					<label class="ai-blog-checkbox-label">
+						<input type="checkbox" id="context-always-html" name="always_include_html" value="1">
+						<?php esc_html_e( 'Always include with HTML Layouts', 'ai-blog-generator' ); ?>
+					</label>
+					<p class="description">
+						<?php esc_html_e( 'When checked, this context will be automatically included when generating content with HTML format.', 'ai-blog-generator' ); ?>
+					</p>
+				</div>
 			</div>
 			
 			<div class="ai-blog-modal-footer">

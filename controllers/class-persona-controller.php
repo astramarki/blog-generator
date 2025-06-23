@@ -63,6 +63,9 @@ class Persona_Controller {
 		
 		// Get all personas
 		add_action( 'wp_ajax_ai_blog_get_personas', [ $this, 'get_personas' ] );
+		
+		// Get format-specific contexts
+		add_action( 'wp_ajax_ai_blog_get_format_contexts', [ $this, 'get_format_contexts' ] );
 	}
 
 	/**
@@ -433,5 +436,56 @@ class Persona_Controller {
 		}
 
 		$this->end_timer( $start_time, 'get_personas' );
+	}
+
+	/**
+	 * Get required contexts for a specific format (Avada or HTML).
+	 */
+	public function get_format_contexts() {
+		$start_time = $this->start_timer();
+
+		try {
+			// Verify security
+			if ( ! $this->verify_ajax_security() ) {
+				return;
+			}
+
+			// Get format parameter
+			$format = isset( $_POST['format'] ) ? sanitize_key( $_POST['format'] ) : '';
+			
+			if ( ! in_array( $format, [ 'avada', 'html' ], true ) ) {
+				$this->send_ajax_error( __( 'Invalid format specified.', 'ai-blog-generator' ) );
+				return;
+			}
+
+			// Get context model
+			$context_model = new \AI_Blog_Generator\Models\Context_Model();
+			
+			// Get required contexts based on format
+			if ( $format === 'avada' ) {
+				$contexts = $context_model->get_always_include_avada();
+			} else {
+				$contexts = $context_model->get_always_include_html();
+			}
+
+			// Extract context IDs
+			$context_ids = array_column( $contexts, 'id' );
+
+			Logger::info( 'format_contexts_retrieved', 'Format-specific contexts retrieved', [
+				'format' => $format,
+				'context_count' => count( $context_ids ),
+				'context_ids' => $context_ids,
+			] );
+
+			$this->send_ajax_success( [
+				'contexts' => $context_ids,
+				'format' => $format,
+			], __( 'Required contexts loaded successfully.', 'ai-blog-generator' ), 'get_format_contexts' );
+
+		} catch ( \Exception $e ) {
+			$this->handle_ajax_exception( $e, 'get_format_contexts' );
+		}
+
+		$this->end_timer( $start_time, 'get_format_contexts' );
 	}
 } 

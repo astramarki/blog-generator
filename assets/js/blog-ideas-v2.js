@@ -1,7 +1,7 @@
 /**
- * Blog Ideas V2 JavaScript
+ * Idea Generator JavaScript
  * 
- * Handles all AJAX interactions and UI updates for the Blog Ideas V2 interface.
+ * Handles all AJAX interactions and UI updates for the Idea Generator interface.
  * Provides extensive console logging for debugging and feedback.
  */
 
@@ -15,7 +15,7 @@
 
     // Initialize when document is ready
     $(document).ready(function() {
-        console.log('🚀 Blog Ideas V2 initialized');
+        console.log('🚀 Idea Generator initialized');
         
         // Initialize the interface
         initializeBlogIdeasV2();
@@ -29,10 +29,10 @@
     });
 
     /**
-     * Initialize the Blog Ideas V2 interface
+     * Initialize the Idea Generator interface
      */
     function initializeBlogIdeasV2() {
-        console.log('📋 Initializing Blog Ideas V2 interface');
+        console.log('📋 Initializing Idea Generator interface');
         
         // Set up AJAX error handling
         setupAjaxErrorHandling();

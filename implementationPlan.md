@@ -19,10 +19,15 @@ ai-blog-generator/
 │   ├── views/
 │   │   ├── settings-page.php
 │   │   ├── blog-ideas-page.php
+│   │   ├── blog-ideas-view-v2.php (Idea Generator page)
+│   │   ├── approved-ideas-view-v2.php
 │   │   ├── approved-blogs-page.php
 │   │   ├── drafted-posts-page.php
 │   │   ├── published-posts-page.php
 │   │   ├── contexts-page.php
+│   │   ├── personas-page.php
+│   │   ├── products-page.php
+│   │   ├── brand-features-page.php
 │   │   ├── logs-page.php
 │   │   └── costs-dashboard-page.php
 │   └── assets/
@@ -241,11 +246,12 @@ ai-blog-generator/
 **Status: COMPLETED ✅**
 
 #### Context Management System (COMPLETED ✅)
-- ✅ **Database Table**: `ai_blog_contexts` with fields: id, name, type, content, seed_image_id, active, timestamps
-- ✅ **Context Types**: general, products, seo, keywords, image
+- ✅ **Database Table**: `ai_blog_contexts` with fields: id, name, type, content, seed_image_id, active, timestamps, always_include_avada, always_include_html
+- ✅ **Context Types**: general, products, seo, keywords, image, layout
 - ✅ **CRUD Operations**: Create, read, update, delete contexts via admin interface
 - ✅ **Active/Inactive States**: Toggle context availability for content generation
 - ✅ **Context Integration**: Use contexts to enhance AI prompts and provide consistent messaging
+- ✅ **Format-Specific Requirements**: Contexts can be marked as required for Avada or HTML formats
 
 #### Admin Interface (COMPLETED ✅)
 - ✅ **Contexts Page**: Full admin interface at `/wp-admin/admin.php?page=ai-blog-generator-contexts`
@@ -286,6 +292,7 @@ ai-blog-generator/
    - Delete with confirmation
    - Toggle active status
    - Default personas seeding
+   - Mutually exclusive content format selection (HTML or Avada)
 
 3. **Persona Selection Algorithm**
    - Analyze idea content and keywords
@@ -299,6 +306,7 @@ ai-blog-generator/
    - Adapt writing style based on persona
    - Maintain persona voice consistency
    - Track which persona wrote what
+   - Generate content in selected format (HTML or Avada)
 
 ### Phase 7: Products Management 
 **Status: COMPLETED ✅**

@@ -99,6 +99,44 @@
                 self.toggleInclusionOptions(usage);
             });
 
+            // Handle mutual exclusion of Avada and HTML checkboxes
+            $(document).on('change', '#context-always-avada', function() {
+                if ($(this).is(':checked')) {
+                    $('#context-always-html').prop('checked', false);
+                    console.log('Avada checked, unchecking HTML');
+                }
+            });
+
+            $(document).on('change', '#context-always-html', function() {
+                if ($(this).is(':checked')) {
+                    $('#context-always-avada').prop('checked', false);
+                    console.log('HTML checked, unchecking Avada');
+                }
+            });
+
+            // Handle "Always include in content generation" checkbox
+            $(document).on('change', '#context-always-content', function() {
+                var isChecked = $(this).is(':checked');
+                console.log('Always include in content generation changed:', isChecked);
+                
+                if (isChecked) {
+                    // Check and disable both Avada and HTML options
+                    $('#context-always-avada').prop('checked', true).prop('disabled', true);
+                    $('#context-always-html').prop('checked', true).prop('disabled', true);
+                    console.log('Content generation checked - enabled and disabled Avada and HTML');
+                } else {
+                    // Enable the options and maintain mutual exclusion
+                    $('#context-always-avada').prop('disabled', false);
+                    $('#context-always-html').prop('disabled', false);
+                    
+                    // Since they're mutually exclusive, uncheck one of them
+                    if ($('#context-always-avada').is(':checked') && $('#context-always-html').is(':checked')) {
+                        $('#context-always-html').prop('checked', false);
+                    }
+                    console.log('Content generation unchecked - enabled Avada and HTML options');
+                }
+            });
+
             // Handle modal backdrop click
             $(document).on('click', '#context-modal', function(e) {
                 if ($(e.target).is('#context-modal')) {
@@ -332,10 +370,16 @@
             var self = this;
             var $form = $('#context-form');
             var contextId = $('#context-id').val();
+            
+            // Add debugging to check the value
+            console.log('AI Blog Contexts: Context ID field value:', contextId);
+            console.log('AI Blog Contexts: Context ID field element:', $('#context-id'));
+            console.log('AI Blog Contexts: Context ID field length:', $('#context-id').length);
+            
             var isEdit = contextId && contextId !== '';
             var action = isEdit ? 'update_context' : 'create_context';
             
-            console.log('AI Blog Contexts: Saving context, action:', action, 'ID:', contextId);
+            console.log('AI Blog Contexts: Saving context, action:', action, 'ID:', contextId, 'isEdit:', isEdit);
             
             // Validate form
             if (!this.validateForm($form)) {
@@ -349,16 +393,27 @@
                 type: $('#context-type').val(),
                 usage_flags: $('#context-usage').val(),
                 content: $('#context-content').val(),
-
                 always_include_content: $('#context-always-content').is(':checked') ? 1 : 0,
-                always_include_images: $('#context-always-images').is(':checked') ? 1 : 0
+                always_include_images: $('#context-always-images').is(':checked') ? 1 : 0,
+                always_include_avada: $('#context-always-avada').is(':checked') ? 1 : 0,
+                always_include_html: $('#context-always-html').is(':checked') ? 1 : 0
             };
             
             if (isEdit) {
                 formData.context_id = contextId;
+                
+                // Extra check to ensure context_id is included
+                if (!formData.context_id) {
+                    console.error('AI Blog Contexts: Context ID is empty for edit operation!');
+                    self.showError('Error: Context ID is missing. Please try again.');
+                    $submitBtn.text(originalText).prop('disabled', false);
+                    return;
+                }
             }
             
             console.log('Form data:', formData);
+            console.log('Form data keys:', Object.keys(formData));
+            console.log('Context ID in form data:', formData.context_id);
             
             // Show loading state
             var $submitBtn = $form.find('button[type="submit"]');
@@ -412,6 +467,11 @@
             if (mode === 'edit' && context) {
                 $title.text('Edit Context');
                 $('#context-id').val(context.id);
+                
+                // Add debugging to verify the ID is set
+                console.log('AI Blog Contexts: Setting context ID to:', context.id);
+                console.log('AI Blog Contexts: Context ID field after setting:', $('#context-id').val());
+                
                 $('#context-name').val(context.name);
                 $('#context-type').val(context.type);
                 $('#context-usage').val(context.usage_flags || 'content');
@@ -419,6 +479,17 @@
 
                 $('#context-always-content').prop('checked', parseInt(context.always_include_content) === 1);
                 $('#context-always-images').prop('checked', parseInt(context.always_include_images) === 1);
+                $('#context-always-avada').prop('checked', parseInt(context.always_include_avada) === 1);
+                $('#context-always-html').prop('checked', parseInt(context.always_include_html) === 1);
+                
+                // Handle disabled state for Avada/HTML based on content checkbox
+                if (parseInt(context.always_include_content) === 1) {
+                    $('#context-always-avada').prop('disabled', true);
+                    $('#context-always-html').prop('disabled', true);
+                } else {
+                    $('#context-always-avada').prop('disabled', false);
+                    $('#context-always-html').prop('disabled', false);
+                }
             } else {
                 $title.text('Add New Context');
                 $('#context-id').val('');
@@ -428,17 +499,19 @@
                 $('#context-content').val('');
                 $('#context-always-content').prop('checked', false);
                 $('#context-always-images').prop('checked', false);
+                $('#context-always-avada').prop('checked', false);
+                $('#context-always-html').prop('checked', false);
+                
+                // Enable Avada/HTML checkboxes for new contexts
+                $('#context-always-avada').prop('disabled', false);
+                $('#context-always-html').prop('disabled', false);
             }
-            
-
             
             // Show/hide inclusion options based on usage category
             this.toggleInclusionOptions($('#context-usage').val());
             
             console.log('Modal populated successfully');
         },
-
-
 
         /**
          * Update context card in UI
@@ -619,6 +692,8 @@
             // Reset any checkboxes to their default state
             $('#context-always-content').prop('checked', false);
             $('#context-always-images').prop('checked', false);
+            $('#context-always-avada').prop('checked', false).prop('disabled', false);
+            $('#context-always-html').prop('checked', false).prop('disabled', false);
         },
 
         /**

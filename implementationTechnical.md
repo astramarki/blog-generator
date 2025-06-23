@@ -26,12 +26,15 @@ ai-blog-generator/
 │   ├── views/
 │   │   ├── settings.php
 │   │   ├── blog-ideas.php
+│   │   ├── blog-ideas-view-v2.php (Idea Generator page)
+│   │   ├── approved-ideas-view-v2.php
 │   │   ├── approved-blogs.php
 │   │   ├── drafted-posts.php
 │   │   ├── published-posts.php
 │   │   ├── contexts.php
 │   │   ├── personas.php
 │   │   ├── products.php
+│   │   ├── brand-features.php#004560
 │   │   ├── logs.php
 │   │   └── costs-dashboard.php
 │   └── class-admin-manager.php (592 lines)
@@ -1188,12 +1191,16 @@ CREATE TABLE wp_ai_blog_personas (
     writing_style TEXT,
     tone VARCHAR(50) DEFAULT 'professional',
     active TINYINT(1) DEFAULT 1,
+    uses_avada_layouts TINYINT(1) DEFAULT 0,
+    uses_plain_html TINYINT(1) DEFAULT 1,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     KEY idx_active (active),
     KEY idx_name (name)
 );
 ```
+
+**Note**: The `uses_avada_layouts` and `uses_plain_html` fields are mutually exclusive. In the UI, they are presented as radio buttons for "Content Generation Format" where users must select either HTML Format or Avada Layout.
 
 #### Schema Updates
 - **Ideas Table**: Add `persona_id` column for persona assignment
@@ -1292,6 +1299,38 @@ private function build_content_prompt_with_persona($idea, $contexts, $persona) {
 ```
 
 ### Admin Interface
+
+#### Content Format Selection
+The personas edit modal includes a required "Content Generation Format" field with two mutually exclusive options:
+
+1. **HTML Format** - Generate standard HTML content without page builder elements
+2. **Avada Layout** - Generate content with Avada page builder elements and shortcodes
+
+**Implementation Details:**
+- Radio button group ensures only one format can be selected
+- HTML format is selected by default for new personas
+- JavaScript validation prevents saving without a selection
+- Modern CSS styling with visual feedback for selected option
+- Database stores selection as two boolean fields for backward compatibility
+
+#### Format-Specific Context Requirements
+Contexts can be marked as required for specific content generation formats:
+
+**Database Fields:**
+- `always_include_avada` - Context is required when generating Avada layouts
+- `always_include_html` - Context is required when generating HTML content
+- Note: These options are mutually exclusive in the UI - selecting one automatically deselects the other
+
+**UI Behavior:**
+- When a persona selects a content format, required contexts are automatically checked
+- Required contexts are visually indicated with gray background and "(Required for [format])" label
+- Required contexts cannot be unchecked while that format is selected
+- AJAX endpoint `ai_blog_get_format_contexts` fetches format-specific contexts
+
+**Implementation:**
+- Context model includes `get_always_include_avada()` and `get_always_include_html()` methods
+- Persona controller handles format context requests
+- JavaScript dynamically updates context checkboxes based on format selection
 
 #### Personas Management Page (admin/views/personas.php)
 ```php
@@ -2264,3 +2303,41 @@ window.aiBlogProducts = {
 This implementation provides a robust, user-friendly products management system that seamlessly integrates with the AI blog generation workflow while maintaining WordPress best practices and security standards.
 
 #### Status Updates
+
+## Known Issues
+
+### Context Update Issue
+- **Problem**: Context updates failing with "Failed to update context" error
+- **Root Cause**: context_id parameter not being sent in AJAX request
+- **Investigation**:
+  - Added debugging to contexts.js to track context ID field value
+  - Console shows form data is missing context_id even though code attempts to add it
+  - Hidden field `#context-id` should contain the ID but appears to be empty
+- **Possible Causes**:
+  1. Form is being reset at the wrong time (closeModal resets the form)
+  2. Hidden field value not being populated correctly in populateModal
+  3. Timing issue between loading context data and form submission
+  4. Race condition where field is cleared before being read
+- **Debugging Added**:
+  - Log context ID field value and element in saveContext
+  - Log when context ID is set in populateModal
+  - Added validation to prevent sending request without context_id
+- **Temporary Workaround**: 
+  - Added check in saveContext to show error if context_id is missing
+  - This prevents the AJAX request from being sent with invalid data
+- **Next Steps**:
+  - Monitor console logs to identify when/why context_id becomes empty
+  - Consider storing context ID in a data attribute or JavaScript variable instead of hidden field
+  - Review modal lifecycle to ensure data persistence
+
+## UI/UX Features
+
+### Context Checkbox Behavior
+- **Always Include in Content Generation**:
+  - When checked: Automatically checks and disables both Avada and HTML options
+  - When unchecked: Re-enables both options and maintains their mutual exclusivity
+  - Rationale: Content generation requires proper formatting, so both options must be selected
+- **Avada and HTML Options**:
+  - Mutually exclusive when enabled (checking one unchecks the other)
+  - Both automatically selected and disabled when content generation is always included
+  - State properly managed during form population and reset

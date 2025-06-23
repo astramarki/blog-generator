@@ -1,6 +1,6 @@
 <?php
 /**
- * Blog Ideas V2 View
+ * Idea Generator View
  *
  * Modern interface for managing blog ideas with Bootstrap styling.
  *
@@ -25,7 +25,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<div>
 						<h1 class="h2 mb-1 text-primary">
 							<i class="fas fa-lightbulb me-2"></i>
-							Blog Ideas V2
+							Idea Generator
 						</h1>
 						<p class="text-muted mb-0">Manage and generate AI-powered blog post ideas</p>
 					</div>

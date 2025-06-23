@@ -1,29 +1,38 @@
-# Blog Ideas V2 Integration Guide
+# Idea Generator Integration Guide
 
-This guide explains how to integrate the new Blog Ideas V2 interface into the main AI Blog Generator plugin.
+This guide explains how to integrate the new Idea Generator interface into the main AI Blog Generator plugin.
 
-## 🏗️ Components Created
+## Overview
 
-1. **Model**: `models/class-blog-ideas-model-v2.php` - Database operations
-2. **Controller**: `controllers/class-blog-ideas-controller-v2.php` - Business logic and AJAX handlers
+The Idea Generator interface is a modern, Bootstrap 5-based UI that replaces the old blog ideas management system. It provides:
+
+- Real-time statistics
+- Bulk operations
+- AJAX-powered interactions
+- Modern, responsive design
+- Detailed console logging
+
+## Components
+
+1. **Controller**: `controllers/class-blog-ideas-controller-v2.php`
+2. **JavaScript**: `assets/js/blog-ideas-v2.js`
 3. **View**: `admin/views/blog-ideas-view-v2.php` - HTML interface
-4. **JavaScript**: `assets/js/blog-ideas-v2.js` - Frontend functionality
-5. **AI Services**: Updated with `generate_text()` methods
+4. **Model**: `models/class-blog-ideas-model-v2.php`
 
-## 🔧 Integration Steps
+## Integration Steps
 
 ### Step 1: Update the Main Plugin File
 
 Add these lines to `ai-blog-generator.php` in the main plugin class constructor:
 
 ```php
-// Include Blog Ideas V2 components
-require_once $this->plugin_path . 'models/class-blog-ideas-model-v2.php';
-require_once $this->plugin_path . 'controllers/class-blog-ideas-controller-v2.php';
+// Include Idea Generator components
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'models/class-blog-ideas-model-v2.php';
+require_once plugin_dir_path( dirname( __FILE__ ) ) . 'controllers/class-blog-ideas-controller-v2.php';
 
-// Initialize Blog Ideas V2 controller
-$this->blog_ideas_v2_controller = new \AI_Blog_Generator\Controllers\Blog_Ideas_Controller_V2();
-$this->blog_ideas_v2_controller->register_ajax_handlers();
+// Initialize Idea Generator controller
+$blog_ideas_v2_controller = new \AI_Blog_Generator\Controllers\Blog_Ideas_Controller_V2();
+$blog_ideas_v2_controller->register_ajax_handlers();
 ```
 
 ### Step 2: Add Admin Menu Page
@@ -31,13 +40,13 @@ $this->blog_ideas_v2_controller->register_ajax_handlers();
 In `admin/class-admin-manager.php`, add the new menu page in the `add_admin_menu()` method:
 
 ```php
-// Add Blog Ideas V2 page
+// Add Idea Generator page
 add_submenu_page(
-    'ai-blog-generator',
-    __( 'Blog Ideas V2', 'ai-blog-generator' ),
-    __( 'Blog Ideas V2', 'ai-blog-generator' ),
-    'manage_options',
-    'ai-blog-generator-ideas-v2',
+    $this->menu_slug,
+    __( 'Idea Generator', 'ai-blog-generator' ),
+    __( 'Idea Generator', 'ai-blog-generator' ),
+    $this->capability,
+    $this->menu_slug . '-ideas-v2',
     [ $this, 'render_blog_ideas_v2_page' ]
 );
 ```
@@ -48,18 +57,20 @@ Add this method to `admin/class-admin-manager.php`:
 
 ```php
 /**
- * Render the Blog Ideas V2 page.
+ * Render the Idea Generator page.
  */
 public function render_blog_ideas_v2_page() {
-    // Enqueue assets
-    $this->enqueue_blog_ideas_v2_assets();
+    // Check user capabilities
+    if ( ! current_user_can( $this->capability ) ) {
+        wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'ai-blog-generator' ) );
+    }
     
-    // Include the view
+    // Load the view
     include_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'admin/views/blog-ideas-view-v2.php';
 }
 
 /**
- * Enqueue Blog Ideas V2 assets.
+ * Enqueue Idea Generator assets.
  */
 private function enqueue_blog_ideas_v2_assets() {
     // Enqueue Bootstrap 5 (if not already loaded)
@@ -126,7 +137,7 @@ private function create_idea_categories_table() {
 
 ### Step 5: Test the Integration
 
-1. **Access the page**: Go to `WordPress Admin > AI Blog Generator > Blog Ideas V2`
+1. **Access the page**: Go to `WordPress Admin > AI Blog Generator > Idea Generator`
 2. **Check console**: Open browser dev tools to see extensive logging
 3. **Test functionality**:
    - Load statistics and pending ideas
@@ -225,4 +236,4 @@ This will provide additional logging throughout the system.
 - **Mobile-friendly** responsive design
 - **Extensible architecture** for future enhancements
 
-The Blog Ideas V2 interface represents a significant upgrade in both functionality and user experience, providing a solid foundation for future AI blog generation features. 
+The Idea Generator interface represents a significant upgrade in both functionality and user experience, providing a solid foundation for future AI blog generation features. 

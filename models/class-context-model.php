@@ -45,7 +45,8 @@ class Context_Model extends Model {
 		'usage_flags',
 		'always_include_content',
 		'always_include_images',
-
+		'always_include_avada',
+		'always_include_html',
 		'active',
 	];
 
@@ -800,6 +801,8 @@ class Context_Model extends Model {
 			case 'active':
 			case 'always_include_content':
 			case 'always_include_images':
+			case 'always_include_avada':
+			case 'always_include_html':
 				return (int) (bool) $value;
 			
 			default:
@@ -818,7 +821,7 @@ class Context_Model extends Model {
 		
 		if ( $formatted ) {
 			// Format boolean fields
-			$boolean_fields = ['active', 'always_include_content', 'always_include_images'];
+			$boolean_fields = ['active', 'always_include_content', 'always_include_images', 'always_include_avada', 'always_include_html'];
 			foreach ( $boolean_fields as $field ) {
 				if ( isset( $formatted[ $field ] ) ) {
 					$formatted[ $field ] = (bool) $formatted[ $field ];
@@ -886,6 +889,48 @@ class Context_Model extends Model {
 		$results = $wpdb->get_results( $sql, ARRAY_A );
 		
 		Logger::info( 'always_include_images_retrieved', 'Retrieved always-include image contexts', [
+			'count' => count( $results ),
+		] );
+		
+		return $results;
+	}
+
+	/**
+	 * Get contexts that should always be included for Avada layouts.
+	 *
+	 * @return array
+	 */
+	public function get_always_include_avada() {
+		global $wpdb;
+		
+		$sql = "SELECT * FROM " . AI_BLOG_GENERATOR_TABLE_CONTEXTS . " 
+				WHERE active = 1 AND always_include_avada = 1 
+				ORDER BY type ASC, priority DESC, name ASC";
+		
+		$results = $wpdb->get_results( $sql, ARRAY_A );
+		
+		Logger::info( 'always_include_avada_retrieved', 'Retrieved always-include Avada contexts', [
+			'count' => count( $results ),
+		] );
+		
+		return $results;
+	}
+
+	/**
+	 * Get contexts that should always be included for HTML layouts.
+	 *
+	 * @return array
+	 */
+	public function get_always_include_html() {
+		global $wpdb;
+		
+		$sql = "SELECT * FROM " . AI_BLOG_GENERATOR_TABLE_CONTEXTS . " 
+				WHERE active = 1 AND always_include_html = 1 
+				ORDER BY type ASC, priority DESC, name ASC";
+		
+		$results = $wpdb->get_results( $sql, ARRAY_A );
+		
+		Logger::info( 'always_include_html_retrieved', 'Retrieved always-include HTML contexts', [
 			'count' => count( $results ),
 		] );
 		
