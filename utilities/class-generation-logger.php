@@ -142,7 +142,8 @@ class Generation_Logger {
 
 		$formatted_entry = $this->format_log_entry( $log_entry );
 		
-		
+		// Write to log file
+		file_put_contents( $this->log_file, $formatted_entry . "\n", FILE_APPEND | LOCK_EX );
 		
 		// Also log to main WordPress debug log if enabled
 		if ( defined( 'WP_DEBUG_LOG' ) && WP_DEBUG_LOG ) {

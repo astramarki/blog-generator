@@ -65,7 +65,9 @@ ai-blog-generator/
 │   ├── class-anthropic-service.php
 │   ├── class-openai-service.php
 │   ├── class-content-generator.php
-│   └── class-scheduler-service.php (690 lines)
+│   ├── class-image-generator.php
+│   ├── class-scheduler-service.php (690 lines)
+│   └── class-prompt-compiler-service.php
 ├── utilities/
 │   ├── class-logger.php (singleton)
 │   ├── class-validator.php
@@ -255,9 +257,21 @@ Location: `services/class-anthropic-service.php`
 
 **Key Methods:**
 - `generate_ideas($contexts)` - Generate blog ideas
-- `generate_content($idea, $contexts)` - Generate full blog post
+- `generate_content($prompts)` - Generate full blog post with pre-compiled prompts (NEW)
+- `generate_blog_content($idea, $contexts)` - Legacy content generation (deprecated)
 - `test_connection()` - Validate API key
 - Cost tracking integrated
+
+**New Method - generate_content():**
+- Accepts pre-compiled prompts array instead of raw idea/contexts
+- Combines system prompts array into single system message
+- Properly formats messages for Anthropic API
+- Returns raw content response for parsing
+
+**Enhanced Methods:**
+- `generate_alt_text_from_prompt()` - Enhanced to include focus keyphrase in image alt text for improved SEO
+- `generate_descriptive_filename()` - Enhanced to include focus keyphrase as first part of image filenames for SEO
+- `generate_filename()` - Enhanced to include focus keyphrase as first part of standard filenames for SEO
 
 #### OpenAI Service
 Location: `services/class-openai-service.php`
@@ -273,13 +287,85 @@ Location: `services/class-content-generator.php`
 
 Orchestrates the content generation process:
 - Validates contexts
-- Calls Anthropic API for ideas/content
+- **NEW**: Uses Prompt Compiler Service for prompt generation
+- Calls Anthropic API with compiled prompts
 - Processes results into WordPress format
 - Handles image generation
 - Creates WordPress posts
 - Tracks all costs
 
-### 5. Controllers
+**Updated Properties:**
+- `$prompt_compiler` - Instance of Prompt_Compiler_Service
+
+**Updated Methods:**
+- `generate_blog_post()` - Now uses `$this->prompt_compiler->generate_content_prompts()`
+- Calls new `generate_content()` method instead of deprecated `generate_blog_content()`
+- `validate_generated_content()` - Updated to enforce 140-character limit for meta descriptions
+- `generate_alt_text_from_prompt()` - Enhanced to include focus keyphrase in image alt text for SEO
+
+### 5. Prompt Compiler Service
+Location: `services/class-prompt-compiler-service.php`
+
+**Purpose:** Centralizes all prompt compilation logic, providing abstraction between AI services and prompt generation.
+
+**Key Methods:**
+- `generate_content_prompts($idea_id)` - Main entry point for content generation prompts
+- `build_system_prompts($idea, $persona, $contexts, $brand_features, $keywords, $products)` - Constructs array of system prompts
+- `build_user_prompt($idea, $target_keywords, $persona, $products)` - Creates user prompt with requirements
+- `generate_image_prompts($image_requirements, $persona)` - Generates prompts for image creation
+
+**System Prompt Components:**
+1. **Persona Information**:
+   - Biography and expertise
+   - Writing style and tone
+   - Format preferences (HTML/Avada)
+
+2. **Layout Instructions**:
+   - Based on persona's layout style settings
+   - Chart usage preferences
+   - Image placement guidelines
+
+3. **Context Compilation**:
+   - Always-include contexts (always_include_content = 1)
+   - Persona-specific contexts
+   - Format-specific contexts (HTML or Avada)
+
+4. **Product Requirements**:
+   - Minimum 2 product promotions
+   - Product descriptions and ideal uses
+   - Natural integration instructions
+
+5. **SEO Guidelines**:
+   - Previously used keyphrases to avoid
+   - Keyword density requirements
+   - Meta description format (120-140 characters for optimal SEO performance)
+
+6. **Brand Features**:
+   - Internal linking opportunities
+   - Brand feature descriptions
+
+**User Prompt Structure:**
+- 2 randomly selected target keywords
+- Image placeholder requirements (based on persona's `number_of_images` setting):
+  - 0 = No content images, only featured image generated
+  - 1+ = That many content images plus featured image
+  - Default is 2 content images if not specified
+- SEO metadata requirements
+- Output format specifications
+- Word count requirements
+
+**Logging Features:**
+- Writes all compiled prompts to `{upload_dir}/ai-blog-generator-logs/{idea_id}_prompts.txt`
+- Includes timestamp and formatting for readability
+- Useful for debugging and prompt optimization
+
+**Integration Points:**
+- Used by Content_Generator service
+- Works with all model classes to gather required data
+- Compatible with both Anthropic and future AI providers
+- Uses `Product_Model::get_all_with_relations()` to fetch complete product data including images and links
+
+### 6. Controllers
 
 All controllers implement:
 - `register_ajax_handlers()` - Registers WordPress AJAX hooks
@@ -298,7 +384,7 @@ All controllers implement:
 - `Image_Controller` - Image generation and seed image management
 - `Analytics_Controller` - Cost tracking and analytics data
 
-### 6. Scheduler Service
+### 7. Scheduler Service
 Location: `services/class-scheduler-service.php`
 
 **Cron Jobs:**
@@ -307,7 +393,7 @@ Location: `services/class-scheduler-service.php`
 - `publish_scheduled_posts()` - Runs every 15 minutes
 - `cleanup_old_data()` - Runs at 3 AM daily
 
-### 7. Utilities
+### 8. Utilities
 
 #### Logger (Singleton)
 - Database and error_log dual logging
@@ -357,14 +443,16 @@ Location: `services/class-scheduler-service.php`
 ### ✅ Completed:
 1. **Database Layer**: All models and Database Manager implemented
 2. **API Services**: Both Anthropic and OpenAI services complete with error handling
-3. **Controllers**: All 6 controllers with AJAX handlers (including Products)
-4. **Admin Views**: All 10 admin pages created with proper escaping (including Products)
+3. **Controllers**: All 7 controllers with AJAX handlers (including Products and Brand Features)
+4. **Admin Views**: All 11 admin pages created with proper escaping
 5. **Logger**: Complete with database storage and cleanup
 6. **Cost Tracking**: Integrated in all API calls
 7. **Plugin Infrastructure**: Activator, Deactivator, Loader implemented
 8. **Cron System**: All scheduled tasks registered
 9. **Admin Assets**: CSS (940 lines) and JS (948 lines) complete
 10. **Products Management**: Full CRUD with images, links, and WooCommerce import
+11. **Brand Features Management**: Complete system for internal linking
+12. **Prompt Compiler Service**: Full abstraction layer for prompt generation
 
 ### ⚠️ Areas for Enhancement:
 1. **Dependency Injection**: Services currently use direct instantiation instead of DI
@@ -1455,11 +1543,97 @@ The system includes four default personas:
 
 ## Content Generation Pipeline
 
-### 1. Context Compilation
+### 1. Idea Selection and Approval
+- User reviews generated ideas and approves them
+- Approved ideas are queued for content generation
+- Background processor picks up approved ideas
 
-// ... existing code ...
+### 2. Prompt Compilation (NEW)
+**Service**: `Prompt_Compiler_Service`
 
-### 2. CSS Styling Framework Integration
+The content generation now uses a dedicated prompt compilation service:
+
+1. **Data Gathering**:
+   - Load idea details from database
+   - Retrieve assigned persona with all settings
+   - Get all active contexts (general, always-include, format-specific)
+   - Fetch brand features for internal linking
+   - Get previously used keyphrases for uniqueness
+   - Load active products for promotion
+
+2. **System Prompt Construction**:
+   - Build persona prompt with bio, expertise, writing style
+   - Add layout instructions based on persona settings
+   - Include chart usage preferences
+   - Compile all relevant contexts
+   - Add format-specific instructions (HTML or Avada)
+   - Include product promotion requirements
+   - Add SEO guidelines and keyphrase avoidance
+   - Include brand features for linking
+
+3. **User Prompt Generation**:
+   - Select 2 random target keywords
+   - Define image requirements (minimum 2, based on persona)
+   - Specify SEO metadata requirements
+   - Set output format and structure
+   - Include word count and other constraints
+
+4. **Prompt Logging**:
+   - Write complete prompts to `{idea_id}_prompts.txt`
+   - Include timestamps and clear formatting
+   - Store in uploads directory for debugging
+
+### 3. Content Generation
+**Service**: `Content_Generator` with `Anthropic_Service`
+
+1. **API Call Preparation**:
+   - Use compiled prompts from Prompt Compiler
+   - Call new `generate_content()` method with prompts array
+   - System prompts combined into single system message
+
+2. **AI Processing**:
+   - Anthropic processes prompts with persona context
+   - Generates content following all specifications
+   - Returns structured response with title, content, metadata
+
+3. **Response Parsing**:
+   - Extract title, meta description, focus keyphrase
+   - Parse HTML content with image tokens
+   - Extract image requirements and descriptions
+   - Identify chart configurations if applicable
+
+### 4. Image Generation
+**Service**: `OpenAI_Service`
+
+1. **Prompt Enhancement**:
+   - Use Prompt Compiler's `generate_image_prompts()` method
+   - Include persona style preferences
+   - Add seed image requirements if applicable
+
+2. **Batch Processing**:
+   - Generate all required images in batch
+   - Use seed images for product consistency
+   - Save to WordPress media library
+
+3. **Token Replacement**:
+   - Replace {{image}} tokens with actual URLs
+   - Add proper alt text and captions
+
+### 5. Post Creation
+**Service**: `Content_Generator`
+
+1. **WordPress Post**:
+   - Create draft post with generated content
+   - Set SEO metadata (Yoast/RankMath compatible)
+   - Assign categories and tags
+   - Set featured image
+
+2. **Tracking**:
+   - Store generation costs
+   - Log completion status
+   - Update idea status to 'generated'
+
+### 6. CSS Styling Framework Integration
 
 **NEW FEATURE**: The AI content generation now includes comprehensive CSS styling context to ensure professional, consistent styling across all generated content.
 
@@ -2072,6 +2246,11 @@ public function update_seed_image_order($product_id, $image_order) {
 
 public function get_all_seed_images() {
     // Gets all seed images across all products with product details
+}
+
+public function get_active_products() {
+    // Gets all active products (currently returns all products)
+    // Used by Prompt Compiler Service for product promotion requirements
 }
 ```
 

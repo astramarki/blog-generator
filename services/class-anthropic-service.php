@@ -55,8 +55,8 @@ class Anthropic_Service {
 	 * @var array
 	 */
 	private $available_models = [
-		'claude-sonnet-4-20250514' => 'Claude Sonnet 4 (May 2025)',
-		'claude-opus-4-20250514' => 'Claude Opus 4 (May 2025)',
+		'claude-sonnet-4-20250514' => 'Claude Sonnet 4 (Extended Thinking)',
+		'claude-opus-4-20250514' => 'Claude Opus 4 (Extended Thinking)',
 	];
 
 	/**
@@ -1112,7 +1112,7 @@ class Anthropic_Service {
 		
 		$prompt .= "Please structure your response exactly as follows:\n\n";
 		$prompt .= "TITLE: [SEO-optimized title under 60 characters that includes the primary keyword]\n\n";
-		$prompt .= "META_DESCRIPTION: [150-160 character description that MUST include the primary keyword]\n\n";
+		$prompt .= "META_DESCRIPTION: [120-140 character description that MUST include the primary keyword]\n\n";
 		$prompt .= "FOCUS_KEYPHRASE: [MUST be the primary keyword: " . (!empty($seo_keywords) ? $seo_keywords[0] : $idea_title) . "]\n\n";
 		$prompt .= "TAGS: [5-8 relevant tags, MUST include the primary keyword as the first tag]\n\n";
 		$prompt .= "AVADA_CONTENT: [full blog post using ONLY Avada Fusion Builder shortcodes - NO HTML except within [fusion_text] blocks]\n\n";
@@ -1706,13 +1706,16 @@ class Anthropic_Service {
 
 		// Extract HTML content
 		if ( preg_match( '/HTML:\s*(.+?)(?=\nIMAGES:|CHARTS:|REFERENCES:|$)/s', $content, $matches ) ) {
-			$result['html'] = trim( $matches[1] );
+			$result['html'] = $this->decode_base64_content( trim( $matches[1] ) );
+		} elseif ( preg_match( '/HTML_CONTENT:\s*(.+?)(?=\nIMAGES:|CHARTS:|REFERENCES:|$)/s', $content, $matches ) ) {
+			// Check for HTML_CONTENT section (from new prompt format)
+			$result['html'] = $this->decode_base64_content( trim( $matches[1] ) );
 		} elseif ( preg_match( '/AVADA_CONTENT:\s*(.+?)(?=\nIMAGES:|CHARTS:|REFERENCES:|$)/s', $content, $matches ) ) {
 			// Check for AVADA_CONTENT section for Avada layouts
-			$result['html'] = trim( $matches[1] );
+			$result['html'] = $this->decode_base64_content( trim( $matches[1] ) );
 		} elseif ( preg_match( '/CONTENT:\s*(.+?)(?=\nIMAGES:|CHARTS:|REFERENCES:|$)/s', $content, $matches ) ) {
 			// Backward compatibility: check for CONTENT section
-			$result['html'] = trim( $matches[1] );
+			$result['html'] = $this->decode_base64_content( trim( $matches[1] ) );
 		}
 
 		// Extract image descriptions
@@ -1725,7 +1728,7 @@ class Anthropic_Service {
 				$result['featured_image'] = [
 					'token' => '{{featured}}',
 					'prompt' => $description,
-					'alt_text' => $this->generate_alt_text_from_prompt( $description ),
+					'alt_text' => $this->generate_alt_text_from_prompt( $description, $result['focus_keyphrase'] ),
 				];
 			}
 			
@@ -1739,7 +1742,7 @@ class Anthropic_Service {
 				$result['images'][] = [
 					'token' => '{{image' . $image_num . '}}',
 					'prompt' => $description,
-					'alt_text' => $this->generate_alt_text_from_prompt( $description ),
+					'alt_text' => $this->generate_alt_text_from_prompt( $description, $result['focus_keyphrase'] ),
 				];
 			}
 		}
@@ -1760,9 +1763,9 @@ class Anthropic_Service {
 			$references_content = trim( $matches[1] );
 			// Format references as an Avada-styled section if not empty
 			if ( ! empty( $references_content ) && $references_content !== '[No references]' ) {
-				$result['references'] = '[fusion_builder_container padding_top="40px" padding_bottom="40px" hundred_percent="no" equal_height_columns="no" hide_on_mobile="no"]' . "\n";
-				$result['references'] .= '[fusion_builder_row]' . "\n";
-				$result['references'] .= '[fusion_builder_column type="1_1" spacing="yes" center_content="no" hover_type="none" link="" min_height="" hide_on_mobile="no" class="" id="" background_color="" background_image="" background_position="left top" undefined="" background_repeat="no-repeat" border_size="0" border_color="" border_style="solid" border_position="all" padding_top="" padding_right="" padding_bottom="" padding_left="" margin_top="" margin_bottom="" animation_type="" animation_direction="left" animation_speed="0.1" animation_offset="" last="no"]' . "\n";
+							$result['references'] = '[fusion_builder_container hundred_percent="no" equal_height_columns="no" hide_on_mobile="no" background_color="" background_image="" background_position="left top" background_repeat="no-repeat" border_size="0" border_color="" border_style="solid" padding_top="40px" padding_right="" padding_bottom="40px" padding_left="" margin_top="" margin_bottom="" animation_type="" animation_direction="left" animation_speed="0.1" animation_offset="" last="no" class="" id="" alpha_background_color=""]' . "\n";
+			$result['references'] .= '[fusion_builder_row]' . "\n";
+			$result['references'] .= '[fusion_builder_column type="1_1" spacing="yes" center_content="no" hover_type="none" link="" min_height="" hide_on_mobile="no" background_color="" background_image="" background_position="left top" background_repeat="no-repeat" border_size="0" border_color="" border_style="solid" padding_top="" padding_right="" padding_bottom="" padding_left="" margin_top="" margin_bottom="" animation_type="" animation_direction="left" animation_speed="0.1" animation_offset="" last="no" class="" id="" alpha_background_color=""]' . "\n";
 				$result['references'] .= '[fusion_separator style_type="single solid" hide_on_mobile="small-visibility,medium-visibility,large-visibility" sep_color="#e0e0e0" top_margin="20" bottom_margin="40" /]' . "\n";
 				$result['references'] .= '[fusion_title size="2" content_align="left" style_type="default" sep_color="" margin_top="" margin_bottom="20" class="" id=""]References[/fusion_title]' . "\n";
 				$result['references'] .= '[fusion_text]' . "\n";
@@ -1789,12 +1792,18 @@ class Anthropic_Service {
 			
 			if ( ! empty( $token_matches[1] ) ) {
 				foreach ( array_unique( $token_matches[1] ) as $image_num ) {
+					// Create fallback alt text with focus keyphrase if available
+					$fallback_alt = 'Image ' . $image_num . ' for ' . ( $result['title'] ?: 'blog post' );
+					if ( ! empty( $result['focus_keyphrase'] ) ) {
+						$fallback_alt = $result['focus_keyphrase'] . ' - ' . $fallback_alt;
+					}
+					
 					$result['images'][] = [
 						'token' => '{{image' . $image_num . '}}',
 						'prompt' => 'Professional image related to ' . ( $result['title'] ?: 'blog content' ),
-						'alt_text' => 'Image ' . $image_num . ' for ' . ( $result['title'] ?: 'blog post' ),
+						'alt_text' => $fallback_alt,
 					];
-		}
+				}
 			}
 		}
 
@@ -1817,20 +1826,140 @@ class Anthropic_Service {
 	 * Generate alt text from image prompt.
 	 *
 	 * @param string $prompt Image generation prompt.
+	 * @param string $focus_keyphrase Optional focus keyphrase to include in alt text.
 	 * @return string Generated alt text.
 	 */
-	private function generate_alt_text_from_prompt( $prompt ) {
-		// Remove common prompt phrases and clean up
-		$alt_text = preg_replace( '/^(create|generate|show|display|illustrate)\s+/i', '', $prompt );
+	private function generate_alt_text_from_prompt( $prompt, $focus_keyphrase = '' ) {
+		// Remove AI prompt prefixes and common phrases
+		$alt_text = preg_replace( '/^(create|generate|show|display|illustrate|image of|photo of|picture of)\s+/i', '', $prompt );
+		
+		// Remove AI-specific prompt language
+		$alt_text = preg_replace( '/\b(professional|high quality|detailed|realistic|vibrant|modern|clean|bright)\s+/i', '', $alt_text );
+		$alt_text = preg_replace( '/\b(in the style of|featuring|showing|with|including|containing)\s+/i', '', $alt_text );
+		$alt_text = preg_replace( '/\b(professional\s+)?photography\b/i', '', $alt_text );
+		$alt_text = preg_replace( '/\b(stock photo|commercial|marketing)\s*/i', '', $alt_text );
+		
+		// Clean up spacing and formatting
 		$alt_text = preg_replace( '/\s+/', ' ', $alt_text );
 		$alt_text = trim( $alt_text );
 		
-		// Limit length for alt text
-		if ( strlen( $alt_text ) > 125 ) {
-			$alt_text = substr( $alt_text, 0, 122 ) . '...';
+		// Ensure it starts with a capital letter
+		$alt_text = ucfirst( $alt_text );
+		
+		// Include focus keyphrase for SEO if provided and not already present
+		if ( ! empty( $focus_keyphrase ) && stripos( $alt_text, $focus_keyphrase ) === false ) {
+			// If alt text is short, prepend the keyphrase
+			if ( strlen( $alt_text ) < 50 ) {
+				$alt_text = ucfirst( $focus_keyphrase ) . ' - ' . lcfirst( $alt_text );
+			} else {
+				// If alt text is longer, append the keyphrase naturally
+				$alt_text = rtrim( $alt_text, '.' ) . ' for ' . $focus_keyphrase;
+			}
+		}
+		
+		// Extend length limit to 200 characters (WordPress recommendation)
+		if ( strlen( $alt_text ) > 200 ) {
+			// Find last complete word before 197 characters to avoid cutting mid-word
+			$truncated = substr( $alt_text, 0, 197 );
+			$last_space = strrpos( $truncated, ' ' );
+			if ( $last_space !== false && $last_space > 150 ) { // Don't truncate too aggressively
+				$alt_text = substr( $alt_text, 0, $last_space );
+			} else {
+				$alt_text = $truncated . '...';
+			}
 		}
 		
 		return $alt_text;
+	}
+
+	/**
+	 * Detect and decode base64 content.
+	 *
+	 * @param string $content Content that may contain base64 strings.
+	 * @return string Decoded content.
+	 */
+	private function decode_base64_content( $content ) {
+		// Multiple patterns to catch base64 in different contexts
+		$patterns = [
+			// Standalone base64 strings (at least 50 characters)
+			'/([A-Za-z0-9+\/]{50,}={0,2})/',
+			// Base64 in code blocks with potential line breaks
+			'/```[^`]*?([A-Za-z0-9+\/\s]{100,}={0,2})[^`]*?```/',
+			// Base64 that might be split across lines (remove newlines first)
+			'/([A-Za-z0-9+\/\s]{100,}={0,2})/'
+		];
+		
+		$decoded_content = $content;
+		
+		foreach ( $patterns as $pattern ) {
+			$decoded_content = preg_replace_callback( $pattern, function( $matches ) {
+				$potential_base64 = $matches[1];
+				
+				// Clean up potential line breaks and spaces
+				$clean_base64 = preg_replace( '/\s+/', '', $potential_base64 );
+				
+				// Must be at least 50 characters after cleaning
+				if ( strlen( $clean_base64 ) < 50 ) {
+					return $matches[0]; // Return original match
+				}
+				
+				// Validate it's actually base64 and decode it
+				$decoded = base64_decode( $clean_base64, true );
+				
+				// Check if decoding was successful and result looks like HTML/JS content
+				if ( $decoded !== false && $this->is_valid_decoded_content( $decoded ) ) {
+					
+					Logger::info( 'base64_content_decoded', 'Successfully decoded base64 content', [
+						'original_length' => strlen( $clean_base64 ),
+						'decoded_length' => strlen( $decoded ),
+						'content_preview' => substr( $decoded, 0, 100 ) . '...',
+						'contains_apexcharts' => strpos( $decoded, 'ApexCharts' ) !== false,
+						'contains_script' => strpos( $decoded, 'script' ) !== false,
+						'contains_chart' => strpos( $decoded, 'chart' ) !== false
+					] );
+					
+					return $decoded;
+				}
+				
+				// If decoding failed or doesn't look like content, return original
+				return $matches[0];
+			}, $decoded_content );
+		}
+		
+		return $decoded_content;
+	}
+	
+	/**
+	 * Check if decoded content looks like valid HTML/JS content.
+	 *
+	 * @param string $decoded The decoded content to validate.
+	 * @return bool True if content looks valid.
+	 */
+	private function is_valid_decoded_content( $decoded ) {
+		// Check for various indicators of HTML/JS content
+		$indicators = [
+			'<',           // HTML tags
+			'function',    // JavaScript functions
+			'var ',        // JavaScript variables
+			'const ',      // JavaScript constants
+			'let ',        // JavaScript let declarations
+			'ApexCharts',  // ApexCharts library
+			'chart',       // Chart-related content
+			'series',      // Chart series data
+			'options',     // Chart options
+			'= {',         // Object assignment
+			'document.',   // DOM manipulation
+			'querySelector', // DOM queries
+			'render(',     // Render method calls
+		];
+		
+		foreach ( $indicators as $indicator ) {
+			if ( strpos( $decoded, $indicator ) !== false ) {
+				return true;
+			}
+		}
+		
+		return false;
 	}
 
 	/**
@@ -2187,6 +2316,130 @@ class Anthropic_Service {
 
 		$this->end_timer( $start_time, 'anthropic_text_generation', [
 			'success' => $result['success']
+		] );
+		$this->log_function_exit( $result['success'] ? 'success' : 'failed' );
+
+		return $result;
+	}
+
+	/**
+	 * Generate content using pre-compiled prompts.
+	 *
+	 * @param array  $system_prompts Array of system prompts with 'type' and 'content' keys.
+	 * @param string $user_prompt    The user prompt string.
+	 * @return array Result with success status and content/error.
+	 */
+	public function generate_content( $system_prompts, $user_prompt ) {
+		$start_time = $this->start_timer();
+		$this->log_function_entry( [
+			'system_prompts_count' => count( $system_prompts ),
+			'user_prompt_length' => strlen( $user_prompt )
+		] );
+
+		try {
+			// Check API key
+			if ( empty( $this->api_key ) ) {
+				$this->log_error( 'anthropic_no_api_key', 'API key is missing for content generation' );
+				throw new \Exception( __( 'API key is required.', 'ai-blog-generator' ) );
+			}
+
+					// Combine system prompts into a single system parameter
+		$system_content = '';
+		foreach ( $system_prompts as $prompt ) {
+			if ( ! empty( $prompt['content'] ) ) {
+				$system_content .= $prompt['content'] . "\n\n";
+			}
+		}
+		
+		// Build the messages array for user prompts only
+		$messages = [
+			[
+				'role' => 'user',
+				'content' => $user_prompt
+			]
+		];
+
+		$this->log_info( 'anthropic_content_request', 'Sending content generation request to Anthropic', [
+			'model' => $this->model,
+			'system_content_length' => strlen( $system_content ),
+			'user_prompt_length' => strlen( $user_prompt ),
+			'total_messages' => count( $messages )
+		] );
+
+		// Build request data with system parameter at top level
+		$request_data = [
+			'model' => $this->model,
+			'max_tokens' => $this->get_max_tokens(),
+			'messages' => $messages,
+		];
+		
+		// Add system parameter if we have system content
+		if ( ! empty( $system_content ) ) {
+			$request_data['system'] = trim( $system_content );
+		}
+
+			// Make API request
+			$response = $this->make_request( $request_data );
+
+			if ( ! isset( $response['content'] ) || ! is_array( $response['content'] ) ) {
+				$this->log_error( 'anthropic_invalid_response', 'Invalid response format from Anthropic API', [
+					'response_keys' => is_array( $response ) ? array_keys( $response ) : 'not_array',
+					'content_type' => isset( $response['content'] ) ? gettype( $response['content'] ) : 'missing'
+				] );
+				throw new \Exception( 'Invalid response format from API' );
+			}
+
+			$content = $response['content'][0]['text'] ?? '';
+
+			$this->log_info( 'anthropic_content_received', 'Content received from Anthropic API', [
+				'content_length' => strlen( $content ),
+				'usage' => $response['usage'] ?? null
+			] );
+
+			// Record cost if usage data is available
+			$cost = 0;
+			$tokens_used = 0;
+			if ( isset( $response['usage'] ) ) {
+				$tokens_used = $response['usage']['input_tokens'] + $response['usage']['output_tokens'];
+				$cost = $this->calculate_cost( $response['usage']['input_tokens'], $response['usage']['output_tokens'] );
+				$this->cost_model->record_anthropic_cost( 'generate_content', $cost, $tokens_used );
+
+				$this->log_info( 'anthropic_cost_recorded', 'API cost recorded for content generation', [
+					'input_tokens' => $response['usage']['input_tokens'],
+					'output_tokens' => $response['usage']['output_tokens'],
+					'total_tokens' => $tokens_used,
+					'cost_usd' => $cost
+				] );
+			}
+
+			$result = [
+				'success' => true,
+				'content' => $content,
+				'cost' => $cost,
+				'tokens_used' => $tokens_used,
+				'usage' => $response['usage'] ?? []
+			];
+
+			$this->log_info( 'anthropic_content_success', 'Content generated successfully', [
+				'content_length' => strlen( $content ),
+				'total_cost' => $cost,
+				'tokens_consumed' => $tokens_used
+			] );
+
+		} catch ( \Exception $e ) {
+			$this->log_exception( 'anthropic_content_failed', $e, [
+				'system_prompts_count' => count( $system_prompts )
+			] );
+
+			$result = [
+				'success' => false,
+				'message' => $e->getMessage(),
+			];
+		}
+
+		$this->end_timer( $start_time, 'anthropic_content_generation', [
+			'success' => $result['success'] ?? false,
+			'content_length' => isset( $result['content'] ) ? strlen( $result['content'] ) : 0
 		] );
 		$this->log_function_exit( $result['success'] ? 'success' : 'failed' );
 

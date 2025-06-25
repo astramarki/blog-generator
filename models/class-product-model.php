@@ -157,7 +157,7 @@ class Product_Model extends Model {
 			// Handle search
 			if ( isset( $where['search'] ) ) {
 				$search = '%' . $wpdb->esc_like( $where['search'] ) . '%';
-				$conditions[] = $wpdb->prepare( "(product_name LIKE %s OR product_description LIKE %s)", $search, $search );
+				$conditions[] = $wpdb->prepare( "(name LIKE %s OR description LIKE %s)", $search, $search );
 			}
 			
 			// Add other where conditions here if needed
@@ -171,7 +171,7 @@ class Product_Model extends Model {
 		if ( ! empty( $order_by ) ) {
 			$sql .= " ORDER BY " . $order_by;
 		} else {
-			$sql .= " ORDER BY product_name ASC";
+			$sql .= " ORDER BY name ASC";
 		}
 		
 		// Add limit
@@ -883,7 +883,7 @@ class Product_Model extends Model {
 		$products_table = AI_BLOG_GENERATOR_TABLE_PRODUCTS;
 		
 		$sql = $wpdb->prepare(
-			"SELECT psi.*, p.product_name, p.product_description, att.guid as image_url
+			"SELECT psi.*, p.product_name as name, p.product_description as description, att.guid as image_url
 			FROM {$seed_table} psi
 			LEFT JOIN {$products_table} p ON psi.product_id = p.id
 			LEFT JOIN {$wpdb->posts} att ON psi.attachment_id = att.ID
@@ -902,5 +902,14 @@ class Product_Model extends Model {
 		}
 		
 		return $images;
+	}
+
+	/**
+	 * Get all active products.
+	 *
+	 * @return array Array of active products.
+	 */
+	public function get_active_products() {
+		return $this->get_all( [ 'active' => 1 ], 'product_name ASC' );
 	}
 } 

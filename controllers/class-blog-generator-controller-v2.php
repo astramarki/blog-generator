@@ -617,9 +617,18 @@ class Blog_Generator_Controller_V2 {
 		try {
 			$content = $this->current_idea['generated_content'];
 			
+			// Convert title to proper case
+			$original_title = $content['title'] ?? $this->current_idea['title'];
+			$proper_title = \AI_Blog_Generator\Utilities\Logger::to_proper_case( $original_title );
+			
+			Logger::info( 'title_converted_to_proper_case', 'Title converted to proper case', [
+				'original_title' => $original_title,
+				'proper_case_title' => $proper_title
+			] );
+			
 			// Prepare post data
 			$post_data = [
-				'post_title' => $content['title'] ?? $this->current_idea['title'],
+				'post_title' => $proper_title,
 				'post_content' => $content['content'] ?? '',
 				'post_status' => 'draft', // Always create as draft for review
 				'post_type' => 'post',
@@ -726,7 +735,7 @@ RESPONSE FORMAT (JSON):
 {
   \"title\": \"Optimized blog post title (may improve on the original)\",
   \"content\": \"Complete blog post content with HTML formatting\",
-  \"excerpt\": \"Brief excerpt/meta description (150-160 characters)\",
+  			\"excerpt\": \"Brief excerpt/meta description (120-140 characters)\",
   \"image_prompts\": [
     \"Detailed image prompt 1 for featured image\",
     \"Detailed image prompt 2 for content illustration\",

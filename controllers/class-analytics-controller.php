@@ -1027,7 +1027,7 @@ class Analytics_Controller {
 <head>
 	<style>
 		body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }
-		.container { max-width: 600px; margin: 0 auto; padding: 20px; }
+		.container { max-width: 1000px; margin: 0 auto; padding: 20px; }
 		h1 { color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px; }
 		h2 { color: #34495e; margin-top: 30px; }
 		.metric { background: #f8f9fa; padding: 15px; margin: 10px 0; border-left: 4px solid #3498db; }

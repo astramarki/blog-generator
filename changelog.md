@@ -7,7 +7,113 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Current Development]
 
+### Fixed
+- **Fusion Code JavaScript Corruption**: Fixed issue where Avada and WordPress strip script tags from fusion_code blocks
+  - **Problem**: 
+    - Avada was wrapping JavaScript code in `<p>` tags and converting line breaks to `<br />` tags
+    - WordPress was stripping `<script>` tags as a security measure when saving posts
+    - Result: ApexCharts code was saved without script tags, preventing execution
+  - **Solution**: Multi-layered approach:
+    1. **Pre-processing**: Enhanced `clean_fusion_code_content()` method that:
+       - Detects existing script tags to avoid double-wrapping
+       - Removes HTML tags (`<p>`, `</p>`, `<br />`) that Avada adds
+       - Wraps JavaScript in `<script>` tags if not already present
+       - Logs all fusion_code blocks before and after processing to debug-transaction.log
+    2. **Post-processing**: Created utilities for fixing fusion_code after save:
+       - `fix-fusion-code-post-save.php`: Creates a WordPress filter/plugin to fix fusion_code on save
+       - `fix-existing-fusion-posts.php`: Repairs existing posts with missing script tags
+       - `check-post-fusion-code.php`: Diagnostic tool to check fusion_code content in posts
+  - **Implementation**: 
+    - Enhanced logging shows fusion_code content before/after processing
+    - Fix script adds proper script tags and decodes HTML entities
+    - Can be applied as a plugin or added to theme's functions.php
+  - **Result**: ApexCharts and other JavaScript code now properly wrapped in script tags and executes correctly
+
 ### Added
+- **Hide Completed Filter on Approved Ideas Page**: Added a checkbox filter to automatically hide completed generations
+  - **Location**: Approved Ideas V2 page (`/wp-admin/admin.php?page=ai-blog-generator-approved-ideas-v2`)
+  - **Default State**: Checkbox is checked by default, hiding completed generations
+  - **Functionality**: When checked, filters out ideas with status `generated` from the display
+  - **User Experience**: Allows users to focus on pending/active generations without clutter from completed ones
+  - **Implementation**: 
+    - Added checkbox control "Hide Completed" in the filter bar
+    - JavaScript filter applied to `updateIdeasDisplay()` function
+    - Preserves all ideas in cache while only filtering display
+    - Real-time toggle without requiring page refresh
+
+### Enhanced
+- **Context Editor Modal Improvements**: Major enhancements to context editing experience
+  - **Larger Modal Size**: Increased to 80% viewport width and height for better code editing
+  - **Code Editor Enhancements**: 
+    - Increased textarea rows from 15 to 25 for more visible content
+    - Added proper code editor styling with monospace font and syntax-friendly formatting
+    - Enhanced CSS with better focus states and overflow handling
+  - **Content Preservation**: Complete removal of sanitization for context content
+    - **Problem**: JavaScript code and complex HTML/shortcodes were being corrupted by `wp_kses_post()` sanitization
+    - **Solution**: Removed all content sanitization to preserve exact input
+    - **Files Modified**:
+      - `models/class-context-model.php` - Removed `wp_kses_post()` from content sanitization
+      - `controllers/class-context-controller.php` - Removed content sanitization in create, update, and import methods
+    - **Result**: JavaScript code, HTML, Avada shortcodes, and any other content is now saved exactly as entered
+  - **UI Improvements**:
+    - Better textarea styling for code editing with proper tab sizing
+    - Responsive height calculation for optimal viewing
+    - Enhanced focus states for better visual feedback
+
+- **Post Title Proper Case Conversion**: Automatically convert generated blog post titles to proper case
+  - **Implementation**: Added intelligent title case conversion that:
+    - Capitalizes first letter of each major word
+    - Keeps articles, conjunctions, and short prepositions lowercase (except when first or last word)
+    - Preserves acronyms in uppercase
+    - Handles special characters and numbers appropriately
+  - **Function Location**: Added `to_proper_case()` static method to Logger utility class
+  - **Applied To**:
+    - Content Generator service when creating WordPress posts
+    - Blog Generator Controller V2 when publishing posts
+    - Blog model records to maintain consistency
+  - **Example**: "THE BEST WAYS TO USE AI IN MARKETING" becomes "The Best Ways to Use AI in Marketing"
+
+### Fixed
+- **CRITICAL: Product Validation Error**: Fixed "Product name is required" error when editing products with filled-out product names
+  - **Root Cause**: Mismatch between form field names and validation method expectations
+  - **Problem**: Form sends `product_name` but validation checked for `name`, causing false validation failures
+  - **Solution**: Updated Product Model validation and all related methods to use correct `product_name` field consistently
+  - **Files Modified**: 
+    - `models/class-product-model.php` - Fixed validation, sanitization, SQL queries, and fillable fields
+    - Updated all database references from `name`/`description` to `product_name`/`product_description`
+  - **Result**: Product editing now works correctly with proper field name consistency
+
+- **CRITICAL: JavaScript Code Corruption in Context Editor**: Fixed context editor converting JavaScript code to HTML with `<br/>` tags
+  - **Root Cause**: Context content was being HTML-escaped with `esc_textarea()` when loaded into edit form
+  - **Problem**: JavaScript code like ApexCharts was corrupted with `<br/>` tags and `<p>` wrappers, making scripts unusable
+  - **Solution**: 
+    - Removed `esc_textarea()` from Context Controller to preserve raw code formatting
+    - Updated context textarea to be code-friendly with monospace font and proper attributes
+    - Added `spellcheck="false"`, `autocorrect="off"`, and `white-space: pre` for code editing
+  - **Files Modified**:
+    - `controllers/class-context-controller.php` - Removed HTML escaping of context content
+    - `admin/views/contexts.php` - Enhanced textarea for code editing with proper styling
+  - **Result**: JavaScript code blocks now preserve proper formatting without HTML tag corruption
+
+### Added
+- **SEO Improvements**: Comprehensive SEO enhancements for better search engine optimization
+  - **Meta Description Length**: Updated from 160 to 140 characters for optimal SEO performance
+    - Updated all AI prompts to request 120-140 character meta descriptions
+    - Updated validation logic to check for 140-character limit instead of 160
+    - Applied changes to both Prompt Compiler Service and Anthropic Service
+  - **Focus Keyphrase in Image Alt Text**: Automatically include focus keyphrase in all image alt tags for improved SEO
+    - Modified `generate_alt_text_from_prompt()` methods to accept focus keyphrase parameter
+    - Smart integration: prepends keyphrase for short alt text, appends naturally for longer alt text
+    - Only adds keyphrase if not already present to avoid duplication
+    - Applied to both Content Generator and Anthropic Service classes
+  - **Focus Keyphrase in Image Filenames**: Include target keyphrase in image filenames for enhanced SEO
+    - Enhanced `generate_descriptive_filename()` and `generate_filename()` methods in OpenAI_Service
+    - Focus keyphrase appears first in filename followed by descriptive keywords
+    - Smart deduplication logic prevents overlap between keyphrase and content keywords
+    - Automatic propagation from content generation to image requirements
+    - Applied to both content images and featured images
+  - Ensures all SEO elements meet current best practices
+
 - **Brand Features Management System**: Complete internal linking management with:
   - New database table: `ai_blog_brand_features`
   - Full CRUD operations for brand features (services, pages, documents, etc.)
@@ -25,6 +131,62 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Fixed save button not working due to incorrect nonce verification name
   - Enhanced modal styling to match other admin modals with gradient header and proper form styling
   - Added `ai-blog-form-control` class to all form inputs for consistent styling
+
+- **Base64 Content Decoding Issue**: Fixed issue where base64-encoded content (like ApexCharts JavaScript) was not being decoded before insertion into blog posts
+  - Root cause: AI was generating base64-encoded content but the content parsing logic wasn't decoding it
+  - Solution: Added `decode_base64_content()` method to detect and decode base64 strings in HTML/Avada content
+  - Enhanced all content parsing paths (HTML, HTML_CONTENT, AVADA_CONTENT, CONTENT) to automatically decode base64
+  - Added intelligent detection for base64-encoded HTML/JavaScript content (checks for tags like `<script>`, `function`, `ApexCharts`)
+  - Result: Charts and other base64-encoded content now properly decode and display in blog posts
+
+- **Enhanced Base64 Content Detection**: Improved base64 detection and decoding to handle ApexCharts and other JavaScript content more reliably
+  - Root cause: Previous base64 detection was too restrictive and couldn't handle various content formats (code blocks, line breaks, etc.)
+  - Problem: ApexCharts JavaScript code was being returned as base64 strings instead of being decoded into functional code
+  - Solution: Implemented multiple detection patterns and enhanced content validation
+  - Added support for base64 in code blocks, with line breaks, and standalone strings
+  - Expanded content validation to detect more JavaScript patterns (`chart`, `series`, `const`, `let`, `querySelector`, etc.)
+  - Added comprehensive logging to track successful base64 decoding attempts
+  - Result: ApexCharts and other base64-encoded JavaScript content now properly decodes and displays as functional code in blog posts
+
+- **Context Textarea HTML Parsing Issue**: Fixed critical issue where HTML content in context textareas was being parsed instead of displayed as raw code
+  - Root cause: Context content containing HTML/Avada shortcodes was not properly escaped when sent to frontend textarea fields
+  - Problem: HTML tags and entities were being interpreted by the browser instead of shown as editable text in the context editor
+  - Critical Impact: Users couldn't properly edit contexts containing HTML/Avada shortcodes because the browser was parsing the HTML
+  - Solution: Added `esc_textarea()` escaping to context content before sending to frontend
+  - Modified `get_context` AJAX handler to create escaped copy of context object for textarea display
+  - Result: HTML and Avada shortcodes now display as raw, editable text in context textareas instead of being parsed
+
+- **Log Noise Reduction**: Removed unnecessary repeating log entry for Product AJAX handlers registration
+  - Removed "PRODUCT_AJAX_HANDLERS_REGISTERED" log entry that was appearing on every Product Controller initialization
+  - This log provided no debugging value and was creating unnecessary log noise
+  - Result: Cleaner debug logs with less repetitive initialization messages
+
+- **Image Saving and Alt Text Improvements**: Comprehensive improvements to image filename generation and alt text quality
+  - **Descriptive Filenames**: Replaced generic "ai_blog_image" prefixes with meaningful, descriptive filenames based on image content
+    - New system extracts 3-4 key words from image prompts (e.g., "classroom-poster-printer-setup" instead of "ai_blog_image_1")
+    - Removes AI prompt language and focuses on actual subject matter
+    - Includes short hash for uniqueness while keeping names readable
+  - **Enhanced Alt Text Generation**: Significantly improved alt text quality and length
+    - Removed AI prompt language ("create", "generate", "professional", "high quality", etc.)
+    - Increased length limit from 125 to 200 characters (WordPress recommendation)
+    - Smart truncation at word boundaries to avoid cutting mid-word
+    - Added proper capitalization and cleanup of technical prompt terminology
+    - Removed references to "stock photo", "commercial", "marketing" language
+  - **Result**: Images now have meaningful filenames and natural, descriptive alt text without AI prompt artifacts
+
+- **Context Content Over-Escaping Issue**: Fixed issue where context content was being overly escaped, showing multiple backslashes in text boxes
+  - Root cause: `sanitize_textarea_field` was aggressively escaping quotes and special characters, causing multiple levels of escaping for complex Avada shortcodes
+  - Problem: Content like `size=\"1\"` was becoming `size=\\\\\\\"1\\\\\\\"` with multiple escape levels
+  - Solution: Replaced `sanitize_textarea_field` with `wp_kses_post( wp_unslash() )` for context content sanitization
+  - Fixed in multiple locations: Context Controller's `create_context()`, `update_context()`, `import_contexts()` methods and Context Model's `sanitize_field()` method
+  - Result: Complex Avada shortcodes and HTML content now save and display correctly without over-escaping
+
+- **Prompt Compiler Service Unnecessary Initialization**: Fixed Prompt Compiler Service being initialized every 2 seconds during AJAX polling
+  - Root cause: Content Generator was eagerly initializing Prompt Compiler Service in constructor, and AJAX status polling was creating Content Generator instances every 2 seconds
+  - Problem: Debug logs showed `PROMPT_COMPILER_INIT` and `PRODUCT_AJAX_HANDLERS_REGISTERED` every 2 seconds due to fast refresh mode
+  - Solution: Implemented lazy initialization for Prompt Compiler Service - only creates instance when actually needed during blog generation
+  - Performance Impact: Eliminates unnecessary service initialization during routine AJAX status checks
+  - Result: Prompt Compiler Service now only initializes during actual blog post generation, not during status polling
 
 ### UI/UX Improvements
 - **Product Modal Button Styling**: Fixed Save/Cancel buttons in product modal
@@ -670,6 +832,42 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Replaced `print_r( array_keys(), true )` with `implode(', ', array_keys())`
   - Replaced database result dumps with safe array key listing
 - **Result**: Debug log now readable and useful for troubleshooting
+
+## [Version 1.0.29] - 2025-06-24
+### Fixed
+- **Critical Image Generation Hanging Fix**: Implemented multiple safeguards to prevent hanging on third image
+  - Added hard time limit check BEFORE each image API call - skips images if running too long
+  - Limited maximum images per post to 2 by default (configurable via `ai_blog_generator_max_images_per_post` option)
+  - Added per-image time budget (2m 20s) to ensure generation continues even if one image is slow
+  - Images are now skipped rather than hanging the entire generation process
+  - Posts will publish successfully even if later images are skipped due to time limits
+
+## [Version 1.0.28] - 2025-06-20
+### Fixed
+- **CRITICAL FIX**: Image generation timeouts no longer fail entire post generation
+  - Changed exception handling to continue with post creation even if all images fail
+  - Posts now publish successfully even when image generation times out
+  - Prevents posts from disappearing due to image generation issues
+  - Individual image timeout set to 2m 30s (150 seconds) as specified
+  - Overall timeout for all images set to 8 minutes (allowing for 3 images)
+  - Added specific timeout detection and logging
+  - Progress messages now clearly indicate when images timeout vs other failures
+  - PHP execution time limits properly managed per image with restoration
+- **Fixed Missing Logging Output**: Generation logs were not being written to files
+  - Fixed missing file write operation in Generation_Logger class
+  - Logs are now properly written to `wp-content/uploads/ai-blog-generator-logs/generations/`
+  - Each generation creates a timestamped log file for debugging
+- **Fixed Undefined Variable Error**: Fixed fatal error when `$images` variable was undefined
+  - Initialized `$images` array before image generation block to prevent undefined variable errors
+- **Enhanced Image Generation Timeout Handling**: Fixed hanging requests during image generation
+  - Added WordPress HTTP API filters to enforce timeouts at multiple levels
+  - Added connection timeout of 30 seconds to prevent hanging on connection
+  - Added CURL-specific timeout options for better timeout enforcement
+  - Added response size limit of 50MB to prevent memory issues
+  - Added shutdown handler to detect and log timeout scenarios
+  - Added periodic timeout checks during image generation
+  - Enhanced logging to track exactly where requests might hang
+  - Fixed fatal error with stream_context_set_default() by removing unnecessary stream context manipulation
 
 ### Fixed - 2025-06-16 - Critical Generation Imports
 
@@ -3863,3 +4061,102 @@ foreach ($contexts as $context) {
   - When "Always include in content generation" is checked, both Avada and HTML options are automatically checked and disabled
   - When unchecked, both options are re-enabled and maintain their mutual exclusivity
   - Form reset and modal population properly handle the disabled states
+
+## [1.9.0] - 2024-01-XX
+### Added
+- **Prompt Compiler Service**: New abstraction layer between AI services and prompt generation
+  - Centralized prompt compilation in `services/class-prompt-compiler-service.php`
+  - Comprehensive system prompt building with persona, contexts, and requirements
+  - User prompt construction with SEO and format specifications
+  - Prompt logging to `{idea_id}_prompts.txt` files for debugging
+  - Support for both content and image prompt generation
+- **Anthropic Service Enhancement**: New `generate_content()` method accepting pre-compiled prompts
+- **Product Model Enhancement**: Added `get_active_products()` method for retrieving active products
+
+### Changed
+- Content Generator now uses Prompt Compiler Service instead of inline prompt building
+- Improved separation of concerns between prompt generation and AI service communication
+- Enhanced maintainability with all prompt logic in a single location
+
+### Technical Details
+- System prompts include: persona info, layout styles, chart usage, contexts, product requirements, SEO guidelines, brand features
+- User prompts include: target keywords, image requirements, SEO metadata, output format
+- Backwards compatible with existing content generation workflow
+
+### Fixed Product Field Name Errors in Prompt Compiler [2025-01-24]
+- **Problem**: PHP warnings about undefined array keys "name" and "description" in Prompt Compiler Service
+- **Root Cause**: Code was accessing `$product['name']` and `$product['description']` but database uses `product_name` and `product_description`
+- **Solution**: Updated field references in `build_product_promotion_prompt()` and `get_available_seed_images()` methods to use correct field names
+- **Files Modified**: 
+  - `services/class-prompt-compiler-service.php`
+
+### Enhanced Product Information in Content Prompts [2025-01-24]
+- **Problem**: Product information in prompts was missing URLs and images (empty arrays)
+- **Root Cause**: The `get_active_products()` method only returned basic product data without relations (images and links)
+- **Solution**: 
+  - Changed to use `get_all_with_relations()` to fetch complete product data including images and links
+  - Properly extract product URLs from the links relation (preferring product_page type)
+  - Extract all image URLs from the images relation (using full_url when available)
+  - Added debug logging to track product data structure
+- **Benefits**: AI now receives complete product information including all images and URLs for better content generation
+- **Files Modified**: 
+  - `services/class-prompt-compiler-service.php` - Updated `build_product_promotion_prompt()` method
+
+## Recent Changes
+
+### Persona-Based Image Count Control [2025-01-24]
+- **Feature**: Content generation now respects the `number_of_images` field in persona settings
+- **Implementation Details**:
+  - If persona has `number_of_images` set to 0 or null: Only featured image is generated
+  - If persona has `number_of_images` set to a specific number (e.g., 2): That many content images are generated PLUS a featured image
+  - Default value is 2 content images if not specified
+- **How it Works**:
+  - Prompt Compiler Service reads `$persona['number_of_images']` (defaults to 2)
+  - Only includes content image prompts if `number_of_images` > 0
+  - Featured image is always generated regardless of this setting
+  - Admin interface already has the field at Personas page > Number of images input
+- **Files Modified**:
+  - `services/class-prompt-compiler-service.php` - Already handles persona image count
+  - `models/class-persona-model.php` - Already includes `number_of_images` in fillable fields
+  - `admin/views/personas.php` - Already has UI for setting image count
+
+### Fixed ApexCharts JavaScript Rendering Issues [2025-01-24]
+- **Problem**: Chart JavaScript code was being wrapped in `<p>` tags with `<br />` tags, breaking functionality
+- **Symptoms**: Chart code displayed as text with HTML formatting instead of executing
+- **Root Cause**: AI was including JavaScript directly in HTML content instead of the CHARTS section
+- **Solution**:
+  - Enhanced chart formatting rules in `build_chart_usage_prompt()` 
+  - Added CHARTS section to user prompt output format
+  - Created "ApexCharts Formatting Rules" context with clear examples
+  - Specified that CHARTS section should contain ONLY JavaScript (no tags)
+- **Files Modified**:
+  - `services/class-prompt-compiler-service.php`
+
+### Fixed Avada Fusion Builder JavaScript Errors [2025-01-24]
+- **Problem**: "Cannot read properties of undefined (reading 'alpha_background_color')" error when editing Avada posts
+- **Root Cause**: Generated Avada shortcodes were missing required attributes and had invalid attributes:
+  - Missing `alpha_background_color` attribute (required by Fusion Builder)
+  - Had invalid `undefined=""` attribute
+  - Had duplicate `padding_top` attributes
+  - Column shortcodes had invalid `border_position` attribute
+- **Solution**:
+  - Fixed shortcode generation in both `class-content-generator.php` and `class-anthropic-service.php`
+  - Added required `alpha_background_color=""` attribute to containers and columns
+  - Removed `undefined=""` and duplicate attributes
+  - Created "Avada Shortcode Requirements" context with proper formatting examples
+- **Files Modified**:
+  - `services/class-content-generator.php`
+  - `services/class-anthropic-service.php`
+  - Added context: "Avada Shortcode Requirements"
+
+### Fixed ApexCharts Not Being Generated [2025-01-24]
+- **Problem**: Chart JavaScript was not being included - only empty divs with no script
+- **Root Cause**: AI was copying instruction text like "[OPTIONAL: Only include JavaScript...]" instead of generating actual JavaScript
+- **Solution**:
+  - Updated chart prompts to be clearer about leaving section empty vs. adding JavaScript
+  - Added example JavaScript structure in system prompt
+  - Enhanced parsing to detect and ignore placeholder/instruction text
+  - Changed from "OPTIONAL" language to clearer instructions
+- **Files Modified**:
+  - `services/class-prompt-compiler-service.php` - Clearer chart instructions
+  - `services/class-content-generator.php` - Filter out placeholder text

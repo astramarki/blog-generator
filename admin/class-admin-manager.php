@@ -722,7 +722,7 @@ class Admin_Manager {
 							console.log('Final persona options HTML:', personaOptions);
 							
 							var modalHtml = '<div id=\"edit-idea-modal\" class=\"ai-blog-modal ai-blog-modal-active\" style=\"display: block; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 999999;\">' +
-								'<div class=\"ai-blog-modal-content\" style=\"position: relative; background: white; margin: 5% auto; padding: 0; width: 90%; max-width: 600px; border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);\">' +
+								'<div class=\"ai-blog-modal-content\" style=\"position: relative; background: white; margin: 5% auto; padding: 0; width: 90%; max-width: 1000px; border-radius: 4px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);\">' +
 								'<div class=\"ai-blog-modal-header\" style=\"padding: 20px; border-bottom: 1px solid #ddd; display: flex; justify-content: space-between; align-items: center;\">' +
 								'<h2 class=\"ai-blog-modal-title\" style=\"margin: 0; font-size: 1.3em;\">Edit Approved Idea</h2>' +
 								'<button type=\"button\" class=\"ai-blog-modal-close\" style=\"background: none; border: none; font-size: 24px; cursor: pointer; padding: 0; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center;\">&times;</button>' +

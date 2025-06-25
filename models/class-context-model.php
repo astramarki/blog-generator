@@ -785,7 +785,9 @@ class Context_Model extends Model {
 				return sanitize_key( $value );
 			
 			case 'content':
-				return wp_kses_post( $value );
+				// For content, preserve everything exactly as entered
+				// This allows JavaScript, HTML, Avada shortcodes, etc. to be stored without modification
+				return wp_unslash( $value );
 			
 			case 'priority':
 				return absint( $value );

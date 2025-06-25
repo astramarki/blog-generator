@@ -1071,13 +1071,30 @@
     position: relative;
     background: #fff;
     width: 90%;
-    max-width: 600px;
+    max-width: 1000px;
     margin: 50px auto;
     border-radius: 8px;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     max-height: calc(100vh - 100px);
     overflow-y: auto;
     animation: ai-blog-modal-slide 0.3s ease;
+}
+
+/* Large modal for context editing */
+.ai-blog-modal-content.large {
+    width: 80vw;
+    max-width: 80vw;
+    height: 80vh;
+    max-height: 80vh;
+    margin: 10vh auto;
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-blog-modal-content.large .ai-blog-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    max-height: calc(80vh - 140px); /* Account for header and footer */
 }
 
 .ai-blog-modal-header {
@@ -1188,6 +1205,33 @@
 .ai-blog-modal textarea.ai-blog-form-control {
     resize: vertical;
     min-height: 80px;
+}
+
+/* Code editor styling for context content */
+.ai-blog-modal textarea.ai-blog-code-editor {
+    background-color: #f8f9fa;
+    border: 1px solid #c3c4c7;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace !important;
+    font-size: 13px !important;
+    line-height: 1.5 !important;
+    tab-size: 4;
+    -moz-tab-size: 4;
+    white-space: pre;
+    overflow-wrap: normal;
+    overflow-x: auto;
+}
+
+.ai-blog-modal.large textarea.ai-blog-code-editor {
+    min-height: 400px;
+    height: calc(80vh - 400px);
+    max-height: 600px;
+}
+
+.ai-blog-modal textarea.ai-blog-code-editor:focus {
+    background-color: #fff;
+    border-color: #2271b1;
+    box-shadow: 0 0 0 1px #2271b1;
+    outline: 2px solid transparent;
 }
 
 .ai-blog-modal .ai-blog-checkbox-label {

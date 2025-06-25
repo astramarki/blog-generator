@@ -180,9 +180,17 @@ class OpenAI_Service {
 
 			Logger::info( 'openai_about_to_make_request', 'About to call make_request method', [
 				'memory_before_make_request' => memory_get_usage(),
+				'api_url' => $this->api_url,
 			] );
 			
 			$api_call_start = microtime( true );
+			
+			// Add pre-call timestamp
+			Logger::info( 'openai_api_call_starting', 'Making actual API call NOW', [
+				'timestamp' => date( 'Y-m-d H:i:s' ),
+				'prompt_preview' => substr( $prompt, 0, 100 ),
+			] );
+			
 			$response = $this->make_request( $request_data );
 			$api_call_duration = microtime( true ) - $api_call_start;
 			
@@ -467,7 +475,7 @@ class OpenAI_Service {
 			'method' => 'POST',
 			'headers' => $headers,
 			'body' => $body,
-			'timeout' => 300, // 5 minute timeout for image editing
+			'timeout' => 150, // 2m 30s timeout for individual image editing
 		];
 		
 		// Disable SSL verification for local environments
@@ -804,9 +812,10 @@ class OpenAI_Service {
 	 * @param string $title Blog post title.
 	 * @param string $description Blog post description.
 	 * @param array  $seed_images Optional seed images for consistency.
+	 * @param string $focus_keyphrase Optional focus keyphrase for SEO-friendly filename.
 	 * @return array Generated image result.
 	 */
-	public function generate_blog_image( $title, $description, $seed_images = [] ) {
+	public function generate_blog_image( $title, $description, $seed_images = [], $focus_keyphrase = '' ) {
 		// Build prompt for blog image
 		$prompt = $this->build_image_prompt( $title, $description, $seed_images );
 
@@ -819,8 +828,8 @@ class OpenAI_Service {
 		$result = $this->generate_image( $prompt, $options );
 
 		if ( $result['success'] ) {
-			// Generate filename based on title
-			$filename = $this->generate_filename( $title );
+			// Generate filename based on title with focus keyphrase for SEO
+			$filename = $this->generate_filename( $title, $focus_keyphrase );
 			
 			// Save to media library
 			$save_result = $this->save_to_media_library(
@@ -868,19 +877,128 @@ class OpenAI_Service {
 	 * Generate filename from title.
 	 *
 	 * @param string $title Blog post title.
+	 * @param string $focus_keyphrase Optional focus keyphrase to include in filename.
 	 * @return string Generated filename.
 	 */
-	private function generate_filename( $title ) {
+	private function generate_filename( $title, $focus_keyphrase = '' ) {
+		// Start with focus keyphrase if available for better SEO
+		$filename_parts = [];
+		
+		if ( ! empty( $focus_keyphrase ) ) {
+			$clean_keyphrase = sanitize_file_name( $focus_keyphrase );
+			$clean_keyphrase = preg_replace( '/[^a-zA-Z0-9\-_]/', '-', $clean_keyphrase );
+			$clean_keyphrase = preg_replace( '/-+/', '-', $clean_keyphrase );
+			$clean_keyphrase = trim( $clean_keyphrase, '-' );
+			if ( ! empty( $clean_keyphrase ) ) {
+				$filename_parts[] = $clean_keyphrase;
+			}
+		}
+		
 		// Clean title for filename
-		$filename = sanitize_file_name( $title );
-		$filename = preg_replace( '/[^a-zA-Z0-9\-_]/', '-', $filename );
-		$filename = preg_replace( '/-+/', '-', $filename );
-		$filename = trim( $filename, '-' );
+		$clean_title = sanitize_file_name( $title );
+		$clean_title = preg_replace( '/[^a-zA-Z0-9\-_]/', '-', $clean_title );
+		$clean_title = preg_replace( '/-+/', '-', $clean_title );
+		$clean_title = trim( $clean_title, '-' );
+		if ( ! empty( $clean_title ) ) {
+			$filename_parts[] = $clean_title;
+		}
+		
+		$filename = implode( '-', $filename_parts );
 		
 		// Add timestamp to ensure uniqueness
 		$filename .= '-' . time();
 		
 		return strtolower( $filename );
+	}
+
+	/**
+	 * Generate descriptive filename from image prompt.
+	 *
+	 * @param string $prompt Image generation prompt.
+	 * @param string $token Image token (e.g., {{image1}}).
+	 * @param int $index Image index.
+	 * @param string $focus_keyphrase Optional focus keyphrase to include in filename.
+	 * @return string Descriptive filename.
+	 */
+	private function generate_descriptive_filename( $prompt, $token, $index, $focus_keyphrase = '' ) {
+		$filename_parts = [];
+		
+		// Start with focus keyphrase if available for better SEO
+		if ( ! empty( $focus_keyphrase ) ) {
+			$clean_keyphrase = sanitize_file_name( $focus_keyphrase );
+			$clean_keyphrase = preg_replace( '/[^a-zA-Z0-9\-_]/', '-', $clean_keyphrase );
+			$clean_keyphrase = preg_replace( '/-+/', '-', $clean_keyphrase );
+			$clean_keyphrase = trim( $clean_keyphrase, '-' );
+			if ( ! empty( $clean_keyphrase ) ) {
+				$filename_parts[] = $clean_keyphrase;
+			}
+		}
+		
+		// Extract meaningful keywords from prompt
+		$clean_prompt = $this->extract_filename_keywords( $prompt );
+		
+		// Fallback to token if prompt doesn't yield good keywords
+		if ( empty( $clean_prompt ) || strlen( $clean_prompt ) < 3 ) {
+			$clean_prompt = str_replace( [ '{{', '}}' ], '', $token );
+		}
+		
+		// Add prompt keywords if they don't overlap with keyphrase
+		if ( ! empty( $clean_prompt ) ) {
+			$prompt_parts = array_filter( explode( '-', $clean_prompt ) );
+			$keyphrase_parts = ! empty( $focus_keyphrase ) ? array_filter( explode( '-', strtolower( str_replace( ' ', '-', $focus_keyphrase ) ) ) ) : [];
+			
+			// Only add prompt parts that aren't already in the keyphrase
+			foreach ( $prompt_parts as $part ) {
+				if ( ! in_array( strtolower( $part ), $keyphrase_parts, true ) && strlen( $part ) > 2 ) {
+					$filename_parts[] = $part;
+				}
+			}
+		}
+		
+		$filename = implode( '-', $filename_parts );
+		
+		// Sanitize for filename
+		$filename = sanitize_file_name( $filename );
+		$filename = preg_replace( '/[^a-zA-Z0-9\-_]/', '-', $filename );
+		$filename = preg_replace( '/-+/', '-', $filename );
+		$filename = trim( $filename, '-' );
+		
+		// Limit length and add uniqueness
+		$filename = substr( $filename, 0, 40 ); // Increased length slightly for keyphrase
+		$filename = trim( $filename, '-' );
+		$filename .= '-' . substr( md5( $prompt ), 0, 6 ); // Short hash for uniqueness
+		
+		return strtolower( $filename );
+	}
+
+	/**
+	 * Extract meaningful keywords from image prompt for filename.
+	 *
+	 * @param string $prompt Image generation prompt.
+	 * @return string Cleaned keywords for filename.
+	 */
+	private function extract_filename_keywords( $prompt ) {
+		// Remove AI prompt prefixes and common phrases
+		$clean = preg_replace( '/^(create|generate|show|display|illustrate|image of|photo of|picture of)\s+/i', '', $prompt );
+		
+		// Remove common prompt modifiers
+		$clean = preg_replace( '/\b(professional|high quality|detailed|realistic|vibrant|modern|clean|bright)\s+/i', '', $clean );
+		
+		// Remove instruction words
+		$clean = preg_replace( '/\b(with|showing|featuring|including|containing|that|has|have)\s+/i', '', $clean );
+		
+		// Extract key nouns and adjectives (first 3-4 meaningful words)
+		$words = explode( ' ', trim( $clean ) );
+		$meaningful_words = [];
+		
+		foreach ( $words as $word ) {
+			$word = trim( preg_replace( '/[^a-zA-Z0-9]/', '', $word ) );
+			if ( strlen( $word ) > 2 && count( $meaningful_words ) < 4 ) {
+				$meaningful_words[] = $word;
+			}
+		}
+		
+		return implode( '-', $meaningful_words );
 	}
 
 	/**
@@ -904,6 +1022,21 @@ class OpenAI_Service {
 			],
 		];
 
+		// SAFETY: Limit images to prevent timeout issues
+		$max_images = (int) get_option( 'ai_blog_generator_max_images_per_post', 2 );
+		if ( $max_images < 1 ) {
+			$max_images = 2; // Default to 2 if invalid
+		}
+		
+		if ( count( $image_requirements ) > $max_images ) {
+			Logger::warning( 'sequential_image_limit_applied', 'Limiting image generation to prevent timeouts', [
+				'requested_images' => count( $image_requirements ),
+				'limited_to' => $max_images,
+				'reason' => 'max_images_per_post setting'
+			] );
+			$image_requirements = array_slice( $image_requirements, 0, $max_images );
+		}
+		
 		Logger::info( 'sequential_image_generation_start', 'Starting sequential image generation', [
 			'total_images' => count( $image_requirements ),
 			'memory_usage' => memory_get_usage(),
@@ -935,6 +1068,46 @@ class OpenAI_Service {
 			$image_number = $index + 1;
 			$total_images = count( $image_requirements );
 			
+			// CRITICAL: Add hard time limit check BEFORE starting each image
+			$total_elapsed = microtime( true ) - $generation_start_time;
+			$per_image_time_limit = 140; // 2m 20s hard limit per image (slightly less than timeout)
+			$expected_time_for_this_image = $per_image_time_limit * ( $index + 1 );
+			
+			if ( $total_elapsed > $expected_time_for_this_image ) {
+				Logger::error( 'sequential_image_hard_timeout', "HARD TIMEOUT: Skipping image {$image_number} - exceeded time limit", [
+					'image_number' => $image_number,
+					'total_elapsed' => $total_elapsed,
+					'expected_time' => $expected_time_for_this_image,
+					'token' => $token
+				] );
+				
+				// Add failed result
+				$results['results'][] = [
+					'success' => false,
+					'token' => $token,
+					'error' => 'Skipped due to time limit - previous images took too long',
+					'stage' => 'hard_timeout',
+					'index' => $index,
+				];
+				
+				$results['summary']['failed']++;
+				
+				if ( $progress_callback ) {
+					call_user_func( $progress_callback, [
+						'stage' => 'images',
+						'message' => "Skipping image {$image_number} of {$total_images} - time limit exceeded",
+						'progress' => round( ( ( $index + 1 ) / $total_images ) * 100 ),
+						'current_image' => $image_number,
+						'total_images' => $total_images,
+						'token' => $token,
+						'failed' => true,
+						'skipped' => true
+					] );
+				}
+				
+				continue; // Skip to next image
+			}
+			
 			// Calculate progress percentage for this image
 			$progress_percentage = round( ( $index / $total_images ) * 100 );
 			
@@ -961,15 +1134,43 @@ class OpenAI_Service {
 			] );
 
 			$image_result = null;
+			$individual_image_start = time();
+			$individual_timeout = 150; // 2m 30s per image
 
 			try {
+				// Set a PHP timeout for this individual image
+				$original_time_limit = ini_get( 'max_execution_time' );
+				set_time_limit( $individual_timeout + 30 ); // Add 30s buffer for cleanup
+				
+				// Add a WordPress-specific timeout mechanism
+				$timeout_check_start = time();
+				$timeout_reached = false;
+				
+				// Register a shutdown handler to detect timeouts
+				$shutdown_function = function() use ( &$timeout_reached, $timeout_check_start, $individual_timeout, $image_number, $token ) {
+					if ( ! $timeout_reached && ( time() - $timeout_check_start ) > $individual_timeout ) {
+						$timeout_reached = true;
+						Logger::error( 'sequential_image_shutdown_timeout', "Image generation shutdown detected - likely timeout for image {$image_number}", [
+							'elapsed' => time() - $timeout_check_start,
+							'token' => $token
+						] );
+					}
+				};
+				register_shutdown_function( $shutdown_function );
+				
 				// Use seed image editing if we have a seed image
 			if ( $has_seed_images && $seed_image_used ) {
 					Logger::info( 'sequential_seed_image_edit', "Starting seed image edit for image {$image_number}", [
 					'token' => $token,
 					'seed_image_url' => $seed_image_used,
 						'prompt_preview' => substr( $prompt, 0, 100 ),
+						'timeout_limit' => $individual_timeout,
 				] );
+				
+				// Check if we've been running too long
+				if ( ( time() - $timeout_check_start ) > $individual_timeout ) {
+					throw new \Exception( 'Image generation timeout before API call' );
+				}
 				
 				$image_result = $this->edit_image( $prompt, $seed_image_used );
 				
@@ -977,12 +1178,19 @@ class OpenAI_Service {
 					'token' => $token,
 					'success' => $image_result['success'] ?? false,
 					'error_message' => $image_result['message'] ?? 'none',
+						'elapsed_time' => time() - $individual_image_start,
 				] );
 			} else {
 					Logger::info( 'sequential_standard_generation', "Starting standard generation for image {$image_number}", [
 					'token' => $token,
 						'prompt_preview' => substr( $prompt, 0, 100 ),
+						'timeout_limit' => $individual_timeout,
 				] );
+				
+				// Check if we've been running too long
+				if ( ( time() - $timeout_check_start ) > $individual_timeout ) {
+					throw new \Exception( 'Image generation timeout before API call' );
+				}
 				
 				$image_result = $this->generate_image( $prompt );
 				
@@ -990,12 +1198,19 @@ class OpenAI_Service {
 					'token' => $token,
 					'success' => $image_result['success'] ?? false,
 					'error_message' => $image_result['message'] ?? 'none',
+						'elapsed_time' => time() - $individual_image_start,
 				] );
 			}
+				
+				// Restore original time limit
+				if ( $original_time_limit ) {
+					set_time_limit( $original_time_limit );
+				}
 
 			if ( $image_result['success'] ) {
-				// Generate filename based on token and timestamp
-					$filename = 'ai-blog-image-' . sanitize_file_name( str_replace( [ '{{', '}}' ], '', $token ) ) . '-' . time() . '-' . $index;
+				// Generate descriptive filename based on prompt content with focus keyphrase for SEO
+					$focus_keyphrase = $requirement['focus_keyphrase'] ?? '';
+					$filename = $this->generate_descriptive_filename( $prompt, $token, $index, $focus_keyphrase );
 					
 					// Update progress: saving image
 					if ( $progress_callback ) {
@@ -1114,33 +1329,54 @@ class OpenAI_Service {
 				}
 
 			} catch ( \Exception $e ) {
+				// Check if this is a timeout error
+				$is_timeout = ( time() - $individual_image_start ) > $individual_timeout || 
+							  strpos( strtolower( $e->getMessage() ), 'timeout' ) !== false ||
+							  strpos( strtolower( $e->getMessage() ), 'timed out' ) !== false;
+				
+				$error_message = $is_timeout ? 
+					"Image generation timed out after " . ( time() - $individual_image_start ) . " seconds" : 
+					'Exception: ' . $e->getMessage();
+				
 				$results['results'][] = [
 					'success' => false,
 					'token' => $token,
-					'error' => 'Exception: ' . $e->getMessage(),
-					'stage' => 'exception',
+					'error' => $error_message,
+					'stage' => $is_timeout ? 'timeout' : 'exception',
 					'index' => $index,
 				];
 				
 				$results['summary']['failed']++;
 				
-				Logger::error( 'sequential_image_exception', "Exception during image {$image_number} generation", [
+				Logger::warning( 'sequential_image_exception', "Exception during image {$image_number} generation - continuing with next image", [
 					'token' => $token,
 					'error' => $e->getMessage(),
+					'is_timeout' => $is_timeout,
+					'elapsed_time' => time() - $individual_image_start,
 					'trace' => $e->getTraceAsString(),
 				] );
 				
-				// Update progress: exception occurred
+				// Update progress: exception occurred but continuing
 				if ( $progress_callback ) {
+					$progress_message = $is_timeout ? 
+						"Image {$image_number} timed out - continuing with next image..." : 
+						"Image {$image_number} failed - continuing with next image...";
+						
 					call_user_func( $progress_callback, [
 						'stage' => 'images',
-						'message' => "Error generating image {$image_number} of {$total_images}: " . $e->getMessage(),
+						'message' => $progress_message,
 						'progress' => round( ( ( $index + 1 ) / $total_images ) * 100 ),
 						'current_image' => $image_number,
 						'total_images' => $total_images,
 						'token' => $token,
-						'failed' => true
+						'failed' => true,
+						'is_timeout' => $is_timeout
 					] );
+				}
+			} finally {
+				// Always restore original time limit
+				if ( isset( $original_time_limit ) && $original_time_limit ) {
+					set_time_limit( $original_time_limit );
 				}
 			}
 
@@ -1149,9 +1385,9 @@ class OpenAI_Service {
 				sleep( 2 ); // 2-second delay between images
 			}
 			
-			// Check for overall timeout (individual timeout per image: 3 minutes max)
+			// Check for overall timeout (individual timeout per image: 2m 30s max)
 			$total_elapsed = microtime( true ) - $generation_start_time;
-			if ( $total_elapsed > 540 ) { // 9 minutes total maximum
+			if ( $total_elapsed > 450 ) { // 7.5 minutes total maximum (allowing for 3 images)
 				Logger::warning( 'sequential_image_timeout', 'Sequential image generation approaching timeout, stopping early', [
 					'processed' => $index + 1,
 					'total' => count( $image_requirements ),
@@ -1221,7 +1457,7 @@ class OpenAI_Service {
 			'method' => 'POST',
 			'headers' => $headers,
 			'body' => wp_json_encode( $data ),
-			'timeout' => 300, // 5 minute timeout for image generation
+			'timeout' => 150, // 2m 30s timeout for individual image generation
 		];
 		
 		// Disable SSL verification for local environments
@@ -1254,8 +1490,58 @@ class OpenAI_Service {
 			'memory_before_request' => memory_get_usage(),
 		] );
 		
-		$response = wp_remote_request( $this->api_url, $args );
+		// Add a more aggressive timeout handler
+		add_filter( 'http_request_timeout', function( $timeout ) {
+			return 150; // Force 2m 30s timeout
+		}, 999 );
 		
+		// Add connection timeout
+		add_filter( 'http_request_args', function( $r ) {
+			$r['connect_timeout'] = 30; // 30 second connection timeout
+			$r['timeout'] = 150; // Total timeout
+			$r['limit_response_size'] = 50 * 1024 * 1024; // 50MB max response
+			$r['blocking'] = true; // Ensure blocking request
+			$r['stream'] = false; // Don't use streams
+			$r['decompress'] = true; // Handle compression
+			return $r;
+		}, 999 );
+		
+		// Add pre-request hook to track timeout
+		$request_start_hook = time();
+		add_action( 'http_api_curl', function( $handle ) use ( $request_start_hook ) {
+			// Set CURL-specific timeout options
+			curl_setopt( $handle, CURLOPT_CONNECTTIMEOUT, 30 );
+			curl_setopt( $handle, CURLOPT_TIMEOUT, 150 );
+			curl_setopt( $handle, CURLOPT_NOSIGNAL, 1 ); // Required for timeout to work in some environments
+		}, 999 );
+		
+		// Log right before the actual HTTP call
+		Logger::info( 'openai_http_call_imminent', 'About to execute wp_remote_request', [
+			'url' => $this->api_url,
+			'timeout' => $args['timeout'],
+			'time' => date( 'Y-m-d H:i:s' ),
+		] );
+		
+		try {
+			$response = wp_remote_request( $this->api_url, $args );
+		} catch ( \Exception $e ) {
+			// Remove filters on exception
+			remove_all_filters( 'http_request_timeout', 999 );
+			remove_all_filters( 'http_request_args', 999 );
+			remove_all_actions( 'http_api_curl', 999 );
+			
+			Logger::error( 'openai_request_exception', 'Exception during HTTP request', [
+				'error_message' => $e->getMessage(),
+				'error_code' => $e->getCode()
+			] );
+			throw new \Exception( 'HTTP request exception: ' . $e->getMessage() );
+		}
+		
+		// Remove filters after request
+		remove_all_filters( 'http_request_timeout', 999 );
+		remove_all_filters( 'http_request_args', 999 );
+		remove_all_actions( 'http_api_curl', 999 );
+
 		$request_duration = microtime( true ) - $request_start;
 		Logger::info( 'openai_wp_remote_request_completed', 'wp_remote_request completed', [
 			'request_duration_seconds' => $request_duration,

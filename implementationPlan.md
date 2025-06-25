@@ -307,6 +307,10 @@ ai-blog-generator/
    - Maintain persona voice consistency
    - Track which persona wrote what
    - Generate content in selected format (HTML or Avada)
+   - Respect persona's `number_of_images` setting:
+     - 0 = Only featured image generated
+     - 1+ = That many content images plus featured image
+     - Default is 2 content images if not specified
 
 ### Phase 7: Products Management 
 **Status: COMPLETED ✅**
@@ -398,6 +402,58 @@ ai-blog-generator/
    - Database query optimization
    - Caching implementation
    - Batch processing
+
+### Phase 10: Prompt Compiler Service
+**Status: COMPLETED ✅**
+
+#### Prompt Compilation Abstraction (COMPLETED ✅)
+- ✅ **Service Creation**: `services/class-prompt-compiler-service.php` - Centralized prompt generation
+- ✅ **System Prompt Compilation**: Builds comprehensive system prompts including:
+  - Persona biography, expertise, writing style, and tone
+  - Layout styles and rules from persona settings
+  - Chart usage instructions based on persona configuration
+  - All contexts with "always_include_content" = 1
+  - Persona-specific contexts
+  - Format-specific contexts (HTML or Avada based on persona settings)
+  - Product promotion requirements (minimum 2 products)
+  - Previously used keyphrases to avoid duplication
+  - Brand features for internal linking
+- ✅ **User Prompt Construction**: Creates user prompts with:
+  - 2 randomly selected target keywords
+  - Image placeholders based on persona settings (minimum 2)
+  - SEO requirements (focus keyphrase, meta description)
+  - Output format requirements (title, tags, content)
+  - Specific formatting instructions for Avada or HTML
+- ✅ **Prompt Logging**: Writes compiled prompts to `<idea_id>_prompts.txt` in uploads directory
+- ✅ **Image Prompt Generation**: Handles image generation prompts with seed image support
+
+#### Service Interface (COMPLETED ✅)
+- ✅ **Main Methods**:
+  - `generate_content_prompts($idea_id)` - Compiles all prompts for content generation
+  - `build_system_prompts($idea, $persona, $contexts, $brand_features, $keywords, $products)` - Constructs system prompt array
+  - `build_user_prompt($idea, $target_keywords, $persona, $products)` - Creates user prompt
+  - `generate_image_prompts($image_requirements, $persona)` - Generates image prompts
+- ✅ **Helper Methods**:
+  - `get_persona_prompt($persona)` - Formats persona information
+  - `get_layout_prompt($persona)` - Generates layout instructions
+  - `get_chart_prompt($persona)` - Creates chart usage guidelines
+  - `get_context_prompts($contexts)` - Compiles context information
+  - `get_format_prompt($persona, $contexts)` - Format-specific instructions
+  - `get_product_prompt($products)` - Product promotion requirements
+  - `get_keyphrase_prompt($keywords)` - Previous keyphrase avoidance
+  - `get_brand_features_prompt($brand_features)` - Brand feature linking
+
+#### AI Service Updates (COMPLETED ✅)
+- ✅ **Anthropic Service**: New `generate_content($prompts)` method accepting pre-compiled prompts
+- ✅ **Content Generator**: Updated to use Prompt Compiler Service instead of inline prompt building
+- ✅ **Product Model**: Added `get_active_products()` method for retrieving active products
+
+#### Benefits Achieved (COMPLETED ✅)
+- ✅ **Separation of Concerns**: Prompt logic completely separated from AI service implementation
+- ✅ **Maintainability**: Single location for all prompt-related changes
+- ✅ **Flexibility**: Easy to add new prompt types or modify existing ones
+- ✅ **Debugging**: Comprehensive prompt logging for troubleshooting
+- ✅ **Extensibility**: Simple to add support for new AI providers
 
 ## Key Implementation Details
 

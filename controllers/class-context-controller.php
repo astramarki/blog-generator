@@ -87,7 +87,9 @@ class Context_Controller {
 		$name = isset( $_POST['name'] ) ? sanitize_text_field( $_POST['name'] ) : '';
 		$type = isset( $_POST['type'] ) ? sanitize_text_field( $_POST['type'] ) : '';
 		$usage_flags = isset( $_POST['usage_flags'] ) ? sanitize_text_field( $_POST['usage_flags'] ) : 'content';
-		$content = isset( $_POST['content'] ) ? sanitize_textarea_field( $_POST['content'] ) : '';
+		// For content, preserve everything exactly as entered without sanitization
+		// This allows JavaScript, HTML, Avada shortcodes, etc. to be saved without modification
+		$content = isset( $_POST['content'] ) ? wp_unslash( $_POST['content'] ) : '';
 		$active = isset( $_POST['active'] ) ? (bool) $_POST['active'] : true;
 		$always_include_content = isset( $_POST['always_include_content'] ) ? (bool) $_POST['always_include_content'] : false;
 		$always_include_images = isset( $_POST['always_include_images'] ) ? (bool) $_POST['always_include_images'] : false;
@@ -176,7 +178,11 @@ class Context_Controller {
 				'name' => 'sanitize_text_field',
 				'type' => 'sanitize_text_field',
 				'usage_flags' => 'sanitize_text_field',
-				'content' => 'sanitize_textarea_field',
+				'content' => function( $value ) {
+					// Preserve content exactly as entered without sanitization
+					// This allows JavaScript, HTML, Avada shortcodes, etc. to be saved without modification
+					return wp_unslash( $value );
+				},
 				'always_include_content' => function( $value ) { return (int) (bool) $value; },
 				'always_include_images' => function( $value ) { return (int) (bool) $value; },
 				'always_include_avada' => function( $value ) { return (int) (bool) $value; },
@@ -528,8 +534,16 @@ class Context_Controller {
 				'context_type' => $context->type
 			] );
 
+			// Create a copy of the context for frontend display
+			$context_for_display = clone $context;
+			
+			// For code content (JavaScript, HTML, Avada shortcodes), we need to preserve 
+			// the original formatting without HTML escaping to prevent code corruption
+			// The textarea will handle proper display without converting line breaks to <br/> tags
+			$context_for_display->content = $context->content;
+
 			$this->send_ajax_success( [
-				'context' => $context,
+				'context' => $context_for_display,
 			], __( 'Context loaded successfully.', 'ai-blog-generator' ), 'get_context' );
 			
 		} catch ( \Exception $e ) {
@@ -850,7 +864,8 @@ class Context_Controller {
 			$context_id = $this->context_model->create( [
 				'name' => sanitize_text_field( $context_data['name'] ),
 				'type' => sanitize_text_field( $context_data['type'] ),
-				'content' => sanitize_textarea_field( $context_data['content'] ),
+				// Preserve content exactly as entered without sanitization
+				'content' => wp_unslash( $context_data['content'] ),
 				'active' => isset( $context_data['active'] ) ? (bool) $context_data['active'] : true,
 			] );
 

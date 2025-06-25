@@ -129,6 +129,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 							</div>
 							<div class="col-md-6">
 								<div class="d-flex justify-content-md-end">
+									<div class="form-check me-3">
+										<input class="form-check-input" type="checkbox" id="hideCompleteFilter" checked>
+										<label class="form-check-label" for="hideCompleteFilter">
+											Hide Completed
+										</label>
+									</div>
 									<button type="button" class="btn btn-outline-warning btn-sm me-2" id="generationManagementBtn" data-bs-toggle="modal" data-bs-target="#generationManagementModal">
 										<i class="fas fa-cogs me-1"></i>
 										Manage Generations

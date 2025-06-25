@@ -348,4 +348,70 @@ class Logger {
 		// phpcs:ignore WordPress.WP.AlternativeFunctions.file_system_operations_file_put_contents
 		file_put_contents( $instance->debug_file, $log_entry, FILE_APPEND | LOCK_EX );
 	}
+
+	/**
+	 * Convert a string to proper case (title case).
+	 * 
+	 * This function intelligently converts strings to title case while:
+	 * - Keeping certain words lowercase (articles, conjunctions, prepositions)
+	 * - Preserving all-caps words (acronyms)
+	 * - Capitalizing the first and last words
+	 * 
+	 * @param string $title The title to convert.
+	 * @return string The title in proper case.
+	 */
+	public static function to_proper_case( $title ) {
+		// Words that should remain lowercase unless they're the first or last word
+		$lowercase_words = [
+			'a', 'an', 'the', // articles
+			'and', 'but', 'or', 'nor', 'for', 'yet', 'so', // conjunctions
+			'as', 'at', 'by', 'for', 'from', 'in', 'into', 'of', 'on', 'to', 'with', 'up' // prepositions
+		];
+		
+		// First, check if the entire title is uppercase
+		if ( strtoupper( $title ) === $title ) {
+			// Convert to lowercase first for all-caps titles
+			$title = strtolower( $title );
+		}
+		
+		// Split the title into words
+		$words = preg_split( '/\s+/', $title );
+		$result = [];
+		
+		foreach ( $words as $index => $word ) {
+			// Skip empty words
+			if ( empty( $word ) ) {
+				continue;
+			}
+			
+			// Check if word contains special characters or numbers at the beginning
+			if ( preg_match( '/^[^a-zA-Z]/', $word ) ) {
+				// Keep the word as is if it starts with non-letter
+				$result[] = $word;
+				continue;
+			}
+			
+			// Check if the word is all uppercase (likely an acronym)
+			if ( strlen( $word ) > 1 && strtoupper( $word ) === $word && strtolower( $word ) !== $word ) {
+				// Keep acronyms as they are
+				$result[] = $word;
+				continue;
+			}
+			
+			// First word or last word should always be capitalized
+			if ( $index === 0 || $index === count( $words ) - 1 ) {
+				$result[] = ucfirst( strtolower( $word ) );
+			}
+			// Check if it's a word that should be lowercase
+			elseif ( in_array( strtolower( $word ), $lowercase_words, true ) ) {
+				$result[] = strtolower( $word );
+			}
+			// Otherwise, capitalize the first letter
+			else {
+				$result[] = ucfirst( strtolower( $word ) );
+			}
+		}
+		
+		return implode( ' ', $result );
+	}
 } 

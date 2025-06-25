@@ -190,9 +190,11 @@ if ( ! defined( 'ABSPATH' ) ) {
 				
 				<div class="ai-blog-form-group">
 					<label for="context-content"><?php esc_html_e( 'Content', 'ai-blog-generator' ); ?></label>
-					<textarea id="context-content" name="content" rows="10" class="ai-blog-form-control" required></textarea>
+					<textarea id="context-content" name="content" rows="25" class="ai-blog-form-control ai-blog-code-editor" 
+						style="font-family: 'Consolas', 'Monaco', 'Courier New', monospace; font-size: 13px; line-height: 1.4; white-space: pre; overflow-wrap: normal; tab-size: 4; -moz-tab-size: 4;" 
+						spellcheck="false" autocorrect="off" autocapitalize="off" wrap="off" required></textarea>
 					<p class="description">
-						<?php esc_html_e( 'Enter the context information that will guide AI content generation.', 'ai-blog-generator' ); ?>
+						<?php esc_html_e( 'Enter the context information that will guide AI content generation. Supports HTML, Avada shortcodes, and JavaScript code. All content will be preserved exactly as entered.', 'ai-blog-generator' ); ?>
 					</p>
 				</div>
 

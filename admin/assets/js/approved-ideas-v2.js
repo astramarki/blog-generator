@@ -20,6 +20,7 @@
         logRefreshTimer: null,
         fastRefreshTimer: null,
         submittingIdeas: [],
+        hideCompleted: true, // Default to hiding completed
         
         // Configuration
         config: {
@@ -133,6 +134,7 @@
         $('#cancelAllGenerationsBtn').off('click.approvedIdeasV2');
         $('#resetStuckGenerationsBtn').off('click.approvedIdeasV2');
         $('#logViewerModal').off('hidden.bs.modal.approvedIdeasV2');
+        $('#hideCompleteFilter').off('change.approvedIdeasV2');
         $(window).off('beforeunload.approvedIdeasV2');
         $(window).off('focus.approvedIdeasV2');
         $(window).off('blur.approvedIdeasV2');
@@ -142,6 +144,9 @@
         
         // Manual refresh
         $('#refreshIdeas').on('click.approvedIdeasV2', handleManualRefresh);
+        
+        // Hide completed filter
+        $('#hideCompleteFilter').on('change.approvedIdeasV2', handleHideCompleteFilter);
         
         // Select all checkbox
         $('#selectAllCheckbox').on('change.approvedIdeasV2', handleSelectAll);
@@ -287,7 +292,16 @@
         const table = $('#ideasTable');
         const emptyState = $('#emptyState');
         
-        if (ideas.length === 0) {
+        // Filter ideas based on hide completed setting
+        let filteredIdeas = ideas;
+        if (window.ApprovedIdeasV2.hideCompleted) {
+            filteredIdeas = ideas.filter(function(idea) {
+                return idea.status !== 'generated';
+            });
+            console.log(`🔽 Filtered out ${ideas.length - filteredIdeas.length} completed ideas`);
+        }
+        
+        if (filteredIdeas.length === 0) {
             console.log('📭 No ideas to display, showing empty state');
             showEmptyState();
             return;
@@ -304,7 +318,7 @@
         const uniqueIdeas = [];
         const seenIds = new Set();
         
-        ideas.forEach(function(idea) {
+        filteredIdeas.forEach(function(idea) {
             if (!seenIds.has(idea.id)) {
                 seenIds.add(idea.id);
                 uniqueIdeas.push(idea);
@@ -313,7 +327,7 @@
             }
         });
         
-        console.log(`🔍 Filtered ${ideas.length} ideas to ${uniqueIdeas.length} unique ideas`);
+        console.log(`🔍 Filtered ${filteredIdeas.length} ideas to ${uniqueIdeas.length} unique ideas`);
 
         // Add each unique idea
         uniqueIdeas.forEach(function(idea) {
@@ -321,11 +335,11 @@
             tbody.append(row);
         });
 
-        // Update count with unique ideas
+        // Update count with filtered unique ideas
         $('#approvedCount').text(uniqueIdeas.length);
         
-        // Store the deduplicated ideas in cache
-        window.ApprovedIdeasV2.currentIdeas = uniqueIdeas;
+        // Store all ideas in cache (not just filtered)
+        window.ApprovedIdeasV2.currentIdeas = ideas;
         
         // Show table and hide loading/empty states
         table.removeClass('d-none');
@@ -562,6 +576,21 @@
     function handleManualRefresh() {
         console.log('🔄 Manual refresh triggered');
         refreshIdeas();
+    }
+
+    /**
+     * Handle hide complete filter toggle
+     */
+    function handleHideCompleteFilter() {
+        const isChecked = $('#hideCompleteFilter').is(':checked');
+        console.log(`🔽 Hide completed filter changed to: ${isChecked}`);
+        
+        window.ApprovedIdeasV2.hideCompleted = isChecked;
+        
+        // Re-display ideas with new filter setting
+        if (window.ApprovedIdeasV2.currentIdeas.length > 0) {
+            updateIdeasDisplay(window.ApprovedIdeasV2.currentIdeas);
+        }
     }
 
     /**

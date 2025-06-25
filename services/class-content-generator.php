@@ -16,6 +16,7 @@ use AI_Blog_Generator\Models\Cost_Model;
 use AI_Blog_Generator\Models\Persona_Model;
 use AI_Blog_Generator\Services\Anthropic_Service;
 use AI_Blog_Generator\Services\OpenAI_Service;
+use AI_Blog_Generator\Services\Prompt_Compiler_Service;
 use AI_Blog_Generator\Utilities\Logger;
 use AI_Blog_Generator\Utilities\Loggable;
 use AI_Blog_Generator\Utilities\Generation_Logger;
@@ -142,6 +143,13 @@ class Content_Generator {
 	private $pending_status_update = null;
 
 	/**
+	 * Prompt Compiler Service instance.
+	 *
+	 * @var Prompt_Compiler_Service
+	 */
+	private $prompt_compiler;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
@@ -158,17 +166,33 @@ class Content_Generator {
 		$this->anthropic_service = new Anthropic_Service();
 		$this->openai_service = new OpenAI_Service();
 		
+		// Prompt Compiler Service will be initialized lazily when needed
+		$this->prompt_compiler = null;
+		
 		// Only log initialization once per session to prevent log spam
 		if ( ! get_transient( 'ai_blog_content_generator_init_logged' ) ) {
 			$this->log_info( 'content_generator_init', 'Content Generator service initialized', [
 				'database_manager_ready' => ! is_null( $this->database_manager ),
 				'models_initialized' => 4,
-				'api_services_ready' => 2
+				'api_services_ready' => 2,
+				'prompt_compiler_lazy' => true
 			] );
 			set_transient( 'ai_blog_content_generator_init_logged', true, 300 ); // 5 minutes
 		}
 		
 		$this->log_function_exit();
+	}
+
+	/**
+	 * Get Prompt Compiler Service instance (lazy initialization).
+	 *
+	 * @return Prompt_Compiler_Service
+	 */
+	private function get_prompt_compiler() {
+		if ( $this->prompt_compiler === null ) {
+			$this->prompt_compiler = new Prompt_Compiler_Service();
+		}
+		return $this->prompt_compiler;
 	}
 
 	/**
@@ -640,63 +664,34 @@ class Content_Generator {
 					$this->handle_cancellation( $idea_id, 'contexts' );
 				}
 				
-				// Extract SEO keywords from contexts.
-				$seo_keywords = [];
-				if ( isset( $contexts['keywords'] ) ) {
-					$this->log_info( 'extracting_seo_keywords', 'Extracting SEO keywords', [ 'idea_id' => $idea_id ] );
+				// **NEW FUNCTIONALITY** - Use Prompt Compiler Service
+				$this->log_info( 'using_prompt_compiler', 'Using Prompt Compiler Service for prompt generation', [ 'idea_id' => $idea_id ] );
+				
+				try {
+					// Generate prompts using the Prompt Compiler Service (lazy initialization)
+					$prompt_data = $this->get_prompt_compiler()->generate_content_prompts( $idea_id );
 					
-					// Only extract generic keywords if they're relevant to the specific idea
-					$generic_keywords = $this->extract_seo_keywords( $contexts );
-					$idea_title = is_array( $idea ) ? $idea['title'] : $idea->title;
-					$idea_description = is_array( $idea ) ? $idea['description'] : $idea->description;
-					$idea_title_lower = strtolower( $idea_title );
-					$idea_desc_lower = strtolower( $idea_description );
-					
-					// Filter keywords to only include those relevant to the specific topic
-					foreach ( $generic_keywords as $keyword ) {
-						$keyword_lower = strtolower( $keyword );
-						// Check if the keyword is relevant to the idea
-						if ( strpos( $idea_title_lower, 'poster' ) !== false || 
-						     strpos( $idea_desc_lower, 'poster' ) !== false ) {
-							// Only include poster-related keywords if the idea is actually about posters
-							$seo_keywords[] = $keyword;
-						}
-					}
-					
-					// Extract keywords from the idea title itself
-					$title_words = explode( ' ', $idea_title );
-					$potential_keywords = [];
-					
-					// Create 2-3 word combinations from the title
-					for ( $i = 0; $i < count( $title_words ) - 1; $i++ ) {
-						if ( strlen( $title_words[$i] ) > 3 ) { // Skip short words
-							// Single important word
-							$potential_keywords[] = strtolower( $title_words[$i] );
-							
-							// Two word combination
-							if ( isset( $title_words[$i + 1] ) ) {
-								$potential_keywords[] = strtolower( $title_words[$i] . ' ' . $title_words[$i + 1] );
-							}
-							
-							// Three word combination
-							if ( isset( $title_words[$i + 2] ) ) {
-								$potential_keywords[] = strtolower( $title_words[$i] . ' ' . $title_words[$i + 1] . ' ' . $title_words[$i + 2] );
-							}
-						}
-					}
-					
-					// Add the most relevant keywords from the title
-					$seo_keywords = array_merge( $seo_keywords, array_slice( $potential_keywords, 0, 5 ) );
-					$seo_keywords = array_unique( $seo_keywords );
-					
-					$this->log_info( 'seo_keywords_filtered', 'Filtered SEO keywords for specific topic', [
-						'idea_title' => $idea_title,
-						'generic_keywords_count' => count( $generic_keywords ),
-						'filtered_keywords_count' => count( $seo_keywords ),
-						'keywords' => $seo_keywords
+					$this->log_info( 'prompts_compiled', 'Prompts compiled successfully', [
+						'idea_id' => $idea_id,
+						'system_prompts_count' => count( $prompt_data['system_prompts'] ),
+						'user_prompt_length' => strlen( $prompt_data['user_prompt'] )
 					] );
-				} else {
-					$seo_keywords = [];
+					
+					if ( $this->generation_logger ) {
+						$this->generation_logger->info( 'Prompts compiled by Prompt Compiler Service', [
+							'system_prompts_count' => count( $prompt_data['system_prompts'] ),
+							'user_prompt_preview' => substr( $prompt_data['user_prompt'], 0, 200 ) . '...'
+						] );
+					}
+				} catch ( \Exception $e ) {
+					$this->log_error( 'prompt_compilation_failed', 'Failed to compile prompts', [
+						'idea_id' => $idea_id,
+						'error' => $e->getMessage()
+					] );
+					if ( $this->generation_logger ) {
+						$this->generation_logger->error( 'Prompt compilation failed: ' . $e->getMessage() );
+					}
+					throw new \Exception( 'Failed to compile prompts: ' . $e->getMessage() );
 				}
 				
 				// Check for cancellation before AI content generation
@@ -704,17 +699,15 @@ class Content_Generator {
 					$this->handle_cancellation( $idea_id, 'pre-content' );
 				}
 				
-				// Generate content using Anthropic.
-				$this->log_info( 'anthropic_generation_start', 'Starting Anthropic content generation', [ 'idea_id' => $idea_id ] );
+				// Generate content using new Anthropic method
+				$this->log_info( 'anthropic_generation_start', 'Starting Anthropic content generation with pre-compiled prompts', [ 'idea_id' => $idea_id ] );
 				
 				// Log to Generation Logger instead of debug file
 				if ( $this->generation_logger ) {
-					$this->generation_logger->info( 'About to call Anthropic service', [
+					$this->generation_logger->info( 'About to call Anthropic service with pre-compiled prompts', [
 						'idea_id' => $idea['id'] ?? 'no_id',
 						'idea_title' => substr($idea['title'] ?? 'no_title', 0, 50),
-						'idea_status' => $idea['status'] ?? 'no_status',
-						'contexts' => array_keys( $contexts ),
-						'seo_keywords' => $seo_keywords
+						'system_prompts_count' => count( $prompt_data['system_prompts'] )
 					] );
 				}
 				
@@ -735,86 +728,39 @@ class Content_Generator {
 					$this->generation_logger->info( 'Anthropic service validated, making call' );
 				}
 				
-				// Fetch persona data if idea has persona_id
-				$persona = null;
-				if ( ! empty( $idea['persona_id'] ) ) {
-					try {
-						if ( ! $this->persona_model ) {
-							$this->log_warning( 'persona_model_missing', 'Persona model not available', [
-								'idea_id' => $idea_id,
-								'persona_id' => $idea['persona_id']
-							] );
-						} else {
-							$persona = $this->persona_model->get( $idea['persona_id'] );
-							if ( $persona ) {
-								// Convert to object format for backward compatibility
-								$persona = (object) $persona;
-								$this->log_info( 'persona_fetched', 'Persona data fetched successfully', [
-									'idea_id' => $idea_id,
-									'persona_id' => $idea['persona_id'],
-									'persona_name' => $persona->name ?? 'unknown'
-								] );
-								if ( $this->generation_logger ) {
-									$this->generation_logger->info( 'Persona fetched: ' . ($persona->name ?? 'unknown') );
-								}
-							} else {
-								$this->log_warning( 'persona_not_found', 'Persona not found', [
-									'idea_id' => $idea_id,
-									'persona_id' => $idea['persona_id']
-								] );
-								if ( $this->generation_logger ) {
-									$this->generation_logger->warning( 'Persona ID ' . $idea['persona_id'] . ' not found' );
-								}
-							}
-						}
-					} catch ( \Exception $e ) {
-						$this->log_error( 'persona_fetch_failed', 'Failed to fetch persona data', [
-							'idea_id' => $idea_id,
-							'persona_id' => $idea['persona_id'],
-							'error' => $e->getMessage()
-						] );
-						if ( $this->generation_logger ) {
-							$this->generation_logger->error( 'Error fetching persona: ' . $e->getMessage() );
-						}
-						// Continue without persona - not critical
-					}
-				} else {
-					if ( $this->generation_logger ) {
-						$this->generation_logger->debug( 'No persona_id in idea data' );
-					}
-				}
+				// Use the idea and persona from prompt compiler results
+				$idea = $prompt_data['idea'];
+				$persona = $prompt_data['persona'];
 				
 				if ( $this->generation_logger ) {
 					$this->generation_logger->info( 'About to call Anthropic service for content generation', [
 						'idea_id' => $idea['id'] ?? 'no_id',
 						'idea_title' => substr($idea['title'] ?? 'no_title', 0, 50),
 						'idea_status' => $idea['status'] ?? 'no_status',
-						'contexts' => array_keys( $contexts ),
-						'seo_keywords' => $seo_keywords
+						'has_persona' => ! is_null( $persona )
 					] );
 				}
 				
 				try {
-					$content_result = $this->anthropic_service->generate_blog_content( 
-						$idea, 
-						$contexts, 
-						$seo_keywords,
-						$persona
+					// Call new generate_content method with pre-compiled prompts
+					$content_result = $this->anthropic_service->generate_content( 
+						$prompt_data['system_prompts'], 
+						$prompt_data['user_prompt']
 					);
 					
-									if ( $this->generation_logger ) {
-					$this->generation_logger->info( 'Anthropic call completed successfully', [
-						'success' => $content_result['success'] ?? 'not_set',
-						'result_keys' => array_keys( $content_result )
+					if ( $this->generation_logger ) {
+						$this->generation_logger->info( 'Anthropic call completed successfully', [
+							'success' => $content_result['success'] ?? 'not_set',
+							'result_keys' => array_keys( $content_result )
+						] );
+					}
+					
+					$this->log_info( 'anthropic_generation_success', 'Anthropic content generation completed', [ 
+						'idea_id' => $idea_id,
+						'success' => $content_result['success'] ?? false
 					] );
-				}
-				
-				$this->log_info( 'anthropic_generation_success', 'Anthropic content generation completed', [ 
-					'idea_id' => $idea_id,
-					'success' => $content_result['success'] ?? false
-				] );
-				
-				$this->update_generation_status( $idea_id, 'content', 'AI content generated successfully. Validating...' );
+					
+					$this->update_generation_status( $idea_id, 'content', 'AI content generated successfully. Validating...' );
 				} catch ( \Exception $e ) {
 					if ( $this->generation_logger ) {
 						$this->generation_logger->error( 'Anthropic call FAILED with exception', [
@@ -852,86 +798,21 @@ class Content_Generator {
 				}
 				
 				if ( $this->generation_logger ) {
-					$this->generation_logger->info( 'Content result success confirmed, extracting content' );
+					$this->generation_logger->info( 'Content result success confirmed, parsing content' );
 				}
 				
-				$content = $content_result['content'];
-				$total_cost = 0;
+				// Parse the content response
+				$content = $this->parse_content_response( $content_result['content'] );
+				$total_cost = $content_result['cost'] ?? 0;
 				
 				if ( $this->generation_logger ) {
-					$this->generation_logger->debug( 'Content extracted, initializing cost calculation' );
-				}
-				
-				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Content result success: " . ($content_result['success'] ?? 'not_set') . "\n", FILE_APPEND );
-				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Content result keys: " . implode(', ', array_keys( $content_result )) . "\n", FILE_APPEND );
-				
-				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Content extracted, initializing cost calculation\n", FILE_APPEND );
-				
-				// Calculate content generation cost.
-				if ( $this->generation_logger ) {
-					$this->generation_logger->debug( 'Checking if usage data exists in content_result' );
-				}
-				
-				if ( isset( $content_result['usage'] ) ) {
-					if ( $this->generation_logger ) {
-						$this->generation_logger->info( 'Usage data found, using pre-calculated cost', [
-							'tokens' => $content_result['usage']['total_tokens'] ?? 'unknown'
-						] );
-					}
-					
-					// Use the cost already calculated by the Anthropic service
-					$content_cost = $content_result['cost'] ?? 0;
-					if ( $this->generation_logger ) {
-						$this->generation_logger->info( 'Using pre-calculated cost: $' . $content_cost );
-					}
-					
-					try {
-						if ( $this->generation_logger ) {
-							$this->generation_logger->debug( 'Calling cost_model->record_cost' );
-						}
-						
-						// Check if cost_model is available
-						if ( ! $this->cost_model ) {
-							if ( $this->generation_logger ) {
-								$this->generation_logger->warning( 'cost_model is not available, skipping cost recording' );
-							}
-						} else {
-							if ( $this->generation_logger ) {
-								$this->generation_logger->debug( 'cost_model is available, recording cost' );
-							}
-							$this->cost_model->record_cost( 'anthropic', 'content_generation', $content_cost, $content_result['usage'] );
-							if ( $this->generation_logger ) {
-								$this->generation_logger->info( 'Cost recorded successfully' );
-							}
-						}
-					} catch ( \Exception $e ) {
-						if ( $this->generation_logger ) {
-							$this->generation_logger->error( 'ERROR in cost_model->record_cost: ' . $e->getMessage() );
-						}
-						// Don't throw here - cost recording failure shouldn't stop generation
-						if ( $this->generation_logger ) {
-							$this->generation_logger->debug( 'Continuing without cost recording' );
-						}
-					}
-					
-					try {
-						if ( $this->generation_logger ) {
-							$this->generation_logger->debug( 'Adding cost to total' );
-						}
-						$total_cost += $content_cost;
-						if ( $this->generation_logger ) {
-							$this->generation_logger->info( 'Total cost now: $' . $total_cost );
-						}
-					} catch ( \Exception $e ) {
-						if ( $this->generation_logger ) {
-							$this->generation_logger->error( 'ERROR adding to total cost: ' . $e->getMessage() );
-						}
-						throw $e;
-					}
-				} else {
-					if ( $this->generation_logger ) {
-						$this->generation_logger->debug( 'No usage data found, skipping cost calculation' );
-					}
+					$this->generation_logger->debug( 'Content parsed successfully', [
+						'has_html' => ! empty( $content['html'] ),
+						'has_title' => ! empty( $content['title'] ),
+						'has_meta' => ! empty( $content['meta_description'] ),
+						'has_images' => ! empty( $content['images'] ),
+						'image_count' => count( $content['images'] ?? [] )
+					] );
 				}
 				
 				if ( $this->generation_logger ) {
@@ -991,14 +872,32 @@ class Content_Generator {
 				$all_image_requirements = [];
 				$featured_image_id = null;
 				
+				// Initialize images array to prevent undefined variable errors
+				$images = [
+					'results' => [],
+					'summary' => [
+						'total' => 0,
+						'successful' => 0,
+						'failed' => 0,
+						'total_cost' => 0,
+					],
+				];
+				
 				// Add featured image to requirements first (will be index 0)
 				if ( ! empty( $content['featured_image'] ) ) {
-					$all_image_requirements[] = $content['featured_image'];
+					$featured_requirement = $content['featured_image'];
+					// Add focus keyphrase for SEO-friendly filename generation
+					$featured_requirement['focus_keyphrase'] = $content['focus_keyphrase'] ?? '';
+					$all_image_requirements[] = $featured_requirement;
 				}
 				
 				// Add content images to requirements
 				if ( ! empty( $content['images'] ) ) {
-					$all_image_requirements = array_merge( $all_image_requirements, $content['images'] );
+					foreach ( $content['images'] as $image_requirement ) {
+						// Add focus keyphrase for SEO-friendly filename generation
+						$image_requirement['focus_keyphrase'] = $content['focus_keyphrase'] ?? '';
+						$all_image_requirements[] = $image_requirement;
+					}
 				}
 				
 				// Check for cancellation before image generation
@@ -1011,9 +910,9 @@ class Content_Generator {
 						$this->generation_logger->info( 'Starting image generation process' );
 					}
 					
-					// Add timeout protection for image generation (reduced to 5 minutes max)
+					// Add timeout protection for image generation (8 minutes max for up to 3 images)
 					$image_timeout_start = time();
-					$image_timeout_limit = 300; // 5 minutes max for image generation
+					$image_timeout_limit = 480; // 8 minutes max for all image generation
 					
 					// Set process timeout protection
 					$original_time_limit = ini_get( 'max_execution_time' );
@@ -1108,7 +1007,7 @@ class Content_Generator {
 							$elapsed_time = time() - $image_timeout_start;
 							file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - IMAGE_GENERATION_ERROR: " . $img_e->getMessage() . " (elapsed: {$elapsed_time}s)\n", FILE_APPEND );
 							
-							$this->log_error( 'image_generation_critical_error', 'Critical error during image generation - FAILING ENTIRE GENERATION', [
+							$this->log_warning( 'image_generation_error_but_continuing', 'Image generation encountered error but continuing with post creation', [
 								'error' => $img_e->getMessage(),
 								'elapsed_time' => $elapsed_time,
 								'idea_id' => $idea_id,
@@ -1117,15 +1016,26 @@ class Content_Generator {
 							] );
 							
 							if ( $this->generation_logger ) {
-								$this->generation_logger->log_phase( 'images', 0, [ 
-									'message' => 'CRITICAL: Image generation failed - failing entire generation',
+								$this->generation_logger->log_phase( 'images', 75, [ 
+									'message' => 'Image generation failed - continuing without images',
 									'error' => $img_e->getMessage(),
 									'elapsed_time' => $elapsed_time
 								] );
 							}
 							
-							// Mark the entire generation as failed and throw the error up
-							throw new \Exception( 'Image generation failed after ' . $elapsed_time . 's: ' . $img_e->getMessage() );
+							// Set empty images result so post can continue
+							$images = [
+								'results' => [],
+								'summary' => [
+									'total' => count( $all_image_requirements ),
+									'successful' => 0,
+									'failed' => count( $all_image_requirements ),
+									'total_cost' => 0,
+								],
+							];
+							
+							// Update status to show we're continuing
+							$this->update_generation_status( $idea_id, 'images', 'Image generation failed - continuing with post creation...' );
 						}
 						
 					} catch ( \Exception $timeout_e ) {
@@ -1133,7 +1043,7 @@ class Content_Generator {
 						$elapsed_time = time() - $image_timeout_start;
 						file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - IMAGE_GENERATION_TIMEOUT: " . $timeout_e->getMessage() . " (elapsed: {$elapsed_time}s)\n", FILE_APPEND );
 						
-						$this->log_error( 'image_generation_timeout_critical', 'CRITICAL: Image generation timeout - FAILING ENTIRE GENERATION', [
+						$this->log_warning( 'image_generation_timeout_but_continuing', 'Image generation timeout - continuing with post creation', [
 							'error' => $timeout_e->getMessage(),
 							'elapsed_time' => $elapsed_time,
 							'idea_id' => $idea_id,
@@ -1141,15 +1051,26 @@ class Content_Generator {
 						] );
 						
 						if ( $this->generation_logger ) {
-							$this->generation_logger->log_phase( 'images', 0, [ 
-								'message' => 'CRITICAL: Image generation timeout - failing entire generation',
+							$this->generation_logger->log_phase( 'images', 75, [ 
+								'message' => 'Image generation timeout - continuing without images',
 								'error' => $timeout_e->getMessage(),
 								'elapsed_time' => $elapsed_time
 							] );
 						}
 						
-						// Mark the entire generation as failed and throw the error up
-						throw new \Exception( 'Image generation timeout after ' . $elapsed_time . 's: ' . $timeout_e->getMessage() );
+						// Set empty images result so post can continue
+						$images = [
+							'results' => [],
+							'summary' => [
+								'total' => count( $all_image_requirements ),
+								'successful' => 0,
+								'failed' => count( $all_image_requirements ),
+								'total_cost' => 0,
+							],
+						];
+						
+						// Update status to show we're continuing
+						$this->update_generation_status( $idea_id, 'images', 'Image generation timeout - continuing with post creation...' );
 					} finally {
 						// Always restore timeout limits
 						if ( isset( $original_time_limit ) && $original_time_limit ) {
@@ -1225,6 +1146,25 @@ class Content_Generator {
 					$this->generation_logger->info( 'Final HTML preparation completed' );
 				}
 				
+				// Clean fusion_code content to fix Avada's HTML markup issues
+				$final_html = $this->clean_fusion_code_content( $final_html );
+				
+				if ( $this->generation_logger ) {
+					$this->generation_logger->info( 'Fusion_code cleanup completed' );
+				}
+				
+				// Log all fusion_code blocks in the final HTML to debug
+				preg_match_all( '/\[fusion_code\](.*?)\[\/fusion_code\]/s', $final_html, $fusion_matches );
+				if ( ! empty( $fusion_matches[1] ) ) {
+					file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: === FINAL FUSION_CODE BLOCKS BEFORE WP_INSERT_POST ===\n", FILE_APPEND );
+					foreach ( $fusion_matches[1] as $index => $fusion_content ) {
+						file_put_contents( $debug_log, "Block " . ($index + 1) . ":\n", FILE_APPEND );
+						file_put_contents( $debug_log, $fusion_content . "\n", FILE_APPEND );
+						file_put_contents( $debug_log, "---\n", FILE_APPEND );
+					}
+					file_put_contents( $debug_log, "=== END FINAL FUSION_CODE BLOCKS ===\n\n", FILE_APPEND );
+				}
+				
 				// Create WordPress post.
 				if ( $this->generation_logger ) {
 					$this->generation_logger->info( 'Starting WordPress post creation' );
@@ -1242,8 +1182,18 @@ class Content_Generator {
 				
 				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Post data prepared, calling wp_insert_post\n", FILE_APPEND );
 				
+				// Convert title to proper case
+				$proper_title = \AI_Blog_Generator\Utilities\Logger::to_proper_case( $content['title'] );
+				
+				if ( $this->generation_logger ) {
+					$this->generation_logger->info( 'Title converted to proper case', [
+						'original_title' => $content['title'],
+						'proper_case_title' => $proper_title
+					] );
+				}
+				
 				$post_data = [
-					'post_title'   => $content['title'],
+					'post_title'   => $proper_title,
 					'post_content' => $final_html,
 					'post_status'  => 'draft',
 					'post_type'    => 'post',
@@ -1330,7 +1280,7 @@ class Content_Generator {
 				$blog_id = $this->blog_model->create([
 					'idea_id' => $idea_id,
 					'post_id' => $post_id,
-					'title' => $content['title'],
+					'title' => $proper_title,
 					'status' => 'draft',
 					'generation_cost' => $total_cost,
 				]);
@@ -1492,7 +1442,7 @@ class Content_Generator {
 					'success' => true,
 					'post_id' => $post_id,
 					'blog_id' => $blog_id,
-					'title' => $content['title'],
+					'title' => $proper_title,
 					'cost' => $total_cost,
 					'edit_link' => get_edit_post_link( $post_id, 'raw' ),
 					'view_link' => get_permalink( $post_id ),
@@ -2036,9 +1986,9 @@ class Content_Generator {
 			$this->generation_logger->debug( 'Meta description length: ' . $meta_desc_length );
 		}
 		
-		if ( $meta_desc_length > 160 ) {
+		if ( $meta_desc_length > 140 ) {
 			if ( $this->generation_logger ) {
-				$this->generation_logger->warning( "Meta description too long ($meta_desc_length > 160)" );
+				$this->generation_logger->warning( "Meta description too long ($meta_desc_length > 140)" );
 			}
 			
 			$this->log_warning( 'content_validation_warning', 'Meta description too long', [
@@ -2073,6 +2023,122 @@ class Content_Generator {
 		] );
 		
 		return $html;
+	}
+
+	/**
+	 * Clean fusion_code content by removing HTML markup and wrapping in script tags.
+	 * 
+	 * This fixes the issue where Avada adds HTML markup (p tags, br tags) to JavaScript
+	 * code within fusion_code shortcodes, breaking the JavaScript functionality.
+	 *
+	 * @param string $html The HTML content to process.
+	 * @return string The processed HTML with cleaned fusion_code content.
+	 */
+	private function clean_fusion_code_content( $html ) {
+		if ( $this->generation_logger ) {
+			$this->generation_logger->debug( 'Starting fusion_code cleanup' );
+		}
+		
+		// Debug log file path
+		$debug_log = __DIR__ . '/../debug-transaction.log';
+		
+		// Find all fusion_code blocks
+		$pattern = '/\[fusion_code\](.*?)\[\/fusion_code\]/s';
+		
+		// Count fusion_code blocks found
+		$fusion_code_count = preg_match_all( $pattern, $html, $matches_count );
+		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: Found {$fusion_code_count} fusion_code blocks\n", FILE_APPEND );
+		
+		$cleaned_html = preg_replace_callback( $pattern, function( $matches ) use ( $debug_log ) {
+			$original_content = $matches[1];
+			$code_content = $matches[1];
+			
+			// Log the ORIGINAL content before any cleaning
+			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: === BEFORE CLEANING ===\n", FILE_APPEND );
+			file_put_contents( $debug_log, "Original fusion_code content:\n", FILE_APPEND );
+			file_put_contents( $debug_log, $original_content . "\n", FILE_APPEND );
+			file_put_contents( $debug_log, "=== END BEFORE ===\n\n", FILE_APPEND );
+			
+			if ( $this->generation_logger ) {
+				$this->generation_logger->debug( 'Found fusion_code block', [
+					'original_length' => strlen( $code_content ),
+					'sample' => substr( $code_content, 0, 100 ) . '...'
+				] );
+			}
+			
+			// First check if the content already has script tags
+			$has_script_tags = preg_match( '/<script[^>]*>.*<\/script>/is', $code_content );
+			
+			if ( $has_script_tags ) {
+				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: Content already has <script> tags, cleaning only HTML\n", FILE_APPEND );
+				
+				// If it already has script tags, just clean any HTML that might have been added around it
+				// Remove <p> and </p> tags
+				$code_content = preg_replace( '/<\/?p[^>]*>/i', '', $code_content );
+				
+				// Remove <br> and <br /> tags
+				$code_content = preg_replace( '/<br\s*\/?>/i', "\n", $code_content );
+				
+				// Trim any extra whitespace
+				$code_content = trim( $code_content );
+			} else {
+				// No script tags, so clean and add them if it's JavaScript
+				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: No script tags found, processing content\n", FILE_APPEND );
+				
+				// Remove all HTML tags that Avada might have added
+				// Remove <p> and </p> tags
+				$code_content = preg_replace( '/<\/?p[^>]*>/i', '', $code_content );
+				
+				// Remove <br> and <br /> tags
+				$code_content = preg_replace( '/<br\s*\/?>/i', "\n", $code_content );
+				
+				// Remove any other HTML tags that might have been added
+				// But preserve the actual JavaScript/code content
+				$code_content = strip_tags( $code_content );
+				
+				// Trim any extra whitespace
+				$code_content = trim( $code_content );
+				
+				// Check if this is JavaScript code (contains function, var, const, etc.)
+				$js_indicators = ['function', 'var ', 'const ', 'let ', 'document.', 'window.', 'new ', 'ApexCharts'];
+				$is_javascript = false;
+				
+				foreach ( $js_indicators as $indicator ) {
+					if ( stripos( $code_content, $indicator ) !== false ) {
+						$is_javascript = true;
+						break;
+					}
+				}
+				
+				// If it's JavaScript, wrap in script tags
+				if ( $is_javascript ) {
+					$code_content = '<script>' . "\n" . $code_content . "\n" . '</script>';
+					
+					file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: Detected JavaScript content, wrapping in script tags\n", FILE_APPEND );
+					
+					if ( $this->generation_logger ) {
+						$this->generation_logger->debug( 'Wrapped JavaScript code in script tags' );
+					}
+				}
+			}
+			
+			// Log the CLEANED content after processing
+			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: === AFTER CLEANING ===\n", FILE_APPEND );
+			file_put_contents( $debug_log, "Cleaned fusion_code content:\n", FILE_APPEND );
+			file_put_contents( $debug_log, $code_content . "\n", FILE_APPEND );
+			file_put_contents( $debug_log, "=== END AFTER ===\n\n", FILE_APPEND );
+			
+			// Return the cleaned fusion_code block
+			return '[fusion_code]' . $code_content . '[/fusion_code]';
+		}, $html );
+		
+		if ( $this->generation_logger ) {
+			$this->generation_logger->debug( 'Fusion_code cleanup completed' );
+		}
+		
+		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: Cleanup completed\n\n", FILE_APPEND );
+		
+		return $cleaned_html;
 	}
 
 	/**
@@ -2562,6 +2628,220 @@ class Content_Generator {
 		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Generation cancelled at stage '{$stage}' for idea {$idea_id}\n", FILE_APPEND );
 		
 		throw new \Exception( 'Generation cancelled by user' );
+	}
+
+	/**
+	 * Parse content response from Anthropic API.
+	 *
+	 * @param string $content Raw content from API.
+	 * @return array Parsed content data.
+	 */
+	private function parse_content_response( $content ) {
+		$result = [
+			'title' => '',
+			'meta_description' => '',
+			'focus_keyphrase' => '',
+			'tags' => [],
+			'html' => '',
+			'images' => [],
+			'featured_image' => null,
+			'charts' => '',
+			'references' => '',
+		];
+
+		// Extract title
+		if ( preg_match( '/TITLE:\s*(.+?)(?=\n|META_DESCRIPTION:|$)/s', $content, $matches ) ) {
+			$result['title'] = trim( $matches[1] );
+		}
+
+		// Extract meta description
+		if ( preg_match( '/META_DESCRIPTION:\s*(.+?)(?=\n|FOCUS_KEYPHRASE:|TAGS:|HTML:|$)/s', $content, $matches ) ) {
+			$result['meta_description'] = trim( $matches[1] );
+		}
+
+		// Extract focus keyphrase
+		if ( preg_match( '/FOCUS_KEYPHRASE:\s*(.+?)(?=\n|TAGS:|HTML:|$)/s', $content, $matches ) ) {
+			$result['focus_keyphrase'] = trim( $matches[1] );
+		}
+
+		// Extract tags
+		if ( preg_match( '/TAGS:\s*(.+?)(?=\n|HTML:|IMAGES:|$)/s', $content, $matches ) ) {
+			$tags = explode( ',', $matches[1] );
+			$result['tags'] = array_map( 'trim', $tags );
+		}
+
+		// Extract HTML content
+		if ( preg_match( '/HTML_CONTENT:\s*(.+?)(?=\nIMAGES:|CHARTS:|REFERENCES:|$)/s', $content, $matches ) ) {
+			$result['html'] = trim( $matches[1] );
+		} elseif ( preg_match( '/AVADA_CONTENT:\s*(.+?)(?=\nIMAGES:|CHARTS:|REFERENCES:|$)/s', $content, $matches ) ) {
+			// Check for AVADA_CONTENT section for Avada layouts
+			$result['html'] = trim( $matches[1] );
+		} elseif ( preg_match( '/HTML:\s*(.+?)(?=\nIMAGES:|CHARTS:|REFERENCES:|$)/s', $content, $matches ) ) {
+			// Backward compatibility: check for HTML section
+			$result['html'] = trim( $matches[1] );
+		} elseif ( preg_match( '/CONTENT:\s*(.+?)(?=\nIMAGES:|CHARTS:|REFERENCES:|$)/s', $content, $matches ) ) {
+			// Backward compatibility: check for CONTENT section
+			$result['html'] = trim( $matches[1] );
+		}
+
+		// Extract image descriptions
+		if ( preg_match( '/IMAGES:\s*(.+?)(?=\nCHARTS:|REFERENCES:|$)/s', $content, $matches ) ) {
+			$images_section = trim( $matches[1] );
+			
+			// Parse featured image description separately
+			if ( preg_match( '/{{featured}}:\s*(.+?)(?={{image\d+}}:|{{featured}}:|$)/s', $images_section, $featured_match ) ) {
+				$description = trim( $featured_match[1] );
+				$result['featured_image'] = [
+					'token' => '{{featured}}',
+					'prompt' => $description,
+					'alt_text' => $this->generate_alt_text_from_prompt( $description, $result['focus_keyphrase'] ),
+				];
+			}
+			
+			// Parse content image descriptions ({{image1}}, {{image2}}, etc.)
+			preg_match_all( '/{{image(\d+)}}:\s*(.+?)(?={{image\d+}}:|{{featured}}:|$)/s', $images_section, $image_matches, PREG_SET_ORDER );
+			
+			foreach ( $image_matches as $match ) {
+				$image_num = $match[1];
+				$description = trim( $match[2] );
+				
+				$result['images'][] = [
+					'token' => '{{image' . $image_num . '}}',
+					'prompt' => $description,
+					'alt_text' => $this->generate_alt_text_from_prompt( $description, $result['focus_keyphrase'] ),
+				];
+			}
+		}
+
+		// Extract charts scripts
+		if ( preg_match( '/CHARTS:\s*(.+?)(?=\nREFERENCES:|$)/s', $content, $matches ) ) {
+			$charts_content = trim( $matches[1] );
+			
+			// Check if this is placeholder text (contains instructions or brackets)
+			if ( preg_match( '/\[(OPTIONAL|If you|leave.*empty|no.*text)/i', $charts_content ) || 
+			     preg_match( '/^\[.*\]$/s', $charts_content ) ) {
+				// This is instruction text, not actual JavaScript - ignore it
+				$result['charts'] = '';
+			} elseif ( ! empty( $charts_content ) && stripos( $charts_content, '<script' ) === false ) {
+				// Wrap charts in a script tag if not already wrapped
+				$result['charts'] = '<script>' . "\n" . $charts_content . "\n" . '</script>';
+			} else {
+				$result['charts'] = $charts_content;
+			}
+		}
+
+		// Extract references
+		if ( preg_match( '/REFERENCES:\s*(.+)$/s', $content, $matches ) ) {
+			$references_content = trim( $matches[1] );
+			// Format references as an Avada-styled section if not empty
+			if ( ! empty( $references_content ) && $references_content !== '[No references]' ) {
+				$result['references'] = '[fusion_builder_container hundred_percent="no" equal_height_columns="no" hide_on_mobile="no" background_color="" background_image="" background_position="left top" background_repeat="no-repeat" border_size="0" border_color="" border_style="solid" padding_top="40px" padding_right="" padding_bottom="40px" padding_left="" margin_top="" margin_bottom="" animation_type="" animation_direction="left" animation_speed="0.1" animation_offset="" last="no" class="" id="" alpha_background_color=""]' . "\n";
+				$result['references'] .= '[fusion_builder_row]' . "\n";
+				$result['references'] .= '[fusion_builder_column type="1_1" spacing="yes" center_content="no" hover_type="none" link="" min_height="" hide_on_mobile="no" background_color="" background_image="" background_position="left top" background_repeat="no-repeat" border_size="0" border_color="" border_style="solid" padding_top="" padding_right="" padding_bottom="" padding_left="" margin_top="" margin_bottom="" animation_type="" animation_direction="left" animation_speed="0.1" animation_offset="" last="no" class="" id="" alpha_background_color=""]' . "\n";
+				$result['references'] .= '[fusion_separator style_type="single solid" hide_on_mobile="small-visibility,medium-visibility,large-visibility" sep_color="#e0e0e0" top_margin="20" bottom_margin="40" /]' . "\n";
+				$result['references'] .= '[fusion_title size="2" content_align="left" style_type="default" sep_color="" margin_top="" margin_bottom="20" class="" id=""]References[/fusion_title]' . "\n";
+				$result['references'] .= '[fusion_text]' . "\n";
+				
+				// Convert each reference line to a paragraph
+				$reference_lines = explode( "\n", $references_content );
+				foreach ( $reference_lines as $line ) {
+					$line = trim( $line );
+					if ( ! empty( $line ) ) {
+						$result['references'] .= '<p>' . esc_html( $line ) . '</p>' . "\n";
+					}
+				}
+				
+				$result['references'] .= '[/fusion_text]' . "\n";
+				$result['references'] .= '[/fusion_builder_column]' . "\n";
+				$result['references'] .= '[/fusion_builder_row]' . "\n";
+				$result['references'] .= '[/fusion_builder_container]';
+			}
+		}
+
+		// If no images found in IMAGES section, check for tokens in HTML
+		if ( empty( $result['images'] ) && ! empty( $result['html'] ) ) {
+			preg_match_all( '/{{image(\d+)}}/', $result['html'], $token_matches );
+			
+			if ( ! empty( $token_matches[1] ) ) {
+				foreach ( array_unique( $token_matches[1] ) as $image_num ) {
+					// Create fallback alt text with focus keyphrase if available
+					$fallback_alt = 'Image ' . $image_num . ' for ' . ( $result['title'] ?: 'blog post' );
+					if ( ! empty( $result['focus_keyphrase'] ) ) {
+						$fallback_alt = $result['focus_keyphrase'] . ' - ' . $fallback_alt;
+					}
+					
+					$result['images'][] = [
+						'token' => '{{image' . $image_num . '}}',
+						'prompt' => 'Professional image related to ' . ( $result['title'] ?: 'blog content' ),
+						'alt_text' => $fallback_alt,
+					];
+				}
+			}
+		}
+
+		Logger::info( 'content_parsed', 'Parsed content from API response', [
+			'has_title' => ! empty( $result['title'] ),
+			'has_meta' => ! empty( $result['meta_description'] ),
+			'has_focus_keyphrase' => ! empty( $result['focus_keyphrase'] ),
+			'tags_count' => count( $result['tags'] ),
+			'html_length' => strlen( $result['html'] ),
+			'images_count' => count( $result['images'] ),
+			'has_featured_image' => ! empty( $result['featured_image'] ),
+			'has_charts' => ! empty( $result['charts'] ),
+			'has_references' => ! empty( $result['references'] ),
+		] );
+
+		return $result;
+	}
+
+	/**
+	 * Generate alt text from image prompt.
+	 *
+	 * @param string $prompt Image generation prompt.
+	 * @param string $focus_keyphrase Optional focus keyphrase to include in alt text.
+	 * @return string Generated alt text.
+	 */
+	private function generate_alt_text_from_prompt( $prompt, $focus_keyphrase = '' ) {
+		// Remove AI prompt prefixes and common phrases
+		$alt_text = preg_replace( '/^(create|generate|show|display|illustrate|image of|photo of|picture of)\s+/i', '', $prompt );
+		
+		// Remove AI-specific prompt language
+		$alt_text = preg_replace( '/\b(professional|high quality|detailed|realistic|vibrant|modern|clean|bright)\s+/i', '', $alt_text );
+		$alt_text = preg_replace( '/\b(in the style of|featuring|showing|with|including|containing)\s+/i', '', $alt_text );
+		$alt_text = preg_replace( '/\b(professional\s+)?photography\b/i', '', $alt_text );
+		$alt_text = preg_replace( '/\b(stock photo|commercial|marketing)\s*/i', '', $alt_text );
+		
+		// Clean up spacing and formatting
+		$alt_text = preg_replace( '/\s+/', ' ', $alt_text );
+		$alt_text = trim( $alt_text );
+		
+		// Ensure it starts with a capital letter
+		$alt_text = ucfirst( $alt_text );
+		
+		// Include focus keyphrase for SEO if provided and not already present
+		if ( ! empty( $focus_keyphrase ) && stripos( $alt_text, $focus_keyphrase ) === false ) {
+			// If alt text is short, prepend the keyphrase
+			if ( strlen( $alt_text ) < 50 ) {
+				$alt_text = ucfirst( $focus_keyphrase ) . ' - ' . lcfirst( $alt_text );
+			} else {
+				// If alt text is longer, append the keyphrase naturally
+				$alt_text = rtrim( $alt_text, '.' ) . ' for ' . $focus_keyphrase;
+			}
+		}
+		
+		// Extend length limit to 200 characters (WordPress recommendation)
+		if ( strlen( $alt_text ) > 200 ) {
+			// Find last complete word before 197 characters to avoid cutting mid-word
+			$truncated = substr( $alt_text, 0, 197 );
+			$last_space = strrpos( $truncated, ' ' );
+			if ( $last_space !== false && $last_space > 150 ) { // Don't truncate too aggressively
+				$alt_text = substr( $alt_text, 0, $last_space );
+			} else {
+				$alt_text = $truncated . '...';
+			}
+		}
+		
+		return $alt_text;
 	}
 } 
  

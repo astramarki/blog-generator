@@ -68,8 +68,6 @@ class Product_Controller {
 		// WooCommerce import
 		add_action( 'wp_ajax_ai_blog_get_woocommerce_products', [ $this, 'get_woocommerce_products' ] );
 		add_action( 'wp_ajax_ai_blog_import_woocommerce_product', [ $this, 'import_woocommerce_product' ] );
-		
-		Logger::info( 'product_ajax_handlers_registered', 'Product AJAX handlers registered' );
 	}
 
 	/**
