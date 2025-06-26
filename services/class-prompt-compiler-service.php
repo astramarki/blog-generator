@@ -604,7 +604,7 @@ class Prompt_Compiler_Service {
 		}
 		
 		$prompt = "PRODUCT PROMOTION REQUIREMENTS:\n\n";
-		$prompt .= "You MUST promote at least 2 products in the content. Here are the available products:\n\n";
+		$prompt .= "You MUST promote at least 2 products in the content. When promoting products, use images of the products. Here are the available products:\n\n";
 		
 		$products_data = [];
 		foreach ( $products as $product ) {

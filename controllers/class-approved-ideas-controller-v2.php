@@ -1069,7 +1069,7 @@ class Approved_Ideas_Controller_V2 {
 			],
 			'settings' => [
 				'auto_refresh_interval' => 5000,
-				'max_concurrent_generations' => 3
+				'max_concurrent_generations' => 5
 			]
 		];
 	}

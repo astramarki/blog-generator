@@ -165,7 +165,15 @@ created_at (datetime)
 updated_at (datetime)
 ```
 
-### 8. Products Table (`wp_ai_blog_generator_products`)
+### 8. Idea Categories Table (`wp_ai_blog_idea_categories`)
+```sql
+blog_idea_id (int)
+category_id (int)
+```
+This junction table stores the many-to-many relationship between blog ideas and WordPress categories.
+When blog posts are generated, all categories from this table are applied to the post.
+
+### 9. Products Table (`wp_ai_blog_generator_products`)
 ```sql
 id (bigint) PRIMARY KEY
 name (varchar 255)
@@ -175,7 +183,7 @@ created_at (datetime)
 updated_at (datetime)
 ```
 
-### 9. Product Images Table (`wp_ai_blog_generator_product_images`)
+### 10. Product Images Table (`wp_ai_blog_generator_product_images`)
 ```sql
 id (bigint) PRIMARY KEY
 product_id (bigint) FOREIGN KEY
@@ -186,7 +194,7 @@ display_order (int) DEFAULT 0
 created_at (datetime)
 ```
 
-### 10. Product Links Table (`wp_ai_blog_generator_product_links`)
+### 11. Product Links Table (`wp_ai_blog_generator_product_links`)
 ```sql
 id (bigint) PRIMARY KEY
 product_id (bigint) FOREIGN KEY
@@ -196,7 +204,7 @@ link_url (varchar 500)
 created_at (datetime)
 ```
 
-### 11. Product Seed Images Table (`wp_ai_blog_generator_product_seed_images`)
+### 12. Product Seed Images Table (`wp_ai_blog_generator_product_seed_images`)
 ```sql
 id (bigint) PRIMARY KEY
 product_id (bigint) FOREIGN KEY
@@ -206,7 +214,7 @@ display_order (int) DEFAULT 0
 created_at (datetime)
 ```
 
-### 12. Brand Features Table (`wp_ai_blog_brand_features`)
+### 13. Brand Features Table (`wp_ai_blog_brand_features`)
 ```sql
 id (bigint) PRIMARY KEY
 name (varchar 255)
@@ -291,7 +299,7 @@ Orchestrates the content generation process:
 - Calls Anthropic API with compiled prompts
 - Processes results into WordPress format
 - Handles image generation
-- Creates WordPress posts
+- Creates WordPress posts with proper category assignment
 - Tracks all costs
 
 **Updated Properties:**
@@ -299,9 +307,16 @@ Orchestrates the content generation process:
 
 **Updated Methods:**
 - `generate_blog_post()` - Now uses `$this->prompt_compiler->generate_content_prompts()`
+  - Retrieves full idea data including all categories from `ai_blog_idea_categories` table
+  - Applies all selected categories to the WordPress post during creation
 - Calls new `generate_content()` method instead of deprecated `generate_blog_content()`
 - `validate_generated_content()` - Updated to enforce 140-character limit for meta descriptions
 - `generate_alt_text_from_prompt()` - Enhanced to include focus keyphrase in image alt text for SEO
+
+**Category Handling**:
+- When creating posts, the generator calls `$this->idea_model->get_idea($idea_id)` to retrieve all category relationships
+- Categories are mapped from the `category_ids` array and applied using `post_category` in `wp_insert_post()`
+- Ensures posts are properly categorized according to the selections made during idea generation
 
 ### 5. Prompt Compiler Service
 Location: `services/class-prompt-compiler-service.php`
@@ -1702,10 +1717,11 @@ ALTER TABLE wp_ai_blog_ideas ADD INDEX idx_generation_status (generation_status)
 Location: `services/class-generation-queue.php`
 
 **Key Features:**
-- Maximum 5 concurrent generations
-- FIFO queue for excess requests
-- Automatic cleanup of stuck generations
+- Maximum 5 concurrent generations (configured via `MAX_CONCURRENT` constant)
+- FIFO queue for excess requests when more than 5 ideas are submitted
+- Automatic cleanup of stuck generations after 15 minutes
 - Real-time queue status tracking
+- Automatic queue processing when generations complete, fail, or are cancelled
 
 **Key Methods:**
 - `add_to_queue($idea_ids)` - Add one or more ideas to generation queue
@@ -1791,9 +1807,10 @@ Location: `admin/assets/js/approved-ideas-v2.js`
 ### Error Handling
 
 #### Automatic Recovery
-- Stuck generations (10+ minutes) automatically reset on page load
-- Failed generations can be retried with one click
+- Stuck generations automatically marked as failed after 15 minutes
+- Failed generations can be retried with one click by clicking the "Retry" button
 - Queue automatically processes when slots become available
+- Active generation count is cleaned up on each check to prevent slot blocking
 
 #### Error Tracking
 - `generation_error` field stores error messages
@@ -2520,3 +2537,34 @@ This implementation provides a robust, user-friendly products management system 
   - Mutually exclusive when enabled (checking one unchecks the other)
   - Both automatically selected and disabled when content generation is always included
   - State properly managed during form population and reset
+
+## Drafted Posts Page Complete Redesign
+
+The drafted posts page has been completely redesigned to match the modern Bootstrap 5 style of the approved ideas and idea generator pages.
+
+### Technical Implementation
+- **JavaScript File**: `admin/assets/js/drafted-posts.js`
+- **AJAX Handlers**: Added to `Blog_Controller` for real-time operations
+- **Model Enhancements**: `Blog_Model` enhanced with statistics methods
+- **View File**: `admin/views/drafted-posts.php` completely rewritten
+- **Script Enqueuing**: Fixed menu slug detection from '-drafted-posts' to '-drafts' for proper asset loading
+
+### Features
+1. **Statistics Cards**: Real-time display of draft count, scheduled posts, published today, and total cost
+2. **AJAX Operations**: All operations without page refresh
+3. **Bulk Actions**: Publish, schedule, and delete multiple posts
+4. **Status Filters**: Show all, drafts only, or scheduled only
+5. **Enhanced Scheduling**: Date ranges and time distribution
+6. **Native WordPress Scheduling**: Direct use of WordPress scheduling functions
+
+### Known Issues Fixed
+- **Asset Loading**: Scripts and styles now properly load due to corrected menu slug pattern matching
+- **Bootstrap Modals**: Added fallback handling for cases where Bootstrap might not be loaded
+- **AJAX Configuration**: Fixed ai_blog_admin object availability verification
+
+### AJAX Endpoints
+- `ai_blog_get_drafted_posts` - Fetch posts with statistics
+- `ai_blog_publish_post` - Publish single post
+- `ai_blog_schedule_post` - Schedule single post
+- `ai_blog_bulk_publish_posts` - Bulk publish
+- `ai_blog_delete_posts` - Delete posts

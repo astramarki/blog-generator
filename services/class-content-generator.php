@@ -1172,11 +1172,15 @@ class Content_Generator {
 				
 				$this->update_generation_status( $idea_id, 'post', 'Creating WordPress post...' );
 				
+				// Get the full idea data including all categories
+				$full_idea = $this->idea_model->get_idea( $idea_id );
+				
 				if ( $this->generation_logger ) {
 					$this->generation_logger->info( 'Preparing post data', [
 						'content_title' => substr( $content['title'] ?? 'no_title', 0, 100 ),
 						'final_html_length' => strlen( $final_html ),
-						'category_id' => $idea['category_id'] ?? 'no_category'
+						'category_ids' => $full_idea['category_ids'] ?? [],
+						'category_count' => count( $full_idea['category_ids'] ?? [] )
 					] );
 				}
 				
@@ -1192,13 +1196,29 @@ class Content_Generator {
 					] );
 				}
 				
+				// Prepare categories array - ensure all IDs are integers
+				$post_categories = [];
+				if ( ! empty( $full_idea['category_ids'] ) && is_array( $full_idea['category_ids'] ) ) {
+					$post_categories = array_map( 'intval', $full_idea['category_ids'] );
+				} elseif ( ! empty( $idea['category_id'] ) ) {
+					// Fallback to single category if available
+					$post_categories = [ intval( $idea['category_id'] ) ];
+				}
+				
+				if ( $this->generation_logger ) {
+					$this->generation_logger->info( 'Categories prepared for post', [
+						'categories' => $post_categories,
+						'category_names' => $full_idea['category_names'] ?? []
+					] );
+				}
+				
 				$post_data = [
 					'post_title'   => $proper_title,
 					'post_content' => $final_html,
 					'post_status'  => 'draft',
 					'post_type'    => 'post',
 					'post_author'  => get_current_user_id(),
-					'post_category' => [ $idea['category_id'] ],
+					'post_category' => $post_categories,
 					'meta_input'   => [
 						'_yoast_wpseo_metadesc' => $content['meta_description'],
 						'_yoast_wpseo_focuskw'  => $content['focus_keyphrase'],

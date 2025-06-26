@@ -356,6 +356,7 @@ class Admin_Manager {
 		wp_localize_script( 'ai-blog-generator-personas', 'aiBlogAjax', $localized_data );
 		wp_localize_script( 'ai-blog-generator-products', 'aiBlogAjax', $localized_data );
 		wp_localize_script( 'ai-blog-generator-brand-features', 'aiBlogAjax', $localized_data );
+		wp_localize_script( 'ai-blog-generator-drafted-posts', 'ai_blog_admin', $localized_data );
 
 		
 		// Debug Idea Generator script localization
@@ -649,10 +650,72 @@ class Admin_Manager {
 			// to prevent duplicate script loading. The controller handles its own asset management.
 		}
 
+		// Drafted Posts page - Bootstrap 5 and modern assets
+		$drafted_posts_patterns = [
+			$this->menu_slug . '-drafts',
+			$this->menu_slug . '_page_' . $this->menu_slug . '-drafts'
+		];
+		
+		$is_drafted_posts_page = false;
+		foreach ( $drafted_posts_patterns as $pattern ) {
+			if ( strpos( $hook, $pattern ) !== false ) {
+				$is_drafted_posts_page = true;
+				break;
+			}
+		}
+		
+		// Also check current page parameter as fallback (exact match only)
+		if ( ! $is_drafted_posts_page && isset( $_GET['page'] ) ) {
+			$is_drafted_posts_page = ( $_GET['page'] === $this->menu_slug . '-drafts' );
+		}
+		
+		if ( $is_drafted_posts_page ) {
+			// Debug logging for Drafted Posts page detection
+			Logger::debug( 'page_specific_scripts', 'Drafted Posts page detected, enqueuing scripts', [
+				'hook' => $hook,
+				'menu_slug' => $this->menu_slug,
+				'matched_pattern' => $pattern ?? 'page_parameter',
+				'page_param' => $_GET['page'] ?? 'none'
+			], __CLASS__, __METHOD__ );
+			
+			// Enqueue Bootstrap 5
+			wp_enqueue_style(
+				'bootstrap',
+				'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
+				[],
+				'5.3.0'
+			);
+			
+			wp_enqueue_script(
+				'bootstrap',
+				'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
+				['jquery'],
+				'5.3.0',
+				true
+			);
+			
+			// Enqueue FontAwesome
+			wp_enqueue_style(
+				'font-awesome',
+				'https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css',
+				[],
+				'6.4.0'
+			);
+			
+			// Enqueue Drafted Posts JavaScript
+			wp_enqueue_script(
+				'ai-blog-generator-drafted-posts',
+				AI_BLOG_GENERATOR_PLUGIN_URL . 'admin/assets/js/drafted-posts.js',
+				['jquery', 'bootstrap', 'ai-blog-generator-admin'],
+				$this->version,
+				true
+			);
+		}
+
 		// Blog Ideas page - ApexCharts for potential data visualization
 		if ( strpos( $hook, $this->menu_slug . '-blog-ideas' ) !== false || 
 			 strpos( $hook, $this->menu_slug . '-approved' ) !== false ||
-			 strpos( $hook, $this->menu_slug . '-drafted-posts' ) !== false ||
+			 strpos( $hook, $this->menu_slug . '-drafts' ) !== false ||
 			 strpos( $hook, $this->menu_slug . '-published-posts' ) !== false ) {
 			
 			// Enqueue ApexCharts for potential charts in blog management pages

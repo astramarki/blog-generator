@@ -67,7 +67,9 @@ class Generation_Queue {
 	public function add_to_queue( $idea_ids ) {
 		Logger::info( 'generation_queue_add', 'Adding ideas to generation queue', [
 			'idea_ids' => $idea_ids,
-			'count' => count( $idea_ids )
+			'count' => count( $idea_ids ),
+			'current_active_count' => $this->get_active_count(),
+			'max_concurrent' => self::MAX_CONCURRENT
 		] );
 
 		$queued = [];
@@ -75,6 +77,13 @@ class Generation_Queue {
 		$errors = [];
 
 		foreach ( $idea_ids as $idea_id ) {
+			$current_active = $this->get_active_count();
+			Logger::debug( 'processing_idea_for_queue', 'Processing idea for generation queue', [
+				'idea_id' => $idea_id,
+				'current_active_count' => $current_active,
+				'can_start' => $current_active < self::MAX_CONCURRENT
+			] );
+			
 			$result = $this->queue_single_idea( $idea_id );
 			
 			if ( $result['status'] === 'started' ) {
@@ -89,7 +98,7 @@ class Generation_Queue {
 			}
 		}
 
-		return [
+		$final_result = [
 			'success' => count( $errors ) === 0,
 			'queued' => $queued,
 			'started' => $started,
@@ -97,6 +106,10 @@ class Generation_Queue {
 			'active_count' => $this->get_active_count(),
 			'queue_length' => count( $queued )
 		];
+		
+		Logger::info( 'generation_queue_add_complete', 'Completed adding ideas to queue', $final_result );
+
+		return $final_result;
 	}
 
 	/**
@@ -167,13 +180,49 @@ class Generation_Queue {
 	public function get_active_count() {
 		$active = get_transient( self::ACTIVE_GENERATIONS_KEY ) ?: [];
 		
-		// NO AUTOMATIC CLEANUP - Let stuck generations stay stuck to prevent automatic retries
-		// If a generation is truly stuck, it must be manually cancelled or marked as failed
-		// This prevents the automatic restart behavior that was causing duplicate generations
+		// Clean up stuck generations older than 15 minutes
+		$cleaned = false;
+		$cutoff_time = time() - ( 15 * 60 ); // 15 minutes ago
 		
-		Logger::debug( 'get_active_count', 'Active generations count (no cleanup)', [
+		foreach ( $active as $idea_id => $data ) {
+			// Check if generation is stuck
+			if ( isset( $data['started_at'] ) && $data['started_at'] < $cutoff_time ) {
+				// Verify if idea is still marked as generating in database
+				$idea = $this->ideas_model->get_idea( $idea_id );
+				
+				if ( ! $idea || $idea['status'] !== 'generating' ) {
+					// Remove from active list as it's no longer generating
+					unset( $active[ $idea_id ] );
+					$cleaned = true;
+					
+					Logger::info( 'cleanup_stale_active_generation', 'Removed stale generation from active list', [
+						'idea_id' => $idea_id,
+						'started_at' => date( 'Y-m-d H:i:s', $data['started_at'] ),
+						'db_status' => $idea ? $idea['status'] : 'not_found'
+					] );
+				} else {
+					// Generation is stuck - mark as failed and remove from active
+					$this->mark_failed( $idea_id, 'Generation timeout - stuck for over 15 minutes' );
+					unset( $active[ $idea_id ] );
+					$cleaned = true;
+					
+					Logger::warning( 'cleanup_stuck_generation', 'Marked stuck generation as failed', [
+						'idea_id' => $idea_id,
+						'duration_minutes' => round( ( time() - $data['started_at'] ) / 60, 1 )
+					] );
+				}
+			}
+		}
+		
+		// Update transient if we cleaned anything
+		if ( $cleaned ) {
+			set_transient( self::ACTIVE_GENERATIONS_KEY, $active, HOUR_IN_SECONDS );
+		}
+		
+		Logger::debug( 'get_active_count', 'Active generations count after cleanup', [
 			'active_count' => count( $active ),
-			'active_idea_ids' => array_keys( $active )
+			'active_idea_ids' => array_keys( $active ),
+			'cleaned' => $cleaned
 		] );
 		
 		return count( $active );
@@ -448,11 +497,13 @@ class Generation_Queue {
 			'generation_completed_at' => current_time( 'mysql' )
 		] );
 
-		// NO AUTOMATIC QUEUE PROCESSING - User must manually start next generations
-		
-		Logger::info( 'generation_cancelled_final', 'Generation cancelled - NO AUTO QUEUE PROCESSING', [
-			'idea_id' => $idea_id
+		Logger::info( 'generation_cancelled', 'Generation cancelled successfully', [
+			'idea_id' => $idea_id,
+			'active_after' => $this->get_active_count()
 		] );
+		
+		// Process queue to start any waiting generations
+		$this->process_queue( $idea_id );
 
 		return true;
 	}
@@ -487,13 +538,17 @@ class Generation_Queue {
 			'generation_completed_at' => current_time( 'mysql' )
 		] );
 
-		// Remove from active generations - NO AUTOMATIC QUEUE PROCESSING
+		// Remove from active generations
 		$this->remove_from_active( $idea_id );
 		
-		Logger::info( 'generation_marked_failed', 'Generation marked as failed - NO RETRY, NO AUTO QUEUE PROCESSING', [
+		Logger::info( 'generation_marked_failed', 'Generation marked as failed', [
 			'idea_id' => $idea_id,
-			'error' => $display_error
+			'error' => $display_error,
+			'active_after' => $this->get_active_count()
 		] );
+		
+		// Process queue to start any waiting generations
+		$this->process_queue( $idea_id );
 	}
 
 	/**
@@ -503,23 +558,27 @@ class Generation_Queue {
 	 */
 	public function mark_complete( $idea_id ) {
 		Logger::info( 'generation_complete', 'Generation completed', [
-			'idea_id' => $idea_id
+			'idea_id' => $idea_id,
+			'active_before' => $this->get_active_count()
 		] );
 
 		// Update idea status
 		$this->ideas_model->update_idea( $idea_id, [
 			'status' => 'generated',
-			'generation_status' => 'Complete',
-			'generation_error' => null,
+			'generation_status' => 'Complete!',
 			'generation_completed_at' => current_time( 'mysql' )
 		] );
 
-		// Remove from active - NO AUTOMATIC QUEUE PROCESSING
+		// Remove from active generations
 		$this->remove_from_active( $idea_id );
 		
-		Logger::info( 'generation_complete_final', 'Generation marked complete - NO AUTO QUEUE PROCESSING', [
-			'idea_id' => $idea_id
+		Logger::info( 'generation_marked_complete', 'Generation marked as complete', [
+			'idea_id' => $idea_id,
+			'active_after' => $this->get_active_count()
 		] );
+
+		// Process queue to start any waiting generations
+		$this->process_queue( $idea_id );
 	}
 
 	/**

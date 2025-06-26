@@ -320,14 +320,26 @@ class Blog_Model extends Model {
 	/**
 	 * Get total cost for a date range.
 	 *
-	 * @param string $date_from Start date.
-	 * @param string $date_to   End date.
+	 * @param string|array $date_from Start date or filters array.
+	 * @param string       $date_to   End date.
 	 * @return float
 	 */
 	public function get_total_cost( $date_from = null, $date_to = null ) {
 		global $wpdb;
+		
+		// Handle array parameter for filters
+		if ( is_array( $date_from ) ) {
+			$filters = $date_from;
+			$date_from = $filters['date_from'] ?? null;
+			$date_to = $filters['date_to'] ?? null;
+		}
 
 		$sql = "SELECT SUM(cost) as total FROM " . AI_BLOG_GENERATOR_TABLE_POSTS . " WHERE 1=1";
+		
+		// Handle status filter
+		if ( is_array( $filters ) && ! empty( $filters['status'] ) ) {
+			$sql .= $wpdb->prepare( " AND status = %s", $filters['status'] );
+		}
 
 		if ( $date_from ) {
 			$sql .= $wpdb->prepare( " AND DATE(created_at) >= %s", $date_from );
@@ -465,6 +477,25 @@ class Blog_Model extends Model {
 			] );
 			throw $e;
 		}
+	}
+
+	/**
+	 * Count published posts today.
+	 *
+	 * @return int
+	 */
+	public function count_published_today() {
+		global $wpdb;
+
+		$today = date( 'Y-m-d' );
+		$table_name = AI_BLOG_GENERATOR_TABLE_POSTS;
+
+		$sql = $wpdb->prepare(
+			"SELECT COUNT(*) FROM {$table_name} WHERE status = 'published' AND DATE(published_at) = %s",
+			$today
+		);
+
+		return (int) $wpdb->get_var( $sql );
 	}
 
 	/**

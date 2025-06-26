@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Current Development]
 
+### Changed
+- **Drafted Posts Page Complete Redesign**: Completely rewrote the drafted posts page to match the modern Bootstrap 5 style of approved ideas and idea generator pages
+  - **Visual Improvements**:
+    - Added statistics cards showing draft count, scheduled posts, published today, and total cost
+    - Modernized table design with inline action buttons and better category display using badges
+    - Added FontAwesome icons throughout the interface for better visual hierarchy
+    - Implemented responsive design that works well on mobile devices
+    - Applied consistent styling matching other v2 admin pages
+  - **Functionality Enhancements**:
+    - Implemented real-time AJAX loading and updates without page refresh
+    - Added bulk actions for publishing, scheduling, and deleting multiple posts
+    - Added status filters to show all posts, drafts only, or scheduled only  
+    - Enhanced bulk scheduling with customizable date ranges and time distribution
+    - Added modals for bulk operations with better user confirmation
+  - **Technical Improvements**:
+    - Created new `drafted-posts.js` JavaScript file for enhanced interactivity
+    - Added comprehensive AJAX handlers for all operations (get, publish, schedule, bulk operations, delete)
+    - Enhanced Blog_Model with count and cost calculation methods for statistics
+    - Fixed scheduling functionality to use WordPress native functions directly
+    - Added proper error handling and user feedback for all operations
+
 ### Fixed
 - **Fusion Code JavaScript Corruption**: Fixed issue where Avada and WordPress strip script tags from fusion_code blocks
   - **Problem**: 
@@ -255,6 +276,40 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Improved typography and spacing consistency
   - Updated color scheme to match modern design language
   - Better visual hierarchy with icon-based actions
+
+### Fixed
+- **Drafted Posts Page Script and Style Loading**: Fixed scripts and styles not loading on drafted posts page
+  - **Root Cause**: Menu slug mismatch - page registered as `-drafts` but scripts checking for `-drafted-posts`
+  - **Solution**: Updated enqueue script patterns to match actual menu slug registration
+  - **Files Modified**: 
+    - `admin/class-admin-manager.php` - Fixed pattern detection from '-drafted-posts' to '-drafts'
+    - `admin/assets/js/drafted-posts.js` - Enhanced dependency verification and Bootstrap modal handling
+  - **Result**: Bootstrap 5, FontAwesome, and all JavaScript functionality now loads correctly on drafted posts page
+
+- **Drafted Posts Table Width**: Fixed table only using half the screen width
+  - **Root Cause**: WordPress default `.wrap` class applies width constraints
+  - **Solution**: Added CSS overrides to make the page full width
+  - **CSS Changes**: 
+    - Override `.wrap` max-width constraint
+    - Ensure table and cards use 100% width
+    - Scoped WordPress admin overrides to drafted posts page only
+  - **Result**: Drafted posts table now uses full available screen width
+
+- **Drafted Posts JavaScript Localization**: Fixed missing `ai_blog_admin` object error
+  - **Root Cause**: Script was enqueued but not localized with AJAX data
+  - **Solution**: Added `wp_localize_script` call for drafted posts script
+  - **Files Modified**: 
+    - `admin/class-admin-manager.php` - Added localization in `localize_scripts()` method
+  - **Result**: Drafted posts page now loads properly with AJAX functionality working
+
+- **Drafted Posts Table Bootstrap Card Constraint**: Fixed table being limited to 520px width
+  - **Root Cause**: Bootstrap card component was constraining table width
+  - **Solution**: Replaced card wrapper with custom div structure
+  - **Changes Made**: 
+    - Replaced `<div class="card">` wrapper with `<div class="drafted-posts-table-wrapper">`
+    - Added custom CSS for table wrapper with full width
+    - Also updated filter actions bar to use consistent wrapper approach
+  - **Result**: Table now uses full available screen width without Bootstrap card constraints
 
 ## [1.7.0] - 2024-12-18
 
@@ -4028,135 +4083,19 @@ foreach ($contexts as $context) {
   - Deleted view file: blog-ideas.php
   - Note: Blog Ideas V2 page at ?page=ai-blog-generator-ideas-v2 remains unchanged
 
-## [Latest] - 2024-01-16
-
-### Changed
-- Updated personas edit modal to use mutually exclusive radio buttons for content generation format (HTML or Avada)
-  - Replaced separate checkboxes with radio button group
-  - Added modern styling for radio buttons with visual feedback
-  - Made content format selection required
-  - Added validation to ensure one format is always selected
-  - Updated JavaScript to properly handle radio button values when saving/loading
-
-### Added
-- Format-specific context requirements for Avada and HTML layouts
-  - New database fields: `always_include_avada` and `always_include_html` in contexts table
-  - Contexts can be marked as required for specific content formats
-  - When selecting Avada or HTML format in personas, required contexts are automatically checked
-  - Required contexts are visually indicated and cannot be unchecked
-  - AJAX endpoint to fetch format-specific required contexts
-
+## [Latest] - 2024-12-21
 ### Fixed
-- Fixed security check failure in contexts edit functionality by updating get_context method to use Ajax_Handler trait
-- Made Avada and HTML context options mutually exclusive - checking one automatically unchecks the other
-
-### Added
-- Added debugging to contexts.js to investigate context update failures
-  - Added console logging to track context ID field value in saveContext
-  - Added console logging to verify context ID is set correctly in populateModal
-  - Added validation to prevent sending update request without context_id
-  - Added extra logging for form data keys and context_id value
-  - Issue: Context updates failing with "Failed to update context" error due to missing context_id parameter
-- Added automatic checkbox management for context generation options
-  - When "Always include in content generation" is checked, both Avada and HTML options are automatically checked and disabled
-  - When unchecked, both options are re-enabled and maintain their mutual exclusivity
-  - Form reset and modal population properly handle the disabled states
-
-## [1.9.0] - 2024-01-XX
-### Added
-- **Prompt Compiler Service**: New abstraction layer between AI services and prompt generation
-  - Centralized prompt compilation in `services/class-prompt-compiler-service.php`
-  - Comprehensive system prompt building with persona, contexts, and requirements
-  - User prompt construction with SEO and format specifications
-  - Prompt logging to `{idea_id}_prompts.txt` files for debugging
-  - Support for both content and image prompt generation
-- **Anthropic Service Enhancement**: New `generate_content()` method accepting pre-compiled prompts
-- **Product Model Enhancement**: Added `get_active_products()` method for retrieving active products
+- Fixed issue where only 2 simultaneous generations would run instead of the configured limit of 5
+- Added automatic cleanup of stuck generations older than 15 minutes in the generation queue
+- Ensured queue processing continues automatically when a generation completes, fails, or is cancelled
+- Updated frontend configuration to correctly show 5 as the max concurrent generations limit
+- Added detailed logging for queue operations to better track generation status
+- Fixed issue where generated blog posts were not assigned to all their selected categories
+  - Updated Content_Generator to retrieve and apply all categories from the ai_blog_idea_categories table
+  - Posts are now correctly assigned to all categories selected during idea generation
 
 ### Changed
-- Content Generator now uses Prompt Compiler Service instead of inline prompt building
-- Improved separation of concerns between prompt generation and AI service communication
-- Enhanced maintainability with all prompt logic in a single location
-
-### Technical Details
-- System prompts include: persona info, layout styles, chart usage, contexts, product requirements, SEO guidelines, brand features
-- User prompts include: target keywords, image requirements, SEO metadata, output format
-- Backwards compatible with existing content generation workflow
-
-### Fixed Product Field Name Errors in Prompt Compiler [2025-01-24]
-- **Problem**: PHP warnings about undefined array keys "name" and "description" in Prompt Compiler Service
-- **Root Cause**: Code was accessing `$product['name']` and `$product['description']` but database uses `product_name` and `product_description`
-- **Solution**: Updated field references in `build_product_promotion_prompt()` and `get_available_seed_images()` methods to use correct field names
-- **Files Modified**: 
-  - `services/class-prompt-compiler-service.php`
-
-### Enhanced Product Information in Content Prompts [2025-01-24]
-- **Problem**: Product information in prompts was missing URLs and images (empty arrays)
-- **Root Cause**: The `get_active_products()` method only returned basic product data without relations (images and links)
-- **Solution**: 
-  - Changed to use `get_all_with_relations()` to fetch complete product data including images and links
-  - Properly extract product URLs from the links relation (preferring product_page type)
-  - Extract all image URLs from the images relation (using full_url when available)
-  - Added debug logging to track product data structure
-- **Benefits**: AI now receives complete product information including all images and URLs for better content generation
-- **Files Modified**: 
-  - `services/class-prompt-compiler-service.php` - Updated `build_product_promotion_prompt()` method
-
-## Recent Changes
-
-### Persona-Based Image Count Control [2025-01-24]
-- **Feature**: Content generation now respects the `number_of_images` field in persona settings
-- **Implementation Details**:
-  - If persona has `number_of_images` set to 0 or null: Only featured image is generated
-  - If persona has `number_of_images` set to a specific number (e.g., 2): That many content images are generated PLUS a featured image
-  - Default value is 2 content images if not specified
-- **How it Works**:
-  - Prompt Compiler Service reads `$persona['number_of_images']` (defaults to 2)
-  - Only includes content image prompts if `number_of_images` > 0
-  - Featured image is always generated regardless of this setting
-  - Admin interface already has the field at Personas page > Number of images input
-- **Files Modified**:
-  - `services/class-prompt-compiler-service.php` - Already handles persona image count
-  - `models/class-persona-model.php` - Already includes `number_of_images` in fillable fields
-  - `admin/views/personas.php` - Already has UI for setting image count
-
-### Fixed ApexCharts JavaScript Rendering Issues [2025-01-24]
-- **Problem**: Chart JavaScript code was being wrapped in `<p>` tags with `<br />` tags, breaking functionality
-- **Symptoms**: Chart code displayed as text with HTML formatting instead of executing
-- **Root Cause**: AI was including JavaScript directly in HTML content instead of the CHARTS section
-- **Solution**:
-  - Enhanced chart formatting rules in `build_chart_usage_prompt()` 
-  - Added CHARTS section to user prompt output format
-  - Created "ApexCharts Formatting Rules" context with clear examples
-  - Specified that CHARTS section should contain ONLY JavaScript (no tags)
-- **Files Modified**:
-  - `services/class-prompt-compiler-service.php`
-
-### Fixed Avada Fusion Builder JavaScript Errors [2025-01-24]
-- **Problem**: "Cannot read properties of undefined (reading 'alpha_background_color')" error when editing Avada posts
-- **Root Cause**: Generated Avada shortcodes were missing required attributes and had invalid attributes:
-  - Missing `alpha_background_color` attribute (required by Fusion Builder)
-  - Had invalid `undefined=""` attribute
-  - Had duplicate `padding_top` attributes
-  - Column shortcodes had invalid `border_position` attribute
-- **Solution**:
-  - Fixed shortcode generation in both `class-content-generator.php` and `class-anthropic-service.php`
-  - Added required `alpha_background_color=""` attribute to containers and columns
-  - Removed `undefined=""` and duplicate attributes
-  - Created "Avada Shortcode Requirements" context with proper formatting examples
-- **Files Modified**:
-  - `services/class-content-generator.php`
-  - `services/class-anthropic-service.php`
-  - Added context: "Avada Shortcode Requirements"
-
-### Fixed ApexCharts Not Being Generated [2025-01-24]
-- **Problem**: Chart JavaScript was not being included - only empty divs with no script
-- **Root Cause**: AI was copying instruction text like "[OPTIONAL: Only include JavaScript...]" instead of generating actual JavaScript
-- **Solution**:
-  - Updated chart prompts to be clearer about leaving section empty vs. adding JavaScript
-  - Added example JavaScript structure in system prompt
-  - Enhanced parsing to detect and ignore placeholder/instruction text
-  - Changed from "OPTIONAL" language to clearer instructions
-- **Files Modified**:
-  - `services/class-prompt-compiler-service.php` - Clearer chart instructions
-  - `services/class-content-generator.php` - Filter out placeholder text
+- Generation queue now properly enforces the 5 concurrent generation limit
+- Stuck generations are automatically marked as failed after 15 minutes to free up slots
+- Queue automatically processes waiting ideas when a slot becomes available
+- Blog post creation now uses all categories from the idea_categories relationship table

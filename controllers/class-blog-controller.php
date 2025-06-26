@@ -17,7 +17,8 @@ use AI_Blog_Generator\Models\Log_Model;
 use AI_Blog_Generator\Utilities\Logger;
 use AI_Blog_Generator\Utilities\Ajax_Handler;
 use AI_Blog_Generator\Services\Post_Publisher;
-use AI_Blog_Generator\Services\Post_Scheduler;
+use AI_Blog_Generator\Services\Scheduler_Service;
+use AI_Blog_Generator\Services\Background_Processor;
 
 // Exit if accessed directly.
 if ( ! defined( 'ABSPATH' ) ) {
@@ -97,6 +98,13 @@ class Blog_Controller {
 		add_action( 'wp_ajax_ai_blog_bulk_schedule_posts', [ $this, 'ajax_bulk_schedule_posts' ] );
 		add_action( 'wp_ajax_ai_blog_write_debug', [ $this, 'ajax_write_debug' ] );
 		add_action( 'wp_ajax_ai_blog_execute_fallback_generation', [ $this, 'ajax_execute_fallback_generation' ] );
+		
+		// Drafted posts handlers
+		add_action( 'wp_ajax_ai_blog_get_drafted_posts', [ $this, 'ajax_get_drafted_posts' ] );
+		add_action( 'wp_ajax_ai_blog_publish_post', [ $this, 'ajax_publish_post' ] );
+		add_action( 'wp_ajax_ai_blog_schedule_post', [ $this, 'ajax_schedule_post' ] );
+		add_action( 'wp_ajax_ai_blog_bulk_publish_posts', [ $this, 'ajax_bulk_publish_posts' ] );
+		add_action( 'wp_ajax_ai_blog_delete_posts', [ $this, 'ajax_delete_posts' ] );
 	}
 
 	/**
@@ -513,21 +521,26 @@ class Blog_Controller {
 		}
 
 		// Schedule the post
-		$scheduler = new Post_Scheduler();
-		$result = $scheduler->schedule_post( $post_id, $scheduled_time );
+		$scheduled_timestamp = strtotime( $scheduled_time );
+		$updated_post = wp_update_post( [
+			'ID' => $post_id,
+			'post_status' => 'future',
+			'post_date' => date( 'Y-m-d H:i:s', $scheduled_timestamp ),
+			'post_date_gmt' => get_gmt_from_date( date( 'Y-m-d H:i:s', $scheduled_timestamp ) )
+		], true );
 
-		if ( is_wp_error( $result ) ) {
+		if ( is_wp_error( $updated_post ) ) {
 			Logger::error( 'Failed to schedule blog', [
 				'blog_id' => $blog_id,
 				'post_id' => $post_id,
 				'scheduled_time' => $scheduled_time,
-				'error' => $result->get_error_message(),
+				'error' => $updated_post->get_error_message(),
 				'action' => 'schedule_blog',
 			] );
 			wp_send_json_error( [ 
 				'message' => sprintf( 
 					__( 'Scheduling failed: %s', 'ai-blog-generator' ), 
-					$result->get_error_message() 
+					$updated_post->get_error_message() 
 				) 
 			] );
 		}
@@ -971,7 +984,7 @@ class Blog_Controller {
 			wp_send_json_error( [ 'message' => __( 'No draft posts to schedule.', 'ai-blog-generator' ) ] );
 		}
 
-		$scheduler = new Post_Scheduler();
+		$scheduler = new Scheduler_Service();
 		$scheduled_count = 0;
 		$failed_count = 0;
 
@@ -989,9 +1002,15 @@ class Blog_Controller {
 			$schedule_time = $schedule_date . ' ' . $scheduler->get_random_publish_time();
 			
 			// Schedule the post
-			$result = $scheduler->schedule_post( $draft->post_id, $schedule_time );
+			$scheduled_timestamp = strtotime( $schedule_time );
+			$updated_post = wp_update_post( [
+				'ID' => $draft->post_id,
+				'post_status' => 'future',
+				'post_date' => date( 'Y-m-d H:i:s', $scheduled_timestamp ),
+				'post_date_gmt' => get_gmt_from_date( date( 'Y-m-d H:i:s', $scheduled_timestamp ) )
+			], true );
 			
-			if ( ! is_wp_error( $result ) ) {
+			if ( ! is_wp_error( $updated_post ) ) {
 				// Update blog record
 				$this->blog_model->update( $draft->id, [
 					'status' => 'scheduled',
@@ -1004,7 +1023,7 @@ class Blog_Controller {
 				Logger::error( 'Failed to schedule post in bulk operation', [
 					'blog_id' => $draft->id,
 					'post_id' => $draft->post_id,
-					'error' => $result->get_error_message(),
+					'error' => $updated_post->get_error_message(),
 				] );
 			}
 		}
@@ -1218,7 +1237,7 @@ class Blog_Controller {
 		}
 
 		// Initialize background processor
-		$processor = new \AI_Blog_Generator\Services\Background_Processor();
+		$processor = new Background_Processor();
 
 		// Check if already in progress
 		if ( $processor->is_generation_in_progress( $idea_id ) ) {
@@ -1259,7 +1278,7 @@ class Blog_Controller {
 			wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'ai-blog-generator' ) ] );
 		}
 
-		$processor = new \AI_Blog_Generator\Services\Background_Processor();
+		$processor = new Background_Processor();
 
 		// Check if single idea ID provided
 		if ( isset( $_POST['idea_id'] ) ) {
@@ -1311,7 +1330,7 @@ class Blog_Controller {
 			wp_send_json_error( [ 'message' => __( 'Invalid idea ID.', 'ai-blog-generator' ) ] );
 		}
 
-		$processor = new \AI_Blog_Generator\Services\Background_Processor();
+		$processor = new Background_Processor();
 		$cancelled = $processor->cancel_generation( $idea_id );
 
 		if ( $cancelled ) {
@@ -1347,7 +1366,7 @@ class Blog_Controller {
 			wp_send_json_error( [ 'message' => __( 'No ideas selected.', 'ai-blog-generator' ) ] );
 		}
 
-		$processor = new \AI_Blog_Generator\Services\Background_Processor();
+		$processor = new Background_Processor();
 		$started_count = 0;
 		$failed_count = 0;
 		$already_running_count = 0;
@@ -1428,7 +1447,7 @@ class Blog_Controller {
 		$ideas = $this->idea_model->get_by_status( 'approved' );
 		
 		// Get generation statuses for all ideas
-		$processor = new \AI_Blog_Generator\Services\Background_Processor();
+		$processor = new Background_Processor();
 		$idea_ids = wp_list_pluck( $ideas, 'id' );
 		$generation_statuses = $processor->get_multiple_generation_statuses( $idea_ids );
 
@@ -1518,7 +1537,7 @@ class Blog_Controller {
 		// Check if should generate after update
 		$generate_after = isset( $_POST['generate_after'] ) && $_POST['generate_after'] === '1';
 		if ( $generate_after ) {
-			$processor = new \AI_Blog_Generator\Services\Background_Processor();
+			$processor = new Background_Processor();
 			$started = $processor->start_generation( $idea_id );
 			
 			if ( $started ) {
@@ -1560,6 +1579,433 @@ class Blog_Controller {
 		file_put_contents( $log_file, $log_entry, FILE_APPEND | LOCK_EX );
 		
 		wp_die(); // Just end the request
+	}
+
+	/**
+	 * AJAX handler to get drafted posts with statistics
+	 */
+	public function ajax_get_drafted_posts() {
+		try {
+			// Verify security
+			if ( ! check_ajax_referer( 'ai_blog_admin_nonce', 'nonce', false ) ) {
+				wp_send_json_error( [ 'message' => __( 'Security check failed.', 'ai-blog-generator' ) ] );
+			}
+
+			// Check capabilities
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'ai-blog-generator' ) ] );
+			}
+
+			Logger::info( 'get_drafted_posts', 'Fetching drafted posts' );
+
+			// Get drafted posts
+			$drafted_posts = $this->blog_model->get_all_with_details( [ 'status' => 'draft' ], 'gp.created_at DESC' );
+			
+			// Format posts for response
+			$formatted_posts = [];
+			foreach ( $drafted_posts as $post ) {
+				$categories = get_the_category( $post->post_id );
+				$formatted_posts[] = [
+					'id' => $post->id,
+					'post_id' => $post->post_id,
+					'post_title' => $post->post_title,
+					'idea_title' => $post->idea_title,
+					'cost' => $post->cost,
+					'created_at' => $post->created_at,
+					'scheduled_time' => $post->scheduled_time,
+					'status' => $post->status,
+					'categories' => $categories,
+					'edit_link' => get_edit_post_link( $post->post_id ),
+					'preview_link' => get_preview_post_link( $post->post_id )
+				];
+			}
+
+			// Get statistics
+			$statistics = [
+				'drafts' => $this->blog_model->count( [ 'status' => 'draft' ] ),
+				'scheduled' => $this->blog_model->count( [ 'status' => 'scheduled' ] ),
+				'published' => $this->blog_model->count_published_today(),
+				'totalCost' => $this->blog_model->get_total_cost( [ 'status' => 'draft' ] )
+			];
+
+			wp_send_json_success( [
+				'posts' => $formatted_posts,
+				'statistics' => $statistics
+			] );
+
+		} catch ( \Exception $e ) {
+			Logger::error( 'get_drafted_posts_error', 'Error fetching drafted posts', [
+				'error' => $e->getMessage()
+			] );
+			wp_send_json_error( [ 'message' => __( 'Failed to load drafted posts.', 'ai-blog-generator' ) ] );
+		}
+	}
+
+	/**
+	 * AJAX handler to publish a single post
+	 */
+	public function ajax_publish_post() {
+		try {
+			// Verify security
+			if ( ! check_ajax_referer( 'ai_blog_admin_nonce', 'nonce', false ) ) {
+				wp_send_json_error( [ 'message' => __( 'Security check failed.', 'ai-blog-generator' ) ] );
+			}
+
+			// Check capabilities
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'ai-blog-generator' ) ] );
+			}
+
+			// Validate input
+			$blog_id = isset( $_POST['blog_id'] ) ? absint( $_POST['blog_id'] ) : 0;
+			$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+			
+			if ( ! $blog_id || ! $post_id ) {
+				wp_send_json_error( [ 'message' => __( 'Invalid blog or post ID.', 'ai-blog-generator' ) ] );
+			}
+
+			Logger::info( 'publish_post', 'Publishing post', [
+				'blog_id' => $blog_id,
+				'post_id' => $post_id
+			] );
+
+			// Get the blog record
+			$blog = $this->blog_model->get( $blog_id );
+			if ( ! $blog || $blog->post_id != $post_id ) {
+				wp_send_json_error( [ 'message' => __( 'Blog not found.', 'ai-blog-generator' ) ] );
+			}
+
+			// Publish the post
+			$updated_post = wp_update_post( [
+				'ID' => $post_id,
+				'post_status' => 'publish'
+			], true );
+
+			if ( is_wp_error( $updated_post ) ) {
+				Logger::error( 'publish_post_error', 'Failed to publish post', [
+					'blog_id' => $blog_id,
+					'post_id' => $post_id,
+					'error' => $updated_post->get_error_message()
+				] );
+				wp_send_json_error( [ 'message' => $updated_post->get_error_message() ] );
+			}
+
+			// Update blog status
+			$this->blog_model->update( $blog_id, [
+				'status' => 'published',
+				'published_at' => current_time( 'mysql' ),
+				'updated_at' => current_time( 'mysql' )
+			] );
+
+			// Get updated statistics
+			$statistics = [
+				'drafts' => $this->blog_model->count( [ 'status' => 'draft' ] ),
+				'scheduled' => $this->blog_model->count( [ 'status' => 'scheduled' ] ),
+				'published' => $this->blog_model->count_published_today(),
+				'totalCost' => $this->blog_model->get_total_cost( [ 'status' => 'draft' ] )
+			];
+
+			wp_send_json_success( [
+				'message' => __( 'Post published successfully.', 'ai-blog-generator' ),
+				'post_url' => get_permalink( $post_id ),
+				'statistics' => $statistics
+			] );
+
+		} catch ( \Exception $e ) {
+			Logger::error( 'publish_post_exception', 'Exception during post publish', [
+				'error' => $e->getMessage()
+			] );
+			wp_send_json_error( [ 'message' => __( 'Failed to publish post.', 'ai-blog-generator' ) ] );
+		}
+	}
+
+	/**
+	 * AJAX handler to schedule a single post
+	 */
+	public function ajax_schedule_post() {
+		try {
+			// Verify security
+			if ( ! check_ajax_referer( 'ai_blog_admin_nonce', 'nonce', false ) ) {
+				wp_send_json_error( [ 'message' => __( 'Security check failed.', 'ai-blog-generator' ) ] );
+			}
+
+			// Check capabilities
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'ai-blog-generator' ) ] );
+			}
+
+			// Validate input
+			$blog_id = isset( $_POST['blog_id'] ) ? absint( $_POST['blog_id'] ) : 0;
+			$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+			$scheduled_time = isset( $_POST['scheduled_time'] ) ? sanitize_text_field( $_POST['scheduled_time'] ) : '';
+			
+			if ( ! $blog_id || ! $post_id || empty( $scheduled_time ) ) {
+				wp_send_json_error( [ 'message' => __( 'Invalid input data.', 'ai-blog-generator' ) ] );
+			}
+
+			// Convert datetime-local format to timestamp
+			$scheduled_timestamp = strtotime( $scheduled_time );
+			if ( ! $scheduled_timestamp || $scheduled_timestamp <= current_time( 'timestamp' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Scheduled time must be in the future.', 'ai-blog-generator' ) ] );
+			}
+
+			Logger::info( 'schedule_post', 'Scheduling post', [
+				'blog_id' => $blog_id,
+				'post_id' => $post_id,
+				'scheduled_time' => $scheduled_time
+			] );
+
+			// Get the blog record
+			$blog = $this->blog_model->get( $blog_id );
+			if ( ! $blog || $blog->post_id != $post_id ) {
+				wp_send_json_error( [ 'message' => __( 'Blog not found.', 'ai-blog-generator' ) ] );
+			}
+
+			// Schedule the post
+			$scheduled_timestamp = strtotime( $scheduled_time );
+			$updated_post = wp_update_post( [
+				'ID' => $post_id,
+				'post_status' => 'future',
+				'post_date' => date( 'Y-m-d H:i:s', $scheduled_timestamp ),
+				'post_date_gmt' => get_gmt_from_date( date( 'Y-m-d H:i:s', $scheduled_timestamp ) )
+			], true );
+
+			if ( is_wp_error( $updated_post ) ) {
+				Logger::error( 'Failed to schedule blog', [
+					'blog_id' => $blog_id,
+					'post_id' => $post_id,
+					'scheduled_time' => $scheduled_time,
+					'error' => $updated_post->get_error_message(),
+					'action' => 'schedule_blog',
+				] );
+				wp_send_json_error( [ 
+					'message' => sprintf( 
+						__( 'Scheduling failed: %s', 'ai-blog-generator' ), 
+						$updated_post->get_error_message() 
+					) 
+				] );
+			}
+
+			// Update blog with scheduled time
+			$this->blog_model->update( $blog_id, [
+				'status' => 'scheduled',
+				'scheduled_time' => date( 'Y-m-d H:i:s', $scheduled_timestamp ),
+				'updated_at' => current_time( 'mysql' )
+			] );
+
+			// Get updated statistics
+			$statistics = [
+				'drafts' => $this->blog_model->count( [ 'status' => 'draft' ] ),
+				'scheduled' => $this->blog_model->count( [ 'status' => 'scheduled' ] ),
+				'published' => $this->blog_model->count_published_today(),
+				'totalCost' => $this->blog_model->get_total_cost( [ 'status' => 'draft' ] )
+			];
+
+			wp_send_json_success( [
+				'message' => __( 'Post scheduled successfully.', 'ai-blog-generator' ),
+				'scheduled_date' => date_i18n( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), $scheduled_timestamp ),
+				'statistics' => $statistics
+			] );
+
+		} catch ( \Exception $e ) {
+			Logger::error( 'schedule_post_exception', 'Exception during post schedule', [
+				'error' => $e->getMessage()
+			] );
+			wp_send_json_error( [ 'message' => __( 'Failed to schedule post.', 'ai-blog-generator' ) ] );
+		}
+	}
+
+	/**
+	 * AJAX handler to bulk publish posts
+	 */
+	public function ajax_bulk_publish_posts() {
+		try {
+			// Verify security
+			if ( ! check_ajax_referer( 'ai_blog_admin_nonce', 'nonce', false ) ) {
+				wp_send_json_error( [ 'message' => __( 'Security check failed.', 'ai-blog-generator' ) ] );
+			}
+
+			// Check capabilities
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'ai-blog-generator' ) ] );
+			}
+
+			// Validate input
+			$blog_ids = isset( $_POST['blog_ids'] ) && is_array( $_POST['blog_ids'] ) 
+				? array_map( 'absint', $_POST['blog_ids'] ) 
+				: [];
+				
+			if ( empty( $blog_ids ) ) {
+				wp_send_json_error( [ 'message' => __( 'No posts selected.', 'ai-blog-generator' ) ] );
+			}
+
+			Logger::info( 'bulk_publish_posts', 'Bulk publishing posts', [
+				'blog_ids' => $blog_ids,
+				'count' => count( $blog_ids )
+			] );
+
+			$published_count = 0;
+			$failed_count = 0;
+
+			foreach ( $blog_ids as $blog_id ) {
+				// Get the blog record
+				$blog = $this->blog_model->get( $blog_id );
+				if ( ! $blog ) {
+					$failed_count++;
+					continue;
+				}
+
+				// Publish the post
+				$updated_post = wp_update_post( [
+					'ID' => $blog->post_id,
+					'post_status' => 'publish'
+				], true );
+
+				if ( is_wp_error( $updated_post ) ) {
+					$failed_count++;
+					Logger::error( 'bulk_publish_error', 'Failed to publish post in bulk', [
+						'blog_id' => $blog_id,
+						'post_id' => $blog->post_id,
+						'error' => $updated_post->get_error_message()
+					] );
+					continue;
+				}
+
+				// Update blog status
+				$this->blog_model->update( $blog_id, [
+					'status' => 'published',
+					'published_at' => current_time( 'mysql' ),
+					'updated_at' => current_time( 'mysql' )
+				] );
+
+				$published_count++;
+			}
+
+			// Get updated statistics
+			$statistics = [
+				'drafts' => $this->blog_model->count( [ 'status' => 'draft' ] ),
+				'scheduled' => $this->blog_model->count( [ 'status' => 'scheduled' ] ),
+				'published' => $this->blog_model->count_published_today(),
+				'totalCost' => $this->blog_model->get_total_cost( [ 'status' => 'draft' ] )
+			];
+
+			$message = sprintf(
+				/* translators: %1$d: published count, %2$d: total count */
+				_n( 
+					'%1$d of %2$d post published.', 
+					'%1$d of %2$d posts published.', 
+					$published_count, 
+					'ai-blog-generator' 
+				),
+				$published_count,
+				count( $blog_ids )
+			);
+
+			wp_send_json_success( [
+				'message' => $message,
+				'published' => $published_count,
+				'failed' => $failed_count,
+				'statistics' => $statistics
+			] );
+
+		} catch ( \Exception $e ) {
+			Logger::error( 'bulk_publish_exception', 'Exception during bulk publish', [
+				'error' => $e->getMessage()
+			] );
+			wp_send_json_error( [ 'message' => __( 'Failed to publish posts.', 'ai-blog-generator' ) ] );
+		}
+	}
+
+	/**
+	 * AJAX handler to delete posts
+	 */
+	public function ajax_delete_posts() {
+		try {
+			// Verify security
+			if ( ! check_ajax_referer( 'ai_blog_admin_nonce', 'nonce', false ) ) {
+				wp_send_json_error( [ 'message' => __( 'Security check failed.', 'ai-blog-generator' ) ] );
+			}
+
+			// Check capabilities
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'ai-blog-generator' ) ] );
+			}
+
+			// Validate input
+			$blog_ids = isset( $_POST['blog_ids'] ) && is_array( $_POST['blog_ids'] ) 
+				? array_map( 'absint', $_POST['blog_ids'] ) 
+				: [];
+				
+			if ( empty( $blog_ids ) ) {
+				wp_send_json_error( [ 'message' => __( 'No posts selected.', 'ai-blog-generator' ) ] );
+			}
+
+			Logger::info( 'delete_posts', 'Deleting posts', [
+				'blog_ids' => $blog_ids,
+				'count' => count( $blog_ids )
+			] );
+
+			$deleted_count = 0;
+			$failed_count = 0;
+
+			foreach ( $blog_ids as $blog_id ) {
+				// Get the blog record
+				$blog = $this->blog_model->get( $blog_id );
+				if ( ! $blog ) {
+					$failed_count++;
+					continue;
+				}
+
+				// Delete the WordPress post
+				$deleted = wp_delete_post( $blog->post_id, false ); // Move to trash
+				
+				if ( ! $deleted ) {
+					$failed_count++;
+					Logger::error( 'delete_post_error', 'Failed to delete post', [
+						'blog_id' => $blog_id,
+						'post_id' => $blog->post_id
+					] );
+					continue;
+				}
+
+				// Delete the blog record
+				$this->blog_model->delete( $blog_id );
+				$deleted_count++;
+			}
+
+			// Get updated statistics
+			$statistics = [
+				'drafts' => $this->blog_model->count( [ 'status' => 'draft' ] ),
+				'scheduled' => $this->blog_model->count( [ 'status' => 'scheduled' ] ),
+				'published' => $this->blog_model->count_published_today(),
+				'totalCost' => $this->blog_model->get_total_cost( [ 'status' => 'draft' ] )
+			];
+
+			$message = sprintf(
+				/* translators: %1$d: deleted count, %2$d: total count */
+				_n( 
+					'%1$d of %2$d post deleted.', 
+					'%1$d of %2$d posts deleted.', 
+					$deleted_count, 
+					'ai-blog-generator' 
+				),
+				$deleted_count,
+				count( $blog_ids )
+			);
+
+			wp_send_json_success( [
+				'message' => $message,
+				'deleted' => $deleted_count,
+				'failed' => $failed_count,
+				'statistics' => $statistics
+			] );
+
+		} catch ( \Exception $e ) {
+			Logger::error( 'delete_posts_exception', 'Exception during delete posts', [
+				'error' => $e->getMessage()
+			] );
+			wp_send_json_error( [ 'message' => __( 'Failed to delete posts.', 'ai-blog-generator' ) ] );
+		}
 	}
 } 
  
