@@ -102,8 +102,8 @@ class Admin_Manager {
 		// Approved Ideas V2 submenu.
 		add_submenu_page(
 			$this->menu_slug,
-			__( 'Approved Ideas V2', 'ai-blog-generator' ),
-			__( 'Approved Ideas V2', 'ai-blog-generator' ),
+			__( 'Approved Ideas', 'ai-blog-generator' ),
+			__( 'Approved Ideas', 'ai-blog-generator' ),
 			$this->capability,
 			$this->menu_slug . '-approved-ideas-v2',
 			[ $this, 'render_approved_ideas_v2_page' ]
@@ -1114,19 +1114,10 @@ class Admin_Manager {
 		add_action( 'wp_ajax_ai_blog_save_settings', [ $this, 'ajax_save_settings' ] );
 		add_action( 'wp_ajax_ai_blog_test_api_connection', [ $this, 'ajax_test_api_connection' ] );
 		
-		// Blog generation handlers.
-		add_action( 'wp_ajax_ai_blog_generate_post', [ $this, 'ajax_generate_post' ] );
-		add_action( 'wp_ajax_ai_blog_schedule_post', [ $this, 'ajax_schedule_post' ] );
-		add_action( 'wp_ajax_ai_blog_publish_post', [ $this, 'ajax_publish_post' ] );
-		
 		// Context handlers.
 		add_action( 'wp_ajax_ai_blog_save_context', [ $this, 'ajax_save_context' ] );
 		add_action( 'wp_ajax_ai_blog_delete_context', [ $this, 'ajax_delete_context' ] );
 		add_action( 'wp_ajax_ai_blog_toggle_context', [ $this, 'ajax_toggle_context' ] );
-		
-		// Note: Seed image handlers are registered in Context_Controller
-		
-
 		
 		// Cost handlers.
 		add_action( 'wp_ajax_ai_blog_get_cost_data', [ $this, 'ajax_get_cost_data' ] );

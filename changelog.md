@@ -311,6 +311,38 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Also updated filter actions bar to use consistent wrapper approach
   - **Result**: Table now uses full available screen width without Bootstrap card constraints
 
+### Fixed
+- **Schedule Post AJAX Error**: Fixed fatal error when scheduling posts in drafted posts page
+  - **Root Cause**: Duplicate AJAX action registration in Admin_Manager for handlers that don't exist in that class
+  - **Error**: `class AI_Blog_Generator\Admin\Admin_Manager does not have a method "ajax_schedule_post"`
+  - **Solution**: Removed duplicate AJAX registrations from Admin_Manager
+  - **Changes Made**:
+    - Removed `wp_ajax_ai_blog_schedule_post` registration from Admin_Manager
+    - Removed `wp_ajax_ai_blog_generate_post` registration (method doesn't exist)
+    - Removed `wp_ajax_ai_blog_publish_post` registration (duplicate of Blog_Controller)
+  - **Result**: Schedule post functionality now works correctly without fatal errors
+
+### Changed
+- **Approved Ideas Page Naming**: Simplified the menu item and page title from "Approved Ideas V2" to "Approved Ideas"
+  - **Files Modified**:
+    - `controllers/class-approved-ideas-controller-v2.php` - Updated menu configuration
+    - `admin/views/approved-ideas-view-v2.php` - Updated page title 
+    - `admin/class-admin-manager.php` - Updated submenu registration
+  - **Note**: Menu slug remains unchanged (`ai-blog-generator-approved-ideas-v2`) to preserve existing links
+
+### Enhanced
+- **Generation Queue Status Visibility**: Improved visibility of generation queue status
+  - **Issue**: Users couldn't see that ideas beyond the 5th were being queued
+  - **Solution**: Enhanced the queue status indicator UI
+  - **Changes Made**:
+    - Made queue status indicator more prominent with badges and icons
+    - Added list of queued items showing position and title
+    - Added notification when items are queued
+    - Added automatic queue status fetching after bulk generation
+    - Added function to fetch queue status on demand
+
+  - **Result**: Users now clearly see when ideas are queued and their position in the queue
+
 ## [1.7.0] - 2024-12-18
 
 ### Added
@@ -4099,3 +4131,13 @@ foreach ($contexts as $context) {
 - Stuck generations are automatically marked as failed after 15 minutes to free up slots
 - Queue automatically processes waiting ideas when a slot becomes available
 - Blog post creation now uses all categories from the idea_categories relationship table
+
+## [1.0.2] - 2025-06-26
+
+### Fixed
+- Fixed database error "Unknown column 'published_at'" by updating `count_published_today()` method to query WordPress post data instead of non-existent column
+- Removed invalid `published_at` field updates from `ajax_publish_post()`, `ajax_bulk_publish_posts()`, and `publish_scheduled_posts()` methods
+- The plugin now correctly counts published posts based on WordPress post dates rather than tracking separately
+
+### Changed
+// ... existing code ...

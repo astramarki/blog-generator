@@ -490,8 +490,14 @@ class Blog_Model extends Model {
 		$today = date( 'Y-m-d' );
 		$table_name = AI_BLOG_GENERATOR_TABLE_POSTS;
 
+		// Query posts that are published and have WordPress posts published today
 		$sql = $wpdb->prepare(
-			"SELECT COUNT(*) FROM {$table_name} WHERE status = 'published' AND DATE(published_at) = %s",
+			"SELECT COUNT(*) 
+			FROM {$table_name} gp
+			INNER JOIN {$wpdb->posts} p ON gp.post_id = p.ID
+			WHERE gp.status = 'published' 
+			AND p.post_status = 'publish'
+			AND DATE(p.post_date) = %s",
 			$today
 		);
 

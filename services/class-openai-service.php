@@ -158,6 +158,7 @@ class OpenAI_Service {
 				'n' => 1,
 				'size' => '1024x1024', // Always use 1024x1024 as specified
 				'quality' => 'high',
+				'style' => 'vivid',
 				// Note: quality parameter may not be supported by gpt-image-1, removed to avoid errors
 			];
 

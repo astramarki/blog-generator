@@ -280,11 +280,10 @@ class Scheduler_Service {
 				], true );
 				
 				if ( ! is_wp_error( $result ) ) {
-					// Update blog record.
-					$this->blog_model->update( $blog_post['id'], [
-						'status' => 'published',
-						'published_at' => current_time( 'mysql' ),
-					] );
+									// Update blog record.
+				$this->blog_model->update( $blog_post['id'], [
+					'status' => 'published',
+				] );
 					
 					$published++;
 					

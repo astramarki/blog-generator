@@ -1081,8 +1081,8 @@ class Approved_Ideas_Controller_V2 {
 	 */
 	public static function get_menu_config() {
 		return [
-			'page_title' => __( 'Approved Ideas V2', 'ai-blog-generator' ),
-			'menu_title' => __( 'Approved Ideas V2', 'ai-blog-generator' ),
+			'page_title' => __( 'Approved Ideas', 'ai-blog-generator' ),
+			'menu_title' => __( 'Approved Ideas', 'ai-blog-generator' ),
 			'capability' => 'manage_options',
 			'menu_slug' => 'ai-blog-generator-approved-ideas-v2',
 			'icon' => 'dashicons-yes-alt',

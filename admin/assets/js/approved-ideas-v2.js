@@ -1047,6 +1047,9 @@
                 // Update queue status display
                 if (data.queue_status) {
                     updateQueueStatusDisplay(data.queue_status);
+                } else {
+                    // Fetch queue status if not provided
+                    fetchQueueStatus();
                 }
             }
             
@@ -1068,6 +1071,9 @@
             // Start faster refresh for active generations
             if (data.queue_result && (data.queue_result.started.length > 0 || data.queue_result.queued.length > 0)) {
                 startFastRefresh();
+                
+                // Also fetch queue status after a short delay to ensure it's visible
+                setTimeout(fetchQueueStatus, 1000);
             }
             
         } else {
@@ -1797,22 +1803,48 @@
         // Create or update queue status indicator
         let $queueStatus = $('#queueStatusIndicator');
         if ($queueStatus.length === 0) {
-            // Create queue status indicator
+            // Create queue status indicator with enhanced styling
             const queueHtml = `
-                <div id="queueStatusIndicator" class="alert alert-info mt-3">
-                    <h6 class="alert-heading">Generation Queue Status</h6>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <strong>Active Generations:</strong> <span id="activeGenerationsCount">0</span> / 5<br>
-                            <strong>Queued Items:</strong> <span id="queuedItemsCount">0</span>
+                <div id="queueStatusIndicator" class="alert alert-info mt-3" style="display: none;">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h5 class="alert-heading mb-2">
+                                <i class="fas fa-tasks me-2"></i>
+                                Generation Queue Status
+                            </h5>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="mb-2">
+                                        <strong>Active Generations:</strong> 
+                                        <span class="badge bg-warning text-dark fs-6">
+                                            <span id="activeGenerationsCount">0</span> / 5
+                                        </span>
+                                    </div>
+                                    <div>
+                                        <strong>Queued Items:</strong> 
+                                        <span class="badge bg-secondary fs-6">
+                                            <span id="queuedItemsCount">0</span>
+                                        </span>
+                                    </div>
+                                </div>
+                                <div class="col-md-8">
+                                    <div id="activeGenerationsList"></div>
+                                    <div id="queuedItemsList" class="mt-2"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="col-md-6">
-                            <div id="activeGenerationsList"></div>
-                        </div>
+                        <button type="button" class="btn-close" aria-label="Close" onclick="$('#queueStatusIndicator').slideUp();"></button>
                     </div>
                 </div>
             `;
-            $('#ideasContainer').prepend(queueHtml);
+            
+            // Insert at the top of the page, right after the page header
+            if ($('#ideasContainer').length > 0) {
+                $('#ideasContainer').prepend(queueHtml);
+            } else {
+                // Fallback: insert after statistics cards
+                $('.ai-admin-statistics').after(queueHtml);
+            }
             $queueStatus = $('#queueStatusIndicator');
         }
         
@@ -1823,7 +1855,7 @@
         // Update active generations list
         let activeList = '';
         if (queueStatus.active_generations && queueStatus.active_generations.length > 0) {
-            activeList = '<strong>Currently Generating:</strong><ul class="mb-0">';
+            activeList = '<strong>Currently Generating:</strong><ul class="mb-0 small">';
             queueStatus.active_generations.forEach(function(gen) {
                 const duration = Math.floor(gen.duration / 60);
                 activeList += `<li>${escapeHtml(gen.title)} - ${escapeHtml(gen.status)} (${duration} min)</li>`;
@@ -1832,11 +1864,37 @@
         }
         $('#activeGenerationsList').html(activeList);
         
+        // Update queued items list
+        let queuedList = '';
+        if (queueStatus.queued_ideas && queueStatus.queued_ideas.length > 0) {
+            queuedList = '<strong>Waiting in Queue:</strong><ul class="mb-0 small">';
+            // Show first 5 queued items
+            const itemsToShow = queueStatus.queued_ideas.slice(0, 5);
+            itemsToShow.forEach(function(item) {
+                queuedList += `<li>Position ${item.position}: ${escapeHtml(item.title)}</li>`;
+            });
+            if (queueStatus.queued_ideas.length > 5) {
+                queuedList += `<li><em>... and ${queueStatus.queued_ideas.length - 5} more</em></li>`;
+            }
+            queuedList += '</ul>';
+        }
+        $('#queuedItemsList').html(queuedList);
+        
         // Show/hide based on activity
         if (queueStatus.active_count > 0 || queueStatus.queue_length > 0) {
             $queueStatus.slideDown();
+            
+            // Also show a notification if items are queued
+            if (queueStatus.queue_length > 0 && !window.ApprovedIdeasV2.queueNotificationShown) {
+                showNotice(
+                    `${queueStatus.queue_length} idea(s) are queued and will start generating automatically when slots become available. Maximum ${5} concurrent generations allowed.`,
+                    'info'
+                );
+                window.ApprovedIdeasV2.queueNotificationShown = true;
+            }
         } else {
             $queueStatus.slideUp();
+            window.ApprovedIdeasV2.queueNotificationShown = false;
         }
     }
 
@@ -1893,6 +1951,33 @@
             clearTimeout(window.ApprovedIdeasV2.fastRefreshTimer);
             window.ApprovedIdeasV2.fastRefreshTimer = null;
         }
+    }
+
+    /**
+     * Fetch queue status from server
+     */
+    function fetchQueueStatus() {
+        console.log('📊 Fetching queue status...');
+        
+        $.ajax({
+            url: ai_blog_admin.ajaxurl,
+            type: 'POST',
+            data: {
+                action: 'ai_blog_v2_get_queue_status',
+                nonce: ai_blog_admin.nonce
+            },
+            success: function(response) {
+                if (response.success) {
+                    console.log('✅ Queue status fetched:', response.data);
+                    updateQueueStatusDisplay(response.data);
+                } else {
+                    console.error('❌ Failed to fetch queue status:', response.data);
+                }
+            },
+            error: function(xhr, status, error) {
+                console.error('❌ AJAX error fetching queue status:', error);
+            }
+        });
     }
 
     // Export for debugging

@@ -1693,7 +1693,6 @@ class Blog_Controller {
 			// Update blog status
 			$this->blog_model->update( $blog_id, [
 				'status' => 'published',
-				'published_at' => current_time( 'mysql' ),
 				'updated_at' => current_time( 'mysql' )
 			] );
 
@@ -1874,7 +1873,6 @@ class Blog_Controller {
 				// Update blog status
 				$this->blog_model->update( $blog_id, [
 					'status' => 'published',
-					'published_at' => current_time( 'mysql' ),
 					'updated_at' => current_time( 'mysql' )
 				] );
 

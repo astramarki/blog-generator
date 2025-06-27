@@ -8999,3 +8999,96 @@ Block 1:
 2025-06-26 03:07:18 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
 2025-06-26 03:07:19 - GET_DRAFTED_POSTS [INFO]: Fetching drafted posts
 2025-06-26 03:08:19 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 03:14:37 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 03:19:20 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-26 03:20:40 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 09:30:30 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 09:30:30 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-26 09:30:31 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-26 09:30:31 - CRON_DAILY_IDEAS_START [INFO]: Starting daily idea generation
+2025-06-26 18:30:01 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 18:30:02 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-26 18:30:02 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-26 18:34:59 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-26 18:37:00 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 19:13:24 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 19:13:25 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-26 19:13:25 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-26 19:18:43 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 19:20:45 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-26 19:20:58 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-26 19:21:00 - GET_DRAFTED_POSTS [INFO]: Fetching drafted posts
+2025-06-26 19:21:06 - SCHEDULE_POST [INFO]: Scheduling post - Context: {"blog_id":77,"post_id":640,"scheduled_time":"2025-06-27T10:30"}
+2025-06-26 19:21:06 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"generated_posts","where_conditions":1,"sql_length":66,"raw_sql":"SELECT * FROM psec_ai_blog_generated_posts WHERE id = '77' LIMIT 1","where_clause":"id = '77'","fields":"*"}
+2025-06-26 19:21:06 - BLOG_MODEL::update - Method called
+2025-06-26 19:21:06 - BLOG_MODEL::update - DATA: {"id":77,"data":{"status":"scheduled","scheduled_time":"2025-06-27 10:30:00","updated_at":"2025-06-26 19:21:06"},"data_keys":["status","scheduled_time","updated_at"],"memory_usage":105380280}
+2025-06-26 19:21:06 - BLOG_MODEL::update - Calling parent::update method
+2025-06-26 19:21:06 - BLOG_MODEL::update - Parent update method completed
+2025-06-26 19:21:06 - BLOG_MODEL::update - DATA: {"result":true,"result_type":"boolean"}
+2025-06-26 19:21:16 - SCHEDULE_POST [INFO]: Scheduling post - Context: {"blog_id":77,"post_id":640,"scheduled_time":"2025-06-27T10:30"}
+2025-06-26 19:21:16 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"generated_posts","where_conditions":1,"sql_length":66,"raw_sql":"SELECT * FROM psec_ai_blog_generated_posts WHERE id = '77' LIMIT 1","where_clause":"id = '77'","fields":"*"}
+2025-06-26 19:21:16 - BLOG_MODEL::update - Method called
+2025-06-26 19:21:16 - BLOG_MODEL::update - DATA: {"id":77,"data":{"status":"scheduled","scheduled_time":"2025-06-27 10:30:00","updated_at":"2025-06-26 19:21:16"},"data_keys":["status","scheduled_time","updated_at"],"memory_usage":105348024}
+2025-06-26 19:21:16 - BLOG_MODEL::update - Calling parent::update method
+2025-06-26 19:21:16 - BLOG_MODEL::update - Parent update method completed
+2025-06-26 19:21:16 - BLOG_MODEL::update - DATA: {"result":true,"result_type":"boolean"}
+2025-06-26 19:21:16 - SCHEDULE_POST [INFO]: Scheduling post - Context: {"blog_id":77,"post_id":640,"scheduled_time":"2025-06-27T10:30"}
+2025-06-26 19:21:16 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"generated_posts","where_conditions":1,"sql_length":66,"raw_sql":"SELECT * FROM psec_ai_blog_generated_posts WHERE id = '77' LIMIT 1","where_clause":"id = '77'","fields":"*"}
+2025-06-26 19:21:17 - BLOG_MODEL::update - Method called
+2025-06-26 19:21:17 - BLOG_MODEL::update - DATA: {"id":77,"data":{"status":"scheduled","scheduled_time":"2025-06-27 10:30:00","updated_at":"2025-06-26 19:21:17"},"data_keys":["status","scheduled_time","updated_at"],"memory_usage":105629848}
+2025-06-26 19:21:17 - BLOG_MODEL::update - Calling parent::update method
+2025-06-26 19:21:17 - BLOG_MODEL::update - Parent update method completed
+2025-06-26 19:21:17 - BLOG_MODEL::update - DATA: {"result":true,"result_type":"boolean"}
+2025-06-26 19:21:27 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-26 19:21:31 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-26 19:21:32 - GET_DRAFTED_POSTS [INFO]: Fetching drafted posts
+2025-06-26 19:21:35 - PUBLISH_POST [INFO]: Publishing post - Context: {"blog_id":76,"post_id":637}
+2025-06-26 19:21:35 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"generated_posts","where_conditions":1,"sql_length":66,"raw_sql":"SELECT * FROM psec_ai_blog_generated_posts WHERE id = '76' LIMIT 1","where_clause":"id = '76'","fields":"*"}
+2025-06-26 19:21:35 - BLOG_MODEL::update - Method called
+2025-06-26 19:21:35 - BLOG_MODEL::update - DATA: {"id":76,"data":{"status":"published","published_at":"2025-06-26 19:21:35","updated_at":"2025-06-26 19:21:35"},"data_keys":["status","published_at","updated_at"],"memory_usage":105376976}
+2025-06-26 19:21:35 - BLOG_MODEL::update - Calling parent::update method
+2025-06-26 19:21:35 - BLOG_MODEL::update - Parent update method completed
+2025-06-26 19:21:35 - BLOG_MODEL::update - DATA: {"result":true,"result_type":"boolean"}
+2025-06-26 19:21:42 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-26 19:22:11 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-26 19:22:11 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-26 19:22:12 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-26 19:22:12 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-26 19:22:12 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-26 19:22:12 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":22}
+2025-06-26 19:22:12 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-26 19:22:12 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":74}
+2025-06-26 19:22:12 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":22,"generating_count":0,"generated_count":74,"approved_ids":["66","72","73","75","76","79","80","38","41","45","39","37","36","34","31","32","30","27","28","24","22","21"],"generating_ids":[],"generated_ids":["61","93","91","104","102","90","103","105","101","89","83","87","100","81","99","98","82","92","96","97","85","25","33","23","35","70","95","74","84","86","94","71","88","78","40","43","67","62","69","26","65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-26 19:22:12 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":96,"approved_count":22,"generating_count":0,"generated_count":74}
+2025-06-26 19:23:44 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 19:23:57 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-26 19:24:26 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-06-26 19:24:26 - RENDER_APPROVED_IDEAS_PAGE [INFO]: Rendering Approved Ideas V2 page
+2025-06-26 19:24:27 - AJAX_GET_IDEAS_START [INFO]: Getting approved ideas via AJAX
+2025-06-26 19:24:27 - CLEANUP_STUCK_GENERATIONS_START [INFO]: Starting automatic cleanup of stuck generations
+2025-06-26 19:24:27 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-26 19:24:27 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"approved","count":22}
+2025-06-26 19:24:27 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generating","count":0}
+2025-06-26 19:24:27 - IDEAS_BY_STATUS_RETRIEVED [INFO]: Retrieved ideas by status (AI_Blog_Generator\Models\Blog_Ideas_Model_V2::get_by_status) - Context: {"status":"generated","count":74}
+2025-06-26 19:24:27 - AJAX_IDEAS_LOADED [INFO]: Ideas loaded by status - Context: {"approved_count":22,"generating_count":0,"generated_count":74,"approved_ids":["66","72","73","75","76","79","80","38","41","45","39","37","36","34","31","32","30","27","28","24","22","21"],"generating_ids":[],"generated_ids":["61","93","91","104","102","90","103","105","101","89","83","87","100","81","99","98","82","92","96","97","85","25","33","23","35","70","95","74","84","86","94","71","88","78","40","43","67","62","69","26","65","18","17","16","44","29","64","63","77","68","42","50","49","48","47","51","46","14","12","4","10","3","20","19","13","15","2","11","7","9","5","1","6","8"]}
+2025-06-26 19:24:27 - AJAX_GET_APPROVED_IDEAS_SUCCESS [INFO]: Approved ideas retrieved successfully - Context: {"total_ideas":96,"approved_count":22,"generating_count":0,"generated_count":74}
+2025-06-26 19:29:33 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 19:34:35 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 19:34:36 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-26 19:39:39 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-26 19:45:42 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-27 09:40:30 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-27 09:40:30 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-27 09:40:30 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-27 12:00:11 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-27 12:00:12 - CRON_DAILY_IDEAS_START [INFO]: Starting daily idea generation
+2025-06-27 13:46:26 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-27 13:46:27 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-27 13:46:27 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-27 13:50:18 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-27 13:52:21 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-27 13:57:24 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-27 14:03:45 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-06-27 14:04:46 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-06-27 14:07:46 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-06-27 14:08:46 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered

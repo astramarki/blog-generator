@@ -26,7 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 					<div>
 						<h1 class="h2 mb-1 text-success">
 							<i class="fas fa-check-circle me-2"></i>
-							Approved Ideas V2
+							Approved Ideas
 						</h1>
 						<p class="text-muted mb-0">Generate blog posts from approved ideas with AI</p>
 					</div>
