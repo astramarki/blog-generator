@@ -702,26 +702,36 @@ class Approved_Ideas_Controller_V2 {
 		}
 
 		try {
-			// Get the log file path
+			// Get the log file path - look for files matching the pattern
 			$upload_dir = wp_upload_dir();
-			$log_dir = $upload_dir['basedir'] . '/ai-blog-generator-logs';
-			$log_file = $log_dir . '/generation-' . $idea_id . '.log';
+			$log_dir = $upload_dir['basedir'] . '/ai-blog-generator-logs/generations';
+			$log_file = null;
 			
-			// Check if log file exists
-			if ( ! file_exists( $log_file ) ) {
-				// Try debug-transaction.log as fallback
-				$debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
-				if ( file_exists( $debug_log ) ) {
-					$log_file = $debug_log;
-				} else {
-					wp_send_json_success( [
-						'lines' => [],
-						'last_line' => 0,
-						'complete' => false,
-						'message' => 'Log file not found yet. Generation may not have started.'
+			// Check if log directory exists
+			if ( is_dir( $log_dir ) ) {
+				// Find log files matching the pattern idea_<ideaid>_*.log
+				$pattern = $log_dir . '/idea_' . $idea_id . '_*.log';
+				$matching_files = glob( $pattern );
+				
+				if ( ! empty( $matching_files ) ) {
+					// Get the most recent log file for this idea
+					$log_file = end( $matching_files );
+					Logger::debug( 'ajax_log_file_found', 'Found generation log file', [
+						'idea_id' => $idea_id,
+						'log_file' => basename( $log_file )
 					] );
-					return;
 				}
+			}
+			
+			// If no specific log file found, return empty response
+			if ( ! $log_file || ! file_exists( $log_file ) ) {
+				wp_send_json_success( [
+					'lines' => [],
+					'last_line' => 0,
+					'complete' => false,
+					'message' => 'Log file not found. Generation may not have started yet.'
+				] );
+				return;
 			}
 			
 			// Read log file
@@ -739,14 +749,20 @@ class Approved_Ideas_Controller_V2 {
 			foreach ( $new_lines as $line ) {
 				$type = 'info';
 				
-				if ( stripos( $line, 'error' ) !== false || stripos( $line, 'fatal' ) !== false ) {
+				// Check for different log levels and keywords
+				if ( stripos( $line, '[ERROR]' ) !== false || stripos( $line, 'error:' ) !== false || 
+					 stripos( $line, 'fatal' ) !== false || stripos( $line, 'failed' ) !== false ) {
 					$type = 'error';
-				} elseif ( stripos( $line, 'warning' ) !== false || stripos( $line, 'warn' ) !== false ) {
+				} elseif ( stripos( $line, '[WARNING]' ) !== false || stripos( $line, 'warning:' ) !== false || 
+						   stripos( $line, 'warn' ) !== false ) {
 					$type = 'warning';
-				} elseif ( stripos( $line, 'success' ) !== false || stripos( $line, 'complete' ) !== false ) {
+				} elseif ( stripos( $line, '[SUCCESS]' ) !== false || stripos( $line, 'success' ) !== false || 
+						   stripos( $line, 'complete' ) !== false || stripos( $line, '✅' ) !== false ) {
 					$type = 'success';
-				} elseif ( stripos( $line, 'debug' ) !== false ) {
+				} elseif ( stripos( $line, '[DEBUG]' ) !== false || stripos( $line, 'debug:' ) !== false ) {
 					$type = 'debug';
+				} elseif ( stripos( $line, '---' ) !== false || stripos( $line, '===' ) !== false ) {
+					$type = 'separator';
 				}
 				
 				$formatted_lines[] = [
@@ -759,12 +775,21 @@ class Approved_Ideas_Controller_V2 {
 			$idea = $this->ideas_model->get_idea( $idea_id );
 			$is_complete = $idea && ! in_array( $idea['status'], [ 'generating', 'queued' ], true );
 			
+			// Get file metadata
+			$file_size = filesize( $log_file );
+			$last_modified = filemtime( $log_file );
+			
 			wp_send_json_success( [
 				'lines' => $formatted_lines,
 				'last_line' => $total_lines,
 				'complete' => $is_complete,
 				'status' => $idea['status'] ?? 'unknown',
-				'generation_status' => $idea['generation_status'] ?? null
+				'generation_status' => $idea['generation_status'] ?? null,
+				'file_info' => [
+					'size' => $file_size,
+					'last_modified' => date( 'Y-m-d H:i:s', $last_modified ),
+					'filename' => basename( $log_file )
+				]
 			] );
 
 		} catch ( \Exception $e ) {

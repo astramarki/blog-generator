@@ -45,7 +45,7 @@ $scheduler = new \AI_Blog_Generator\Services\Scheduler_Service();
 
 		<!-- Statistics Cards -->
 		<div class="row mb-4" id="statisticsCards">
-			<div class="col-md-3 col-sm-6 mb-3">
+			<div class="col-md-4 col-sm-6 mb-3">
 				<div class="card border-0 shadow-sm h-100">
 					<div class="card-body text-center">
 						<div class="d-flex align-items-center justify-content-center mb-2">
@@ -60,7 +60,7 @@ $scheduler = new \AI_Blog_Generator\Services\Scheduler_Service();
 					</div>
 				</div>
 			</div>
-			<div class="col-md-3 col-sm-6 mb-3">
+			<div class="col-md-4 col-sm-6 mb-3">
 				<div class="card border-0 shadow-sm h-100">
 					<div class="card-body text-center">
 						<div class="d-flex align-items-center justify-content-center mb-2">
@@ -75,7 +75,7 @@ $scheduler = new \AI_Blog_Generator\Services\Scheduler_Service();
 					</div>
 				</div>
 			</div>
-			<div class="col-md-3 col-sm-6 mb-3">
+			<div class="col-md-4 col-sm-6 mb-3">
 				<div class="card border-0 shadow-sm h-100">
 					<div class="card-body text-center">
 						<div class="d-flex align-items-center justify-content-center mb-2">
@@ -90,21 +90,7 @@ $scheduler = new \AI_Blog_Generator\Services\Scheduler_Service();
 					</div>
 				</div>
 			</div>
-			<div class="col-md-3 col-sm-6 mb-3">
-				<div class="card border-0 shadow-sm h-100">
-					<div class="card-body text-center">
-						<div class="d-flex align-items-center justify-content-center mb-2">
-							<div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
-								<i class="fas fa-dollar-sign text-info fs-4"></i>
-							</div>
-							<div class="text-start">
-								<h3 class="mb-0 text-info">$<span id="stat-cost">0.00</span></h3>
-								<small class="text-muted">Total Cost</small>
-							</div>
-						</div>
-					</div>
-				</div>
-			</div>
+
 		</div>
 
 		<!-- Filter and Actions Bar -->
@@ -189,10 +175,9 @@ $scheduler = new \AI_Blog_Generator\Services\Scheduler_Service();
 										</th>
 										<th scope="col">Title</th>
 										<th scope="col" style="width: 200px;">Categories</th>
-										<th scope="col" style="width: 100px;">Cost</th>
 										<th scope="col" style="width: 150px;">Generated</th>
 										<th scope="col" style="width: 200px;">Schedule</th>
-										<th scope="col" style="width: 150px;">Actions</th>
+										<th scope="col" style="width: 180px;">Actions</th>
 									</tr>
 								</thead>
 								<tbody id="draftsTableBody">
@@ -200,6 +185,7 @@ $scheduler = new \AI_Blog_Generator\Services\Scheduler_Service();
 										<?php foreach ( $drafted_posts as $post ) : ?>
 											<tr data-post-id="<?php echo esc_attr( $post->post_id ); ?>" 
 												data-blog-id="<?php echo esc_attr( $post->id ); ?>"
+												data-idea-id="<?php echo esc_attr( $post->idea_id ); ?>"
 												data-status="<?php echo esc_attr( $post->status ); ?>">
 												<td>
 													<div class="form-check">
@@ -234,11 +220,6 @@ $scheduler = new \AI_Blog_Generator\Services\Scheduler_Service();
 													?>
 												</td>
 												<td>
-													<span class="text-success fw-bold">
-														$<?php echo esc_html( number_format( $post->cost, 2 ) ); ?>
-													</span>
-												</td>
-												<td>
 													<small><?php echo esc_html( wp_date( get_option( 'date_format' ) . ' ' . get_option( 'time_format' ), strtotime( $post->created_at ) ) ); ?></small>
 												</td>
 												<td>
@@ -269,6 +250,11 @@ $scheduler = new \AI_Blog_Generator\Services\Scheduler_Service();
 														   title="Preview">
 															<i class="fas fa-eye"></i>
 														</a>
+														<button type="button" class="btn btn-info btn-sm download-prompts" 
+															data-idea-id="<?php echo esc_attr( $post->idea_id ); ?>"
+															title="Download Prompts">
+															<i class="fas fa-download"></i>
+														</button>
 													</div>
 												</td>
 											</tr>

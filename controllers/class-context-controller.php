@@ -945,15 +945,15 @@ class Context_Controller {
 			// Sanitize input data
 			$sanitized_data = $this->sanitize_ajax_data( $_POST, [
 				'product_name' => 'sanitize_text_field',
-				'context_id' => 'absint'
+				'context' => 'sanitize_textarea_field'
 			] );
 
 			$product_name = $sanitized_data['product_name'];
-			$context_id = $sanitized_data['context_id'] ?? null;
+			$context = $sanitized_data['context'] ?? null;
 
 			$this->log_debug( 'seed_image_fields_validated', 'Seed image upload fields validated', [
 				'product_name' => $product_name,
-				'context_id' => $context_id,
+				'context' => ! empty( $context ) ? 'provided' : 'empty',
 				'has_file' => ! empty( $_FILES['image_file'] )
 			] );
 
@@ -1143,13 +1143,13 @@ class Context_Controller {
 			$this->log_debug( 'seed_image_saving_to_db', 'Saving seed image data to database', [
 				'table_name' => $table_name,
 				'product_name' => $product_name,
-				'context_id' => $context_id
+				'context' => $context
 			] );
 
 			$seed_image_id = $db_manager->insert( 'seed_images', [
 				'product_name' => $product_name,
 				'image_url' => $uploaded_file['url'],
-				'context_id' => $context_id,
+				'context' => $context,
 				'created_at' => current_time( 'mysql' )
 			] );
 
@@ -1159,7 +1159,7 @@ class Context_Controller {
 					'data' => [
 						'product_name' => $product_name,
 						'image_url' => $uploaded_file['url'],
-						'context_id' => $context_id
+						'context' => $context
 					],
 					'db_error' => $wpdb->last_error
 				] );
@@ -1178,7 +1178,7 @@ class Context_Controller {
 				'product_name' => $product_name,
 				'attachment_id' => $attachment_id,
 				'image_url' => $uploaded_file['url'],
-				'context_id' => $context_id,
+				'context' => $context,
 				'file_size' => $file['size'],
 				'uploaded_by' => get_current_user_id()
 			] );
@@ -1193,7 +1193,7 @@ class Context_Controller {
 					'id' => $seed_image_id,
 					'product_name' => $product_name,
 					'image_url' => $uploaded_file['url'],
-					'context_id' => $context_id,
+					'context' => $context,
 					'attachment_id' => $attachment_id
 				],
 				'message' => __( 'Seed image uploaded successfully.', 'ai-blog-generator' )
@@ -1206,7 +1206,7 @@ class Context_Controller {
 		} catch ( \Exception $e ) {
 			$this->handle_ajax_exception( $e, 'upload_seed_image', [
 				'product_name' => $product_name ?? 'unknown',
-				'context_id' => $context_id ?? 'unknown',
+				'context' => $context ?? 'unknown',
 				'file_details' => $_FILES['image_file'] ?? 'no_file'
 			] );
 		}
@@ -1237,7 +1237,7 @@ class Context_Controller {
 			// Validate input
 			$seed_id = isset( $_POST['seed_id'] ) ? absint( $_POST['seed_id'] ) : 0;
 			$product_name = isset( $_POST['product_name'] ) ? sanitize_text_field( $_POST['product_name'] ) : '';
-			$context_id = isset( $_POST['context_id'] ) ? absint( $_POST['context_id'] ) : null;
+			$context = isset( $_POST['context'] ) ? sanitize_textarea_field( $_POST['context'] ) : '';
 
 			if ( ! $seed_id ) {
 				ob_end_clean();
@@ -1257,10 +1257,10 @@ class Context_Controller {
 				$table_name,
 				[
 					'product_name' => $product_name,
-					'context_id' => $context_id
+					'context' => $context
 				],
 				[ 'id' => $seed_id ],
-				[ '%s', '%d' ],
+				[ '%s', '%s' ],
 				[ '%d' ]
 			);
 
@@ -1273,7 +1273,7 @@ class Context_Controller {
 			Logger::info( 'Seed image updated', [
 				'seed_image_id' => $seed_id,
 				'product_name' => $product_name,
-				'context_id' => $context_id,
+				'context' => $context,
 				'action' => 'update_seed_image',
 				'user_id' => get_current_user_id(),
 			] );

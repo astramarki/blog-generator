@@ -960,6 +960,20 @@
     font-weight: 500;
 }
 
+.seed-image-info .context-text {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    border-left: 3px solid #0073aa;
+}
+
+.seed-image-info .context-text small {
+    color: #555;
+    font-style: italic;
+    line-height: 1.4;
+}
+
 .seed-image-actions {
     display: flex;
     gap: 4px;
@@ -2602,3 +2616,20 @@
 }
 
 /* Product Links Container */
+
+/* Modal textarea styling */
+#seed-image-upload-modal textarea.ai-blog-form-control {
+	min-height: 120px;
+	font-size: 14px;
+	line-height: 1.5;
+	resize: vertical;
+}
+
+#seed-image-upload-modal .ai-blog-form-group .description {
+	margin-top: 8px;
+	font-size: 13px;
+	color: #666;
+	font-style: italic;
+}
+
+/* Required field asterisk */

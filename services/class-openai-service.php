@@ -282,8 +282,33 @@ class OpenAI_Service {
 			// Download the seed image to a temporary file
 			$temp_file = $this->download_seed_image_to_temp( $seed_image_url );
 			if ( ! $temp_file ) {
-				throw new \Exception( 'Failed to download seed image' );
+				Logger::error( 'openai_seed_download_failed', 'Failed to download seed image', [
+					'seed_image_url' => $seed_image_url,
+				] );
+				throw new \Exception( 'Failed to download seed image from URL: ' . $seed_image_url );
 			}
+
+			// Verify the temp file exists and has content
+			if ( ! file_exists( $temp_file ) ) {
+				Logger::error( 'openai_temp_file_missing', 'Temporary file does not exist', [
+					'temp_file' => $temp_file,
+				] );
+				throw new \Exception( 'Temporary file does not exist: ' . $temp_file );
+			}
+
+			$file_size = filesize( $temp_file );
+			if ( $file_size === 0 ) {
+				Logger::error( 'openai_temp_file_empty', 'Temporary file is empty', [
+					'temp_file' => $temp_file,
+				] );
+				unlink( $temp_file );
+				throw new \Exception( 'Downloaded file is empty' );
+			}
+
+			Logger::info( 'openai_temp_file_ready', 'Temporary file created successfully', [
+				'temp_file' => $temp_file,
+				'file_size' => $file_size,
+			] );
 
 			// Prepare form data for multipart upload
 			$form_data = [
@@ -298,6 +323,7 @@ class OpenAI_Service {
 				'model' => $form_data['model'],
 				'size' => $form_data['size'],
 				'temp_file' => $temp_file,
+				'prompt_preview' => substr( $enhanced_prompt, 0, 100 ) . '...',
 			] );
 
 			// Make multipart request to edits endpoint
@@ -307,6 +333,11 @@ class OpenAI_Service {
 			unlink( $temp_file );
 
 			if ( ! isset( $response['data'][0] ) ) {
+				Logger::error( 'openai_invalid_response', 'Invalid response format - no image data', [
+					'response_keys' => array_keys( $response ),
+					'has_data' => isset( $response['data'] ),
+					'data_count' => isset( $response['data'] ) ? count( $response['data'] ) : 0,
+				] );
 				throw new \Exception( 'Invalid response format - no image data returned' );
 			}
 
@@ -328,6 +359,9 @@ class OpenAI_Service {
 					'data_size' => strlen( $image_data ),
 				] );
 			} else {
+				Logger::error( 'openai_response_no_image', 'No image data in response', [
+					'response_keys' => array_keys( $image_response ),
+				] );
 				throw new \Exception( 'Invalid response format - no b64_json or url field found in response' );
 			}
 
@@ -357,9 +391,23 @@ class OpenAI_Service {
 		} catch ( \Exception $e ) {
 			Logger::error( 'openai_image_edit_failed', 'Image edit failed', [
 				'error' => $e->getMessage(),
+				'error_class' => get_class( $e ),
 				'seed_image_url' => $seed_image_url,
 				'prompt_length' => strlen( $prompt ),
+				'trace' => $e->getTraceAsString(),
 			] );
+
+			// Log to debug transaction log as well for easier debugging
+			$debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+			$log_entry = sprintf(
+				"[%s] OPENAI_IMAGE_EDIT_ERROR: %s\nSeed URL: %s\nPrompt: %s\nTrace:\n%s\n\n",
+				date( 'Y-m-d H:i:s' ),
+				$e->getMessage(),
+				$seed_image_url,
+				substr( $prompt, 0, 200 ) . '...',
+				$e->getTraceAsString()
+			);
+			file_put_contents( $debug_log, $log_entry, FILE_APPEND );
 
 			return [
 				'success' => false,
@@ -488,17 +536,21 @@ class OpenAI_Service {
 			'url' => $this->api_edit_url,
 			'form_data' => $form_data,
 			'body_size' => strlen( $body ),
+			'boundary' => $boundary,
+			'image_file' => $image_file,
+			'image_file_size' => filesize( $image_file ),
 		] );
 
 		$response = wp_remote_request( $this->api_edit_url, $args );
 
 		if ( is_wp_error( $response ) ) {
-			Logger::error( 'openai_multipart_request_error', 'HTTP request failed', [
-				'error_message' => $response->get_error_message(),
-				'error_data' => $response->get_error_data()
-			] );
-			throw new \Exception( 'HTTP request failed: ' . $response->get_error_message() );
-		}
+				Logger::error( 'openai_multipart_request_error', 'HTTP request failed', [
+					'error_message' => $response->get_error_message(),
+					'error_data' => $response->get_error_data(),
+					'error_code' => $response->get_error_code(),
+				] );
+				throw new \Exception( 'HTTP request failed: ' . $response->get_error_message() );
+			}
 
 		$response_code = wp_remote_retrieve_response_code( $response );
 		$response_body = wp_remote_retrieve_body( $response );
@@ -509,18 +561,67 @@ class OpenAI_Service {
 			'response_code' => $response_code,
 			'response_headers' => $response_headers,
 			'response_body_length' => strlen( $response_body ),
-			// Don't log the full response body as it can be huge for images
-			'response_preview' => substr( $response_body, 0, 200 ) . '...',
+			// Log first 500 chars of response for debugging
+			'response_preview' => substr( $response_body, 0, 500 ),
 		] );
+
+		// Handle different response codes
+		if ( $response_code === 400 ) {
+			$error_data = json_decode( $response_body, true );
+			$error_message = $error_data['error']['message'] ?? 'Bad request - invalid parameters';
+			
+			Logger::error( 'openai_bad_request', 'Bad request to OpenAI API', [
+				'response_code' => $response_code,
+				'error_data' => $error_data,
+				'error_message' => $error_message,
+				'form_data' => $form_data,
+			] );
+			
+			throw new \Exception( "Bad request (HTTP 400): {$error_message}" );
+		}
+		
+		if ( $response_code === 401 ) {
+			Logger::error( 'openai_unauthorized', 'Unauthorized - check API key', [
+				'response_code' => $response_code,
+			] );
+			throw new \Exception( "Unauthorized (HTTP 401): Check your OpenAI API key" );
+		}
+		
+		if ( $response_code === 413 ) {
+			Logger::error( 'openai_payload_too_large', 'Image file too large', [
+				'response_code' => $response_code,
+				'image_size' => filesize( $image_file ),
+			] );
+			throw new \Exception( "Payload too large (HTTP 413): Image file is too large for API" );
+		}
+		
+		if ( $response_code === 429 ) {
+			$error_data = json_decode( $response_body, true );
+			Logger::error( 'openai_rate_limit', 'Rate limit exceeded', [
+				'response_code' => $response_code,
+				'error_data' => $error_data,
+			] );
+			throw new \Exception( "Rate limit exceeded (HTTP 429): Please try again later" );
+		}
+		
+		if ( $response_code === 500 || $response_code === 502 || $response_code === 503 ) {
+			Logger::error( 'openai_server_error', 'OpenAI server error', [
+				'response_code' => $response_code,
+			] );
+			throw new \Exception( "Server error (HTTP {$response_code}): OpenAI service temporarily unavailable" );
+		}
 
 		if ( $response_code !== 200 ) {
 			$error_data = json_decode( $response_body, true );
 			$error_message = $error_data['error']['message'] ?? 'Unknown API error';
+			$error_type = $error_data['error']['type'] ?? 'unknown_error';
 			
 			Logger::error( 'openai_edits_api_error', 'API returned error response', [
 				'response_code' => $response_code,
+				'error_type' => $error_type,
 				'error_data' => $error_data,
 				'error_message' => $error_message,
+				'response_body' => $response_body,
 			] );
 			
 			throw new \Exception( "API error (HTTP {$response_code}): {$error_message}" );
@@ -531,10 +632,27 @@ class OpenAI_Service {
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
 			Logger::error( 'openai_edits_json_decode_error', 'Failed to decode JSON response', [
 				'json_error' => json_last_error_msg(),
-				'response_preview' => substr( $response_body, 0, 200 ) . '...',
+				'json_error_code' => json_last_error(),
+				'response_preview' => substr( $response_body, 0, 1000 ),
+				'response_length' => strlen( $response_body ),
 			] );
-			throw new \Exception( 'Invalid JSON response from API' );
+			throw new \Exception( 'Invalid JSON response from API: ' . json_last_error_msg() );
 		}
+
+		// Validate response structure
+		if ( ! isset( $decoded_response['data'] ) || ! is_array( $decoded_response['data'] ) || empty( $decoded_response['data'] ) ) {
+			Logger::error( 'openai_invalid_response_structure', 'Response missing expected data structure', [
+				'has_data' => isset( $decoded_response['data'] ),
+				'data_type' => gettype( $decoded_response['data'] ?? null ),
+				'response_keys' => array_keys( $decoded_response ),
+			] );
+			throw new \Exception( 'Invalid response structure from API - missing data array' );
+		}
+
+		Logger::info( 'openai_multipart_success', 'Multipart request successful', [
+			'data_count' => count( $decoded_response['data'] ),
+			'has_usage' => isset( $decoded_response['usage'] ),
+		] );
 
 		return $decoded_response;
 	}
@@ -1116,7 +1234,7 @@ class OpenAI_Service {
 			if ( $progress_callback ) {
 				call_user_func( $progress_callback, [
 					'stage' => 'images',
-					'message' => "Generating image {$image_number} of {$total_images}: " . substr( $prompt, 0, 50 ) . '...',
+					'message' => "Waiting for images Response",
 					'progress' => $progress_percentage,
 					'current_image' => $image_number,
 					'total_images' => $total_images,
@@ -1217,7 +1335,7 @@ class OpenAI_Service {
 					if ( $progress_callback ) {
 						call_user_func( $progress_callback, [
 							'stage' => 'images',
-							'message' => "Saving image {$image_number} of {$total_images} to media library...",
+							'message' => "Saving Images",
 							'progress' => $progress_percentage + 50 / $total_images, // Add proportional progress
 							'current_image' => $image_number,
 							'total_images' => $total_images,

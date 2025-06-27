@@ -105,6 +105,7 @@ class Blog_Controller {
 		add_action( 'wp_ajax_ai_blog_schedule_post', [ $this, 'ajax_schedule_post' ] );
 		add_action( 'wp_ajax_ai_blog_bulk_publish_posts', [ $this, 'ajax_bulk_publish_posts' ] );
 		add_action( 'wp_ajax_ai_blog_delete_posts', [ $this, 'ajax_delete_posts' ] );
+		add_action( 'wp_ajax_ai_blog_download_prompts', [ $this, 'ajax_download_prompts' ] );
 	}
 
 	/**
@@ -1608,6 +1609,7 @@ class Blog_Controller {
 				$formatted_posts[] = [
 					'id' => $post->id,
 					'post_id' => $post->post_id,
+					'idea_id' => $post->idea_id,
 					'post_title' => $post->post_title,
 					'idea_title' => $post->idea_title,
 					'cost' => $post->cost,
@@ -2003,6 +2005,80 @@ class Blog_Controller {
 				'error' => $e->getMessage()
 			] );
 			wp_send_json_error( [ 'message' => __( 'Failed to delete posts.', 'ai-blog-generator' ) ] );
+		}
+	}
+
+	/**
+	 * AJAX handler to download prompts file
+	 */
+	public function ajax_download_prompts() {
+		try {
+			// Verify security
+			if ( ! check_ajax_referer( 'ai_blog_admin_nonce', 'nonce', false ) ) {
+				wp_send_json_error( [ 'message' => __( 'Security check failed.', 'ai-blog-generator' ) ] );
+			}
+
+			// Check capabilities
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'ai-blog-generator' ) ] );
+			}
+
+			// Validate input
+			$idea_id = isset( $_POST['idea_id'] ) ? absint( $_POST['idea_id'] ) : 0;
+			
+			if ( ! $idea_id ) {
+				wp_send_json_error( [ 'message' => __( 'Invalid idea ID.', 'ai-blog-generator' ) ] );
+			}
+
+			Logger::info( 'download_prompts', 'Downloading prompts file', [
+				'idea_id' => $idea_id
+			] );
+
+			// Build the path to the prompts file
+			$upload_dir = wp_upload_dir();
+			$log_dir = $upload_dir['basedir'] . '/ai-blog-generator-logs/generations';
+			$filename = $idea_id . '_prompts.txt';
+			$filepath = $log_dir . '/' . $filename;
+
+			// Check if file exists
+			if ( ! file_exists( $filepath ) ) {
+				wp_send_json_error( [ 'message' => __( 'Prompts file not found. The prompts file may not have been created for this idea.', 'ai-blog-generator' ) ] );
+			}
+
+			// Read the file content
+			$content = file_get_contents( $filepath );
+			
+			if ( $content === false ) {
+				wp_send_json_error( [ 'message' => __( 'Failed to read prompts file.', 'ai-blog-generator' ) ] );
+			}
+
+			// Get idea details for better filename
+			$idea = $this->idea_model->get( $idea_id );
+			$safe_title = '';
+			if ( $idea && isset( $idea['title'] ) ) {
+				// Create a safe filename from the idea title
+				$safe_title = sanitize_title( $idea['title'] );
+				$safe_title = substr( $safe_title, 0, 50 ); // Limit length
+			}
+
+			// Create download filename
+			$download_filename = 'prompts_' . $idea_id;
+			if ( ! empty( $safe_title ) ) {
+				$download_filename .= '_' . $safe_title;
+			}
+			$download_filename .= '.txt';
+
+			wp_send_json_success( [
+				'content' => $content,
+				'filename' => $download_filename
+			] );
+
+		} catch ( \Exception $e ) {
+			Logger::error( 'download_prompts_exception', 'Exception during prompts download', [
+				'idea_id' => $idea_id ?? 'unknown',
+				'error' => $e->getMessage()
+			] );
+			wp_send_json_error( [ 'message' => __( 'Failed to download prompts file.', 'ai-blog-generator' ) ] );
 		}
 	}
 } 

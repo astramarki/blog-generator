@@ -136,6 +136,7 @@
         // Individual actions (delegated)
         $('#draftsTableBody').on('click.draftedPosts', '.publish-now', handlePublishNow);
         $('#draftsTableBody').on('click.draftedPosts', '.schedule-post', handleSchedulePost);
+        $('#draftsTableBody').on('click.draftedPosts', '.download-prompts', handleDownloadPrompts);
         
         // Modal confirmations
         $('#confirmPublish').on('click.draftedPosts', handleConfirmPublish);
@@ -284,6 +285,7 @@
         return `
             <tr data-post-id="${post.post_id}" 
                 data-blog-id="${post.id}"
+                data-idea-id="${post.idea_id}"
                 data-status="${post.status}"
                 class="${isSelected ? 'table-active' : ''}">
                 <td>
@@ -307,11 +309,6 @@
                 </td>
                 <td>
                     ${categoryBadges || '<span class="text-muted">Uncategorized</span>'}
-                </td>
-                <td>
-                    <span class="text-success fw-bold">
-                        $${parseFloat(post.cost).toFixed(2)}
-                    </span>
                 </td>
                 <td>
                     <small>${formatDate(post.created_at)}</small>
@@ -340,6 +337,11 @@
                            title="Preview">
                             <i class="fas fa-eye"></i>
                         </a>
+                        <button type="button" class="btn btn-info btn-sm download-prompts" 
+                            data-idea-id="${post.idea_id}"
+                            title="Download Prompts">
+                            <i class="fas fa-download"></i>
+                        </button>
                     </div>
                 </td>
             </tr>
@@ -355,7 +357,6 @@
         $('#stat-drafts').text(stats.drafts || 0);
         $('#stat-scheduled').text(stats.scheduled || 0);
         $('#stat-published').text(stats.published || 0);
-        $('#stat-cost').text((stats.totalCost || 0).toFixed(2));
         
         window.DraftedPosts.stats = stats;
     }
@@ -909,6 +910,99 @@
         tomorrow.setHours(9 + Math.floor(Math.random() * 8)); // 9 AM to 5 PM
         tomorrow.setMinutes(Math.floor(Math.random() * 60));
         return tomorrow.toISOString().slice(0, 16);
+    }
+
+    /**
+     * Handle download prompts button
+     */
+    function handleDownloadPrompts() {
+        const ideaId = $(this).data('idea-id');
+        
+        console.log(`📥 Downloading prompts for idea: ${ideaId}`);
+        
+        // Add visual feedback
+        const $button = $(this);
+        const originalHtml = $button.html();
+        $button.prop('disabled', true).html('<i class="fas fa-spinner fa-spin"></i>');
+        
+        downloadPrompts(ideaId, function() {
+            // Reset button on completion
+            $button.prop('disabled', false).html(originalHtml);
+        });
+    }
+
+    /**
+     * Download prompts file
+     */
+    function downloadPrompts(ideaId, callback) {
+        const ajaxData = {
+            action: 'ai_blog_download_prompts',
+            idea_id: ideaId,
+            nonce: ai_blog_admin.nonce
+        };
+
+        console.log('📤 Sending AJAX request:', ajaxData);
+
+        $.ajax({
+            url: ai_blog_admin.ajaxurl,
+            type: 'POST',
+            data: ajaxData,
+            dataType: 'json',
+            success: function(response) {
+                console.log('📥 AJAX response:', response);
+                
+                if (response.success && response.data) {
+                    try {
+                        // Create a download link and trigger it
+                        const blob = new Blob([response.data.content], { type: 'text/plain' });
+                        const url = window.URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = response.data.filename || `idea_${ideaId}_prompts.txt`;
+                        document.body.appendChild(a);
+                        a.click();
+                        document.body.removeChild(a);
+                        window.URL.revokeObjectURL(url);
+                        
+                        console.log('✅ Prompts file download triggered');
+                        showNotice('Prompts file downloaded successfully!', 'success');
+                    } catch (error) {
+                        console.error('❌ Error creating download:', error);
+                        showNotice('Failed to create download file.', 'error');
+                    }
+                } else {
+                    console.error('❌ Server returned error:', response);
+                    const message = (response.data && response.data.message) ? response.data.message : 
+                                   response.data || 'Failed to download prompts file';
+                    showNotice(message, 'error');
+                }
+                
+                if (callback) callback();
+            },
+            error: function(xhr, status, error) {
+                console.error('❌ AJAX error:', {
+                    status: status,
+                    error: error,
+                    responseText: xhr.responseText,
+                    responseJSON: xhr.responseJSON
+                });
+                
+                let errorMessage = 'Failed to download prompts file';
+                
+                // Try to get error message from response
+                if (xhr.responseJSON && xhr.responseJSON.data) {
+                    if (typeof xhr.responseJSON.data === 'string') {
+                        errorMessage = xhr.responseJSON.data;
+                    } else if (xhr.responseJSON.data.message) {
+                        errorMessage = xhr.responseJSON.data.message;
+                    }
+                }
+                
+                showNotice(errorMessage, 'error');
+                
+                if (callback) callback();
+            }
+        });
     }
 
 })(jQuery); 

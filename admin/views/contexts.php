@@ -116,9 +116,9 @@ if ( ! defined( 'ABSPATH' ) ) {
 						<div class="seed-image-info">
 							<strong class="product-name"><?php echo esc_html( $seed_image->product_name ); ?></strong>
 							<p class="image-url"><?php echo esc_html( basename( $seed_image->image_url ) ); ?></p>
-							<?php if ( $seed_image->context_id ) : ?>
-								<p class="context-link">
-									<small>Linked to Context ID: <?php echo esc_html( $seed_image->context_id ); ?></small>
+							<?php if ( $seed_image->context ) : ?>
+								<p class="context-text">
+									<small><?php echo esc_html( wp_trim_words( $seed_image->context, 20 ) ); ?></small>
 								</p>
 							<?php endif; ?>
 						</div>
@@ -285,17 +285,10 @@ if ( ! defined( 'ABSPATH' ) ) {
 				</div>
 				
 				<div class="ai-blog-form-group">
-					<label for="seed-context-link"><?php esc_html_e( 'Link to Context', 'ai-blog-generator' ); ?></label>
-					<select id="seed-context-link" name="context_id" class="ai-blog-form-control">
-						<option value=""><?php esc_html_e( 'No specific context', 'ai-blog-generator' ); ?></option>
-						<?php foreach ( $contexts as $context ) : ?>
-							<option value="<?php echo esc_attr( $context->id ); ?>">
-								<?php echo esc_html( $context->name ); ?> (<?php echo esc_html( ucfirst( $context->type ) ); ?>)
-							</option>
-						<?php endforeach; ?>
-					</select>
+					<label for="seed-context"><?php esc_html_e( 'Context', 'ai-blog-generator' ); ?></label>
+					<textarea id="seed-context" name="context" rows="6" class="ai-blog-form-control" placeholder="<?php esc_attr_e( 'Provide clear instructions on how to use this seed image and what it represents. This context will be included when generating images.', 'ai-blog-generator' ); ?>"></textarea>
 					<p class="description">
-						<?php esc_html_e( 'Optionally link this seed image to a specific context.', 'ai-blog-generator' ); ?>
+						<?php esc_html_e( 'Enter specific instructions for AI image generation. For example: "This is the official logo for Product X. Always place it in the top-right corner with adequate white space. Maintain the original colors and proportions."', 'ai-blog-generator' ); ?>
 					</p>
 				</div>
 			</div>

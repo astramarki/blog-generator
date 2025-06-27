@@ -618,7 +618,7 @@ class Content_Generator {
 				
 				try {
 					$this->log_info( 'updating_generation_status', 'Updating generation status', [ 'idea_id' => $idea_id ] );
-					$this->update_generation_status( $idea_id, 'starting', 'Initializing generation process...' );
+					$this->update_generation_status( $idea_id, 'starting', 'Compiling Context' );
 					$this->log_info( 'generation_status_updated', 'Generation status update completed', [ 'idea_id' => $idea_id ] );
 				} catch ( \Exception $e ) {
 					$this->log_error( 'generation_status_update_failed', 'Failed to update generation status', [
@@ -636,7 +636,7 @@ class Content_Generator {
 				
 				// Compile contexts specifically for content generation.
 				$this->log_info( 'compiling_contexts_start', 'Starting context compilation', [ 'idea_id' => $idea_id ] );
-				$this->update_generation_status( $idea_id, 'contexts', 'Compiling content contexts...' );
+				$this->update_generation_status( $idea_id, 'contexts', 'Compiling Context' );
 				
 				try {
 					$contexts = $this->compile_contexts_enhanced( 'content', [
@@ -649,7 +649,7 @@ class Content_Generator {
 						'context_types' => array_keys( $contexts ),
 						'context_count' => count( $contexts )
 					] );
-					$this->update_generation_status( $idea_id, 'contexts', 'Content contexts ready. Preparing for AI generation...' );
+					$this->update_generation_status( $idea_id, 'contexts', 'Submitting request' );
 				} catch ( \Exception $e ) {
 					$this->log_error( 'compiling_contexts_failed', 'Context compilation failed', [
 						'idea_id' => $idea_id,
@@ -711,7 +711,7 @@ class Content_Generator {
 					] );
 				}
 				
-				$this->update_generation_status( $idea_id, 'content', 'Generating blog content with AI...' );
+				$this->update_generation_status( $idea_id, 'content', 'Waiting for Content Response' );
 				
 				// Validate anthropic service before calling
 				if ( ! $this->anthropic_service ) {
@@ -760,7 +760,7 @@ class Content_Generator {
 						'success' => $content_result['success'] ?? false
 					] );
 					
-					$this->update_generation_status( $idea_id, 'content', 'AI content generated successfully. Validating...' );
+					$this->update_generation_status( $idea_id, 'content', 'Compiling image prompts' );
 				} catch ( \Exception $e ) {
 					if ( $this->generation_logger ) {
 						$this->generation_logger->error( 'Anthropic call FAILED with exception', [
@@ -840,7 +840,7 @@ class Content_Generator {
 					$this->handle_cancellation( $idea_id, 'post-content' );
 				}
 				
-				$this->update_generation_status( $idea_id, 'content', 'Content validated successfully. Preparing for image generation...' );
+				$this->update_generation_status( $idea_id, 'content', 'Compiling image prompts' );
 				
 				// Convert any H1 headings to H2 headings (safety measure)
 				$content['html'] = $this->convert_h1_to_h2( $content['html'] );
@@ -919,7 +919,7 @@ class Content_Generator {
 					set_time_limit( $image_timeout_limit + 60 ); // Give extra 60 seconds for cleanup
 					
 					try {
-						$this->update_generation_status( $idea_id, 'images', 'Generating images...' );
+						$this->update_generation_status( $idea_id, 'images', 'Submitting Images Request' );
 						
 						if ( $this->generation_logger ) {
 							$this->generation_logger->log_phase( 'images', 75, [ 
@@ -1113,7 +1113,7 @@ class Content_Generator {
 						$this->generation_logger->info( 'Image generation process completed' );
 					}
 					
-					$this->update_generation_status( $idea_id, 'images', 'Image generation completed. Preparing WordPress post...' );
+					$this->update_generation_status( $idea_id, 'images', 'Saving Images' );
 				} else {
 					if ( $this->generation_logger ) {
 						$this->generation_logger->debug( 'No image generation needed (no images or disabled)' );
@@ -1254,7 +1254,7 @@ class Content_Generator {
 					$this->generation_logger->info( 'WordPress post created successfully, ID: ' . $post_id );
 				}
 				
-				$this->update_generation_status( $idea_id, 'post', 'WordPress post created successfully. Finalizing...' );
+				$this->update_generation_status( $idea_id, 'post', 'Publishing Post' );
 				
 				// Set featured image if available.
 				if ( $featured_image_id ) {
@@ -1322,7 +1322,11 @@ class Content_Generator {
 					}
 					
 					$idea_update_start = microtime(true);
-					$idea_update_result = $this->idea_model->update( $idea_id, [ 'status' => 'generated' ] );
+					$idea_update_result = $this->idea_model->update( $idea_id, [ 
+						'status' => 'generated',
+						'failed_status' => null, // Clear any previous failure status
+						'generation_error' => null // Clear any previous error
+					] );
 					$idea_update_duration = microtime(true) - $idea_update_start;
 					
 					if ( $this->generation_logger ) {
@@ -1439,7 +1443,7 @@ class Content_Generator {
 				}
 				// Flush any pending status updates before final update
 				$this->flush_pending_status_updates( $idea_id );
-				$this->update_generation_status( $idea_id, 'complete', 'Blog post generated successfully!' );
+				$this->update_generation_status( $idea_id, 'complete', 'Complete!' );
 				
 				// Force clear any stuck generation locks
 				if ( $this->generation_logger ) {
@@ -1534,16 +1538,35 @@ class Content_Generator {
 				// Update idea status back to approved with timeout protection
 				try {
 					if ( $this->idea_model ) {
+						// Determine failure reason for failed_status
+						$failed_status = 'Failed - Unknown';
+						$error_msg = strtolower( $e->getMessage() );
+						
+						if ( strpos( $error_msg, 'timeout' ) !== false || strpos( $error_msg, 'timed out' ) !== false ) {
+							$failed_status = 'Failed - Timeout';
+						} elseif ( strpos( $error_msg, 'overloaded' ) !== false || strpos( $error_msg, 'capacity' ) !== false || strpos( $error_msg, 'rate limit' ) !== false ) {
+							$failed_status = 'Failed - Overloaded';
+						} elseif ( strpos( $error_msg, 'api' ) !== false || strpos( $error_msg, 'service' ) !== false ) {
+							$failed_status = 'Failed - API Error';
+						} elseif ( strpos( $error_msg, 'cancelled' ) !== false ) {
+							$failed_status = 'Failed - Cancelled';
+						} elseif ( strpos( $error_msg, 'memory' ) !== false ) {
+							$failed_status = 'Failed - Memory Limit';
+						} elseif ( strpos( $error_msg, 'network' ) !== false || strpos( $error_msg, 'connection' ) !== false ) {
+							$failed_status = 'Failed - Network Error';
+						}
+						
 						$status_update_start = microtime( true );
 						$status_result = $this->idea_model->update( $idea_id, [ 
 							'status' => 'approved',
+							'failed_status' => $failed_status,
 							'generation_status' => 'Generation failed: ' . substr( $e->getMessage(), 0, 100 ),
 							'generation_error' => $e->getMessage(),
 							'updated_at' => current_time( 'mysql' )
 						] );
 						$status_duration = microtime( true ) - $status_update_start;
 						
-						file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Status reset completed in {$status_duration}s, result: " . ($status_result ? 'SUCCESS' : 'FAILED') . "\n", FILE_APPEND );
+						file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Status reset completed in {$status_duration}s, result: " . ($status_result ? 'SUCCESS' : 'FAILED') . ", failed_status: {$failed_status}\n", FILE_APPEND );
 					}
 				} catch ( \Exception $status_exception ) {
 					file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Status reset exception: " . $status_exception->getMessage() . "\n", FILE_APPEND );
@@ -2209,25 +2232,12 @@ class Content_Generator {
 				$this->generation_logger->debug( 'Getting seed images from context model' );
 			}
 		
-			// Initialize seed images array
 			$seed_images = [];
 			
 			// Try to get seed images from contexts that have seed_image_id
-			try {
-				if ( method_exists( $this->context_model, 'get_seed_images' ) ) {
-					$seed_images = $this->context_model->get_seed_images();
-					if ( $this->generation_logger ) {
-						$this->generation_logger->debug( 'Retrieved seed images from context model: ' . count( $seed_images ) );
-					}
-				} else {
-					if ( $this->generation_logger ) {
-						$this->generation_logger->debug( 'Context model does not have get_seed_images method' );
-					}
-				}
-			} catch ( \Exception $e ) {
-				if ( $this->generation_logger ) {
-					$this->generation_logger->error( 'Error getting seed images from context model: ' . $e->getMessage() );
-				}
+			// The Context_Model doesn't have a get_seed_images method, so we'll query directly
+			if ( $this->generation_logger ) {
+				$this->generation_logger->debug( 'Attempting to get seed images from database' );
 			}
 			
 			// Also try to get seed images from the general seed images table
@@ -2254,6 +2264,7 @@ class Content_Generator {
 							'url' => $seed->image_url,
 							'keywords' => $seed->product_name, // Use product name as keywords
 							'product_name' => $seed->product_name,
+							'context' => $seed->context, // Include the context field
 						];
 					}
 					if ( $this->generation_logger ) {
@@ -2293,13 +2304,21 @@ class Content_Generator {
 				
 				$seed_url = isset( $selected_seed['url'] ) ? $selected_seed['url'] : ( isset( $selected_seed['image_url'] ) ? $selected_seed['image_url'] : 'unknown' );
 				$product_name = isset( $selected_seed['product_name'] ) ? $selected_seed['product_name'] : ( isset( $selected_seed['keywords'] ) ? $selected_seed['keywords'] : 'unknown' );
+				$seed_context = isset( $selected_seed['context'] ) ? $selected_seed['context'] : '';
 				
 				if ( $this->generation_logger ) {
 					$this->generation_logger->debug( 'Image ' . ($index + 1) . ' using seed image ' . ($seed_index + 1) . ': ' . $seed_url . ' (product: ' . $product_name . ')' );
 				}
 				
-				// Update the prompt to specifically include the seed image product
-				$requirement['prompt'] = "Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image. " . $requirement['prompt'];
+				// Update the prompt to specifically include the seed image product and context
+				$prompt_prefix = "Include this exact product if it makes sense for this image. Do not change the look of the product at all, just include it in the context of the image.";
+				
+				// Add seed image context if available
+				if ( ! empty( $seed_context ) ) {
+					$prompt_prefix .= " " . $seed_context;
+				}
+				
+				$requirement['prompt'] = $prompt_prefix . " " . $requirement['prompt'];
 				$requirement['seed_image'] = $seed_url;
 				$requirement['preserve_product'] = true; // Flag for OpenAI service
 				
@@ -2313,6 +2332,7 @@ class Content_Generator {
 					'seed_id' => isset( $selected_seed['id'] ) ? $selected_seed['id'] : 'unknown',
 					'seed_url' => $seed_url,
 					'product_name' => $product_name,
+					'has_context' => ! empty( $seed_context ),
 					'token' => $requirement['token'] ?? 'unknown',
 				] );
 			}

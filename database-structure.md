@@ -1,4 +1,3 @@
-
 --
 -- Create table `psec_ai_blog_contexts`
 --
@@ -38,7 +37,10 @@ ADD INDEX idx_type (type);
 ALTER TABLE psec_ai_blog_contexts
 ADD INDEX idx_active (active);
 
+### psec_ai_blog_contexts
+Stores content contexts that provide information and rules for blog generation.
 
+**Note on Keywords Context**: The 'keywords' type context may contain mixed content including both keywords and image URLs. The Prompt_Compiler_Service automatically filters out URLs and image links when selecting target keywords, keeping only valid keyword phrases.
 
 --
 -- Create table `psec_ai_blog_cost_analytics`
@@ -138,8 +140,13 @@ CREATE TABLE psec_ai_blog_ideas (
   category_id bigint(20) UNSIGNED DEFAULT NULL,
   persona_id bigint(20) UNSIGNED DEFAULT NULL,
   status enum ('pending', 'approved', 'denied', 'generated', 'generating') DEFAULT 'pending',
+  failed_status varchar(255) DEFAULT NULL, -- Stores the last failure reason (e.g., "Failed - Timeout", "Failed - Overloaded")
   created_at datetime DEFAULT current_timestamp,
   updated_at datetime DEFAULT current_timestamp ON UPDATE CURRENT_TIMESTAMP,
+  generation_status text DEFAULT NULL,
+  generation_error text DEFAULT NULL,
+  generation_started_at datetime DEFAULT NULL,
+  generation_completed_at datetime DEFAULT NULL,
   PRIMARY KEY (id)
 )
 ENGINE = INNODB,

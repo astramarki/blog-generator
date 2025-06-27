@@ -646,6 +646,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 	color: white;
 }
 
+/* Failed status indicator styling */
+.fa-info-circle.text-danger {
+	cursor: pointer;
+	font-size: 0.9em;
+	vertical-align: middle;
+}
+
+.fa-info-circle.text-danger:hover {
+	opacity: 0.8;
+}
+
 /* Modal Styling */
 .ai-approved-ideas-v2 .modal-content {
 	border-radius: 12px;
@@ -668,6 +679,44 @@ if ( ! defined( 'ABSPATH' ) ) {
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+}
+
+/* Log Viewer Styling */
+#logContent .log-line {
+	padding: 2px 0;
+	font-family: 'Courier New', Courier, monospace;
+	white-space: pre-wrap;
+	word-wrap: break-word;
+}
+
+#logContent .log-line.log-error {
+	color: #ff6b6b;
+	font-weight: bold;
+}
+
+#logContent .log-line.log-warning {
+	color: #ffd93d;
+}
+
+#logContent .log-line.log-success {
+	color: #51cf66;
+	font-weight: bold;
+}
+
+#logContent .log-line.log-debug {
+	color: #868e96;
+	font-size: 0.9em;
+}
+
+#logContent .log-line.log-separator {
+	color: #495057;
+	border-top: 1px solid #495057;
+	margin: 5px 0;
+	padding-top: 5px;
+}
+
+#logContent .log-line.log-info {
+	color: #d4d4d4;
 }
 
 /* Auto-refresh indicator */

@@ -602,62 +602,17 @@
             console.log('Modal element found:', $modal.length > 0);
             console.log('Modal current display:', $modal.css('display'));
             console.log('Modal current visibility:', $modal.css('visibility'));
-            console.log('Modal current z-index:', $modal.css('z-index'));
-            console.log('Modal current position:', $modal.css('position'));
-            console.log('Modal element:', $modal[0]);
             
-            // Force the modal to be visible with explicit styles
-            $modal.css({
-                'display': 'block',
-                'visibility': 'visible',
-                'opacity': '1',
-                'z-index': '999999',
-                'position': 'fixed',
-                'top': '0',
-                'left': '0',
-                'width': '100%',
-                'height': '100%',
-                'background-color': 'rgba(0,0,0,0.5)'
-            });
-
-            // Also ensure the modal content is properly positioned
-            var $modalContent = $modal.find('.ai-blog-modal-content');
-            $modalContent.css({
-                'position': 'relative',
-                'background': '#fff',
-                'margin': '5% auto',
-                'padding': '20px',
-                'width': '90%',
-                'max-width': '90%',
-                'border-radius': '4px',
-                'max-height': '80vh',
-                'overflow-y': 'auto',
-                'box-shadow': '0 4px 8px rgba(0,0,0,0.1)'
-            });
+            // Remove any existing show classes first
+            $modal.removeClass('ai-blog-modal-active');
             
-            // Add CSS classes for additional styling
-            $modal.addClass('ai-blog-modal-show force-visible');
+            // Force the modal to be visible with the correct CSS class
+            setTimeout(function() {
+                $modal.addClass('ai-blog-modal-active');
+            }, 10);
             
             // Add body class to prevent scrolling
             $('body').addClass('ai-blog-modal-open');
-            
-            // Debug: Check modal state after showing
-            setTimeout(function() {
-                console.log('After setup - Modal display:', $modal.css('display'));
-                console.log('After setup - Modal visibility:', $modal.css('visibility'));
-                console.log('After setup - Modal opacity:', $modal.css('opacity'));
-                console.log('After setup - Modal z-index:', $modal.css('z-index'));
-                console.log('After setup - Modal position:', $modal.css('position'));
-                console.log('After setup - Modal classes:', $modal.attr('class'));
-                
-                // Check if modal is actually visible in viewport
-                var rect = $modal[0].getBoundingClientRect();
-                console.log('Modal bounding rect:', rect);
-                console.log('Modal is visible in viewport:', rect.top >= 0 && rect.left >= 0 && rect.bottom <= window.innerHeight && rect.right <= window.innerWidth);
-                
-                // Force focus on the modal to ensure it's on top
-                $modal.focus();
-            }, 100);
             
             // Focus first input
             setTimeout(function() {
@@ -673,14 +628,8 @@
             
             var $modal = $('#context-modal');
             
-            // Remove all modal classes
-            $modal.removeClass('ai-blog-modal-show force-visible');
-            
-            // Reset all inline styles that might have been added
-            $modal.removeAttr('style');
-            
-            // Hide the modal
-            $modal.hide();
+            // Remove modal active class
+            $modal.removeClass('ai-blog-modal-active');
             
             // Remove body class
             $('body').removeClass('ai-blog-modal-open');
@@ -902,24 +851,12 @@
             console.log('Modal element:', $modal[0]);
             
             // Remove any existing show classes first
-            $modal.removeClass('ai-blog-modal-show force-visible');
+            $modal.removeClass('ai-blog-modal-active force-visible');
             
-            // Force the modal to be visible with CSS classes and inline styles as backup
-            $modal.addClass('ai-blog-modal-show force-visible');
-            
-            // Also force with inline styles as a backup
-            $modal.css({
-                'display': 'block !important',
-                'visibility': 'visible !important',
-                'opacity': '1 !important',
-                'z-index': '999999 !important',
-                'position': 'fixed !important',
-                'top': '0 !important',
-                'left': '0 !important',
-                'width': '100% !important',
-                'height': '100% !important',
-                'background-color': 'rgba(0,0,0,0.5) !important'
-            });
+            // Force the modal to be visible with the correct CSS class
+            setTimeout(function() {
+                $modal.addClass('ai-blog-modal-active');
+            }, 10);
             
             // Add body class to prevent scrolling
             $('body').addClass('ai-blog-modal-open');
@@ -962,27 +899,10 @@
             var $modal = $('#seed-image-upload-modal');
             
             // Remove the visibility classes
-            $modal.removeClass('ai-blog-modal-show force-visible');
-            
-            // Reset inline styles
-            $modal.css({
-                'display': '',
-                'visibility': '',
-                'opacity': '',
-                'z-index': '',
-                'position': '',
-                'top': '',
-                'left': '',
-                'width': '',
-                'height': '',
-                'background-color': ''
-            });
+            $modal.removeClass('ai-blog-modal-active force-visible');
             
             // Remove body class
             $('body').removeClass('ai-blog-modal-open');
-            
-            // Hide with fade out animation
-            $modal.fadeOut(300);
         },
 
         /**
@@ -1005,7 +925,7 @@
                     // Populate form
                     $('#seed-image-id').val(response.data.id);
                     $('#seed-product-name').val(response.data.product_name);
-                    $('#seed-context-link').val(response.data.context_id || '');
+                    $('#seed-context').val(response.data.context || '');
                     
                     // Update modal for editing
                     $('#seed-modal-title').text('Edit Seed Image');
@@ -1019,8 +939,14 @@
                         $('#image-preview').show();
                     }
                     
-                    // Show modal
-                    $('#seed-image-upload-modal').fadeIn(300);
+                    // Show modal using the correct class
+                    $('#seed-image-upload-modal').removeClass('ai-blog-modal-active');
+                    setTimeout(function() {
+                        $('#seed-image-upload-modal').addClass('ai-blog-modal-active');
+                    }, 10);
+                    
+                    // Add body class to prevent scrolling
+                    $('body').addClass('ai-blog-modal-open');
                     
                     // Focus on product name
                     setTimeout(function() {

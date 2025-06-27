@@ -334,6 +334,11 @@
             const row = createIdeaRow(idea);
             tbody.append(row);
         });
+        
+        // Initialize tooltips for failed status indicators
+        tbody.find('[data-bs-toggle="tooltip"]').each(function() {
+            new bootstrap.Tooltip(this);
+        });
 
         // Update count with filtered unique ideas
         $('#approvedCount').text(uniqueIdeas.length);
@@ -404,7 +409,15 @@
         if (idea.status === 'generating') {
             return createProgressBar(idea.generation_status || 'Starting...');
         } else if (idea.status === 'approved') {
-            return '<span class="badge status-ready">Ready</span>';
+            // Add failed status indicator if there was a previous failure
+            let statusHtml = '<span class="badge status-ready">Ready</span>';
+            if (idea.failed_status) {
+                statusHtml += ` <i class="fas fa-info-circle text-danger ms-1" 
+                                   data-bs-toggle="tooltip" 
+                                   data-bs-placement="top" 
+                                   title="${escapeHtml(idea.failed_status)}"></i>`;
+            }
+            return statusHtml;
         } else if (idea.status === 'generated') {
             return '<span class="badge status-generated">Complete</span>';
         } else if (idea.status === 'denied') {
@@ -817,6 +830,14 @@
         
         if (oldStatus !== newStatusDisplay) {
             statusCell.html(newStatusDisplay);
+            
+            // Reinitialize tooltips if there's a failed status indicator
+            if (idea.failed_status) {
+                const tooltip = statusCell.find('[data-bs-toggle="tooltip"]');
+                if (tooltip.length > 0) {
+                    new bootstrap.Tooltip(tooltip[0]);
+                }
+            }
             
             // Add visual feedback for update
             row.addClass('table-info');
@@ -1332,13 +1353,19 @@
         console.log(`📄 Showing log viewer for generating idea ${ideaId}`);
         
         // Update modal title
-        $('#logViewerModalLabel').text(`Generation Log: ${ideaTitle}`);
+        $('#logViewerModalLabel').html(`<i class="fas fa-file-alt me-2 text-info"></i>Generation Log: ${escapeHtml(ideaTitle)}`);
         
-        // Store current idea ID for log operations
+        // Store current idea ID and title for log operations
         window.ApprovedIdeasV2.currentLogIdeaId = ideaId;
+        window.ApprovedIdeasV2.currentLogIdeaTitle = ideaTitle;
         
         // Clear previous content
         $('#logContent').html('<div class="text-center p-4"><i class="fas fa-spinner fa-spin fa-2x"></i><br>Loading generation log...</div>');
+        
+        // Reset file info
+        $('#logIdeaTitle').text(ideaTitle);
+        $('#logSize').text('0 B');
+        $('#logLastModified').text('-');
         
         // Show the modal
         $('#logViewerModal').modal('show');
@@ -1371,6 +1398,7 @@
      */
     function refreshGenerationLog() {
         const ideaId = window.ApprovedIdeasV2.currentLogIdeaId;
+        const ideaTitle = window.ApprovedIdeasV2.currentLogIdeaTitle || 'Idea ' + ideaId;
         
         if (!ideaId) {
             console.error('❌ No idea ID set for log viewer');
@@ -1436,6 +1464,16 @@
                     
                     // Update log content
                     $('#logContent').html(formattedContent);
+                    
+                    // Update file info if provided
+                    if (logData.file_info) {
+                        $('#logIdeaTitle').text(ideaTitle || 'Idea ' + ideaId);
+                        $('#logSize').text(formatFileSize(logData.file_info.size));
+                        $('#logLastModified').text(logData.file_info.last_modified);
+                        
+                        // Show filename in console for debugging
+                        console.log(`📄 Viewing log file: ${logData.file_info.filename}`);
+                    }
                     
                     // Update status
                     if (logData.status) {
@@ -1792,6 +1830,16 @@
         if (!text) return '';
         if (text.length <= maxLength) return text;
         return text.substring(0, maxLength) + '...';
+    }
+
+    function formatFileSize(bytes) {
+        if (bytes === 0) return '0 B';
+        
+        const units = ['B', 'KB', 'MB', 'GB'];
+        const k = 1024;
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + units[i];
     }
 
     /**

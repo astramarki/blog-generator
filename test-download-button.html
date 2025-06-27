@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Download Button</title>
+    <script>
+        // Test function to create and download a file using the same method as the plugin
+        function testDownload() {
+            console.log('Testing download functionality...');
+            
+            try {
+                // Create sample content
+                const content = 'This is a test file content.\nLine 2\nLine 3';
+                const filename = 'test_download.txt';
+                
+                // Create blob and download
+                const blob = new Blob([content], { type: 'text/plain' });
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = filename;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+                
+                console.log('✅ Download should have triggered');
+                document.getElementById('result').innerHTML = '✅ Download triggered successfully';
+            } catch (error) {
+                console.error('❌ Error:', error);
+                document.getElementById('result').innerHTML = '❌ Error: ' + error.message;
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Test Download Button</h1>
+    <p>This tests if the browser can create and download files using the Blob API.</p>
+    
+    <button onclick="testDownload()">Test Download</button>
+    
+    <div id="result" style="margin-top: 20px; padding: 10px; border: 1px solid #ccc;">
+        Click the button to test
+    </div>
+    
+    <h2>Next Steps</h2>
+    <ol>
+        <li>Open your browser's Developer Console (F12)</li>
+        <li>Go to the Drafted Posts page in WordPress admin</li>
+        <li>Click a download prompts button</li>
+        <li>Check the console for these messages:
+            <ul>
+                <li>📥 Downloading prompts for idea: X</li>
+                <li>📤 Sending AJAX request: {...}</li>
+                <li>📥 AJAX response: {...} (or error)</li>
+            </ul>
+        </li>
+        <li>Check the Network tab for the admin-ajax.php request</li>
+    </ol>
+</body>
+</html> 

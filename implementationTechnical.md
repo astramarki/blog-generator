@@ -2568,3 +2568,36 @@ The drafted posts page has been completely redesigned to match the modern Bootst
 - `ai_blog_schedule_post` - Schedule single post
 - `ai_blog_bulk_publish_posts` - Bulk publish
 - `ai_blog_delete_posts` - Delete posts
+
+### 12. Prompt Compiler Service
+- **File**: `services/class-prompt-compiler-service.php`
+- **Purpose**: Compiles structured prompts for AI content generation
+- **Key Methods**:
+  - `generate_content_prompts()`: Builds system and user prompts
+  - `build_system_prompts()`: Creates persona and context prompts
+  - `build_user_prompt()`: Creates the main content request
+  - `get_random_target_keywords()`: Selects keywords for SEO focus
+- **Integration**: Used by Content_Generator for prompt preparation
+- **Keyword Filtering**: The `get_random_target_keywords()` method automatically filters out:
+  - URLs starting with `http://` or `https://`
+  - Lines starting with "Image link:"
+  - Lines ending with image file extensions (.jpg, .jpeg, .png, .gif, .webp, .svg)
+  - This ensures only actual keywords are selected as target keywords, not image references
+
+### 8. Drafted Posts Page
+- **Files**: 
+  - `admin/views/drafted-posts.php` - View template
+  - `admin/assets/js/drafted-posts.js` - JavaScript functionality
+  - `controllers/class-blog-controller.php` - Backend handlers
+- **Features**:
+  - Statistics cards (drafts, scheduled, published today)
+  - Bulk actions (publish, schedule, delete)
+  - Individual post actions (publish, schedule, preview, download prompts)
+  - Real-time updates without page refresh
+  - Status filtering
+  - Responsive design
+- **Download Prompts Feature**:
+  - 4th action button in each row allows downloading the prompts file
+  - Downloads the `{idea_id}_prompts.txt` file created during generation
+  - Filename format: `prompts_{idea_id}_{sanitized_title}.txt`
+  - Handled by `ajax_download_prompts` in Blog_Controller

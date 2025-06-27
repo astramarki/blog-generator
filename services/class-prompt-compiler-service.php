@@ -755,7 +755,12 @@ class Prompt_Compiler_Service {
 				foreach ( $lines as $line ) {
 					$keyword = trim( $line );
 					if ( ! empty( $keyword ) ) {
-						$all_keywords[] = $keyword;
+						// Filter out image URLs - they typically start with http:// or https:// or contain Image link:
+						if ( ! preg_match( '/^https?:\/\//i', $keyword ) && 
+						     ! preg_match( '/^Image link:/i', $keyword ) &&
+						     ! preg_match( '/\.(jpg|jpeg|png|gif|webp|svg)$/i', $keyword ) ) {
+							$all_keywords[] = $keyword;
+						}
 					}
 				}
 			}
