@@ -102,7 +102,7 @@ class Database_Manager {
 	 */
 	public function create_tables() {
 		$start_time = $this->start_timer();
-		$this->log_function_entry( [ 'tables_to_create' => 12 ] );
+		$this->log_function_entry( [ 'tables_to_create' => 13 ] );
 
 		$success = true;
 		$tables_created = [];
@@ -111,88 +111,59 @@ class Database_Manager {
 		try {
 			$this->log_debug( 'database_init', 'Starting database table creation process' );
 
-			// Ideas table
-			$this->log_debug( 'table_creation', 'Creating ideas table', [ 'table' => 'ideas' ] );
-			$ideas_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_IDEAS . " (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				title varchar(255) NOT NULL,
-				description text,
-				category_id bigint(20) unsigned,
-				status enum('pending', 'approved', 'denied', 'generated') DEFAULT 'pending',
-				created_at datetime DEFAULT CURRENT_TIMESTAMP,
-				updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-				PRIMARY KEY (id),
-				KEY idx_status (status),
-				KEY idx_category (category_id),
-				KEY idx_created (created_at)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			$charset_collate = $this->wpdb->get_charset_collate();
 
-			if ( ! $this->execute_query( $ideas_table_sql ) ) {
-				$tables_failed[] = 'ideas';
-				$this->log_error( 'table_creation_failed', 'Failed to create ideas table', [ 
-					'table' => 'ideas',
-					'error' => $this->wpdb->last_error 
-				] );
-				$success = false;
-			} else {
-				$tables_created[] = 'ideas';
-				$this->log_debug( 'table_creation_success', 'Ideas table created successfully' );
-			}
-
-			// Generated posts table  
-			$this->log_debug( 'table_creation', 'Creating generated posts table', [ 'table' => 'generated_posts' ] );
-			$posts_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_POSTS . " (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				idea_id bigint(20) unsigned,
-				post_id bigint(20) unsigned,
-				title varchar(255),
-				content longtext,
-				excerpt text,
-				featured_image_id bigint(20) unsigned,
-				seo_title varchar(255),
-				seo_description text,
-				cost decimal(10,4) DEFAULT 0.0000,
-				status enum('draft', 'scheduled', 'published') DEFAULT 'draft',
-				scheduled_time datetime,
-				published_at datetime,
-				created_at datetime DEFAULT CURRENT_TIMESTAMP,
-				updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-				PRIMARY KEY (id),
-				KEY idx_idea (idea_id),
-				KEY idx_post (post_id),
-				KEY idx_status (status),
-				KEY idx_scheduled (scheduled_time),
-				KEY idx_published (published_at)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-
-			if ( ! $this->execute_query( $posts_table_sql ) ) {
-				$tables_failed[] = 'generated_posts';
-				$this->log_error( 'table_creation_failed', 'Failed to create generated posts table', [ 
-					'table' => 'generated_posts',
-					'error' => $this->wpdb->last_error 
-				] );
-				$success = false;
-			} else {
-				$tables_created[] = 'generated_posts';
-				$this->log_debug( 'table_creation_success', 'Generated posts table created successfully' );
-			}
-
-			// Contexts table
-			$this->log_debug( 'table_creation', 'Creating contexts table', [ 'table' => 'contexts' ] );
-			$contexts_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_CONTEXTS . " (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+			// Brand features table
+			$this->log_debug( 'table_creation', 'Creating brand features table', [ 'table' => 'brand_features' ] );
+			$brand_features_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_BRAND_FEATURES . " (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
 				name varchar(255) NOT NULL,
-				type varchar(50) NOT NULL,
-				content longtext NOT NULL,
-				seed_image_id bigint(20) unsigned NULL,
+				description text DEFAULT NULL,
+				category enum('informational_page', 'document', 'image', 'video') DEFAULT 'informational_page',
+				url varchar(500) NOT NULL,
 				active tinyint(1) DEFAULT 1,
 				created_at datetime DEFAULT CURRENT_TIMESTAMP,
 				updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 				PRIMARY KEY (id),
-				KEY idx_type (type),
 				KEY idx_active (active),
-				KEY idx_seed_image (seed_image_id)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+				KEY idx_category (category),
+				KEY idx_name (name)
+			) ENGINE=InnoDB $charset_collate;";
+
+			if ( ! $this->execute_query( $brand_features_table_sql ) ) {
+				$tables_failed[] = 'brand_features';
+				$this->log_error( 'table_creation_failed', 'Failed to create brand features table', [ 
+					'table' => 'brand_features',
+					'error' => $this->wpdb->last_error 
+				] );
+				$success = false;
+			} else {
+				$tables_created[] = 'brand_features';
+				$this->log_debug( 'table_creation_success', 'Brand features table created successfully' );
+			}
+
+			// Contexts table
+			$this->log_debug( 'table_creation', 'Creating contexts table', [ 'table' => 'contexts' ] );
+			$contexts_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_CONTEXTS . " (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				name varchar(100) NOT NULL,
+				description text DEFAULT NULL,
+				type enum('general', 'products', 'seo', 'keywords', 'image', 'layout') DEFAULT 'general',
+				content text DEFAULT NULL,
+				seed_image_id bigint(20) DEFAULT NULL,
+				active tinyint(1) DEFAULT 1,
+				priority int(11) DEFAULT 50,
+				usage_flags varchar(255) DEFAULT 'ideas,content,images',
+				always_include_content tinyint(1) DEFAULT 0,
+				always_include_images tinyint(1) DEFAULT 0,
+				created_at datetime DEFAULT CURRENT_TIMESTAMP,
+				updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+				always_include_avada tinyint(1) DEFAULT NULL,
+				always_include_html tinyint(1) DEFAULT NULL,
+				PRIMARY KEY (id),
+				KEY idx_active (active),
+				KEY idx_type (type)
+			) ENGINE=InnoDB $charset_collate;";
 
 			if ( ! $this->execute_query( $contexts_table_sql ) ) {
 				$tables_failed[] = 'contexts';
@@ -206,48 +177,20 @@ class Database_Manager {
 				$this->log_debug( 'table_creation_success', 'Contexts table created successfully' );
 			}
 
-			// Logs table
-			$this->log_debug( 'table_creation', 'Creating logs table', [ 'table' => 'logs' ] );
-			$logs_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_LOGS . " (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				action varchar(100) NOT NULL,
-				message text NOT NULL,
-				level enum('info', 'warning', 'error') DEFAULT 'info',
-				context longtext,
-				created_at datetime DEFAULT CURRENT_TIMESTAMP,
-				PRIMARY KEY (id),
-				KEY idx_action (action),
-				KEY idx_level (level),
-				KEY idx_created (created_at)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-
-			if ( ! $this->execute_query( $logs_table_sql ) ) {
-				$tables_failed[] = 'logs';
-				$this->log_error( 'table_creation_failed', 'Failed to create logs table', [ 
-					'table' => 'logs',
-					'error' => $this->wpdb->last_error 
-				] );
-				$success = false;
-			} else {
-				$tables_created[] = 'logs';
-				$this->log_debug( 'table_creation_success', 'Logs table created successfully' );
-			}
-
 			// Cost analytics table
 			$this->log_debug( 'table_creation', 'Creating cost analytics table', [ 'table' => 'cost_analytics' ] );
-			$costs_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_COSTS . " (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				service varchar(50) NOT NULL,
+			$costs_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_COSTS . " (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				service enum('anthropic', 'openai') NOT NULL,
 				action varchar(100) NOT NULL,
-				cost decimal(10,4) NOT NULL DEFAULT 0.0000,
-				tokens_used int unsigned DEFAULT 0,
+				tokens_used int(11) DEFAULT 0,
+				cost decimal(10, 4) NOT NULL,
 				created_at datetime DEFAULT CURRENT_TIMESTAMP,
 				PRIMARY KEY (id),
 				KEY idx_service (service),
 				KEY idx_action (action),
-				KEY idx_created (created_at),
-				KEY idx_cost (cost)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+				KEY idx_created (created_at)
+			) ENGINE=InnoDB $charset_collate;";
 
 			if ( ! $this->execute_query( $costs_table_sql ) ) {
 				$tables_failed[] = 'cost_analytics';
@@ -261,72 +204,51 @@ class Database_Manager {
 				$this->log_debug( 'table_creation_success', 'Cost analytics table created successfully' );
 			}
 
-			// Seed images table
-			$this->log_debug( 'table_creation', 'Creating seed images table', [ 'table' => 'seed_images' ] );
-			$seed_images_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_SEED_IMAGES . " (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				product_name varchar(100) NOT NULL,
-				image_url varchar(500) NOT NULL,
-				context_id bigint(20) unsigned,
+			// Generated posts table  
+			$this->log_debug( 'table_creation', 'Creating generated posts table', [ 'table' => 'generated_posts' ] );
+			$posts_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_POSTS . " (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				idea_id bigint(20) UNSIGNED NOT NULL,
+				persona_id bigint(20) UNSIGNED DEFAULT NULL,
+				post_id bigint(20) UNSIGNED DEFAULT NULL,
+				scheduled_time datetime DEFAULT NULL,
+				status enum('draft', 'scheduled', 'published') DEFAULT 'draft',
+				cost decimal(10, 4) DEFAULT 0.0000,
 				created_at datetime DEFAULT CURRENT_TIMESTAMP,
 				PRIMARY KEY (id),
-				KEY idx_context (context_id),
-				KEY idx_product (product_name)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+				KEY idx_idea (idea_id),
+				KEY idx_post (post_id),
+				KEY idx_status (status),
+				KEY idx_scheduled (scheduled_time),
+				KEY idx_persona (persona_id)
+			) ENGINE=InnoDB $charset_collate;";
 
-			if ( ! $this->execute_query( $seed_images_table_sql ) ) {
-				$tables_failed[] = 'seed_images';
-				$this->log_error( 'table_creation_failed', 'Failed to create seed images table', [ 
-					'table' => 'seed_images',
+			if ( ! $this->execute_query( $posts_table_sql ) ) {
+				$tables_failed[] = 'generated_posts';
+				$this->log_error( 'table_creation_failed', 'Failed to create generated posts table', [ 
+					'table' => 'generated_posts',
 					'error' => $this->wpdb->last_error 
 				] );
 				$success = false;
 			} else {
-				$tables_created[] = 'seed_images';
-				$this->log_debug( 'table_creation_success', 'Seed images table created successfully' );
-			}
-
-			// Personas table
-			$this->log_debug( 'table_creation', 'Creating personas table', [ 'table' => 'personas' ] );
-			$personas_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_PERSONAS . " (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				name varchar(100) NOT NULL,
-				bio text NOT NULL,
-				expertise text,
-				writing_style text,
-				tone varchar(50) DEFAULT 'professional',
-				active tinyint(1) DEFAULT 1,
-				created_at datetime DEFAULT CURRENT_TIMESTAMP,
-				updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-				PRIMARY KEY (id),
-				KEY idx_active (active),
-				KEY idx_name (name)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-
-			if ( ! $this->execute_query( $personas_table_sql ) ) {
-				$tables_failed[] = 'personas';
-				$this->log_error( 'table_creation_failed', 'Failed to create personas table', [ 
-					'table' => 'personas',
-					'error' => $this->wpdb->last_error 
-				] );
-				$success = false;
-			} else {
-				$tables_created[] = 'personas';
-				$this->log_debug( 'table_creation_success', 'Personas table created successfully' );
+				$tables_created[] = 'generated_posts';
+				$this->log_debug( 'table_creation_success', 'Generated posts table created successfully' );
 			}
 
 			// Products table
 			$this->log_debug( 'table_creation', 'Creating products table', [ 'table' => 'products' ] );
-			$products_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_PRODUCTS . " (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				name varchar(255) NOT NULL,
-				description text,
-				ideal_uses text,
+			$products_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_PRODUCTS . " (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				product_name varchar(255) NOT NULL,
+				product_description text DEFAULT NULL,
+				ideal_uses text DEFAULT NULL,
+				woocommerce_product_id bigint(20) UNSIGNED DEFAULT NULL,
 				created_at datetime DEFAULT CURRENT_TIMESTAMP,
 				updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
 				PRIMARY KEY (id),
-				KEY idx_name (name)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+				KEY idx_woocommerce_product_id (woocommerce_product_id),
+				KEY idx_product_name (product_name)
+			) ENGINE=InnoDB $charset_collate;";
 
 			if ( ! $this->execute_query( $products_table_sql ) ) {
 				$tables_failed[] = 'products';
@@ -342,19 +264,18 @@ class Database_Manager {
 
 			// Product images table
 			$this->log_debug( 'table_creation', 'Creating product images table', [ 'table' => 'product_images' ] );
-			$product_images_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES . " (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				product_id bigint(20) unsigned NOT NULL,
-				attachment_id bigint(20) unsigned NOT NULL,
-				image_url varchar(500) NOT NULL,
+			$product_images_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES . " (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				product_id bigint(20) UNSIGNED NOT NULL,
+				attachment_id bigint(20) UNSIGNED NOT NULL,
+				display_order int(11) DEFAULT 0,
 				is_primary tinyint(1) DEFAULT 0,
-				display_order int DEFAULT 0,
 				created_at datetime DEFAULT CURRENT_TIMESTAMP,
 				PRIMARY KEY (id),
-				KEY idx_product (product_id),
-				KEY idx_primary (is_primary),
-				KEY idx_order (display_order)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+				KEY idx_product_id (product_id),
+				KEY idx_attachment_id (attachment_id),
+				KEY idx_display_order (display_order)
+			) ENGINE=InnoDB $charset_collate;";
 
 			if ( ! $this->execute_query( $product_images_table_sql ) ) {
 				$tables_failed[] = 'product_images';
@@ -366,21 +287,29 @@ class Database_Manager {
 			} else {
 				$tables_created[] = 'product_images';
 				$this->log_debug( 'table_creation_success', 'Product images table created successfully' );
+				
+				// Add foreign key constraint
+				$fk_sql = "ALTER TABLE " . AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES . " 
+					ADD CONSTRAINT fk_product_images_product FOREIGN KEY (product_id) 
+					REFERENCES " . AI_BLOG_GENERATOR_TABLE_PRODUCTS . " (id) ON DELETE CASCADE";
+				$this->execute_query( $fk_sql );
 			}
 
 			// Product links table
 			$this->log_debug( 'table_creation', 'Creating product links table', [ 'table' => 'product_links' ] );
-			$product_links_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS . " (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				product_id bigint(20) unsigned NOT NULL,
-				link_type enum('product_page','purchase','documentation','other') DEFAULT 'other',
-				link_text varchar(255) NOT NULL,
+			$product_links_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS . " (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				product_id bigint(20) UNSIGNED NOT NULL,
 				link_url varchar(500) NOT NULL,
+				link_text varchar(255) DEFAULT NULL,
+				link_type enum('product_page', 'purchase', 'documentation', 'other') DEFAULT 'product_page',
+				display_order int(11) DEFAULT 0,
 				created_at datetime DEFAULT CURRENT_TIMESTAMP,
 				PRIMARY KEY (id),
-				KEY idx_product (product_id),
-				KEY idx_type (link_type)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+				KEY idx_product_id (product_id),
+				KEY idx_link_type (link_type),
+				KEY idx_display_order (display_order)
+			) ENGINE=InnoDB $charset_collate;";
 
 			if ( ! $this->execute_query( $product_links_table_sql ) ) {
 				$tables_failed[] = 'product_links';
@@ -392,16 +321,89 @@ class Database_Manager {
 			} else {
 				$tables_created[] = 'product_links';
 				$this->log_debug( 'table_creation_success', 'Product links table created successfully' );
+				
+				// Add foreign key constraint
+				$fk_sql = "ALTER TABLE " . AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS . " 
+					ADD CONSTRAINT fk_product_links_product FOREIGN KEY (product_id) 
+					REFERENCES " . AI_BLOG_GENERATOR_TABLE_PRODUCTS . " (id) ON DELETE CASCADE";
+				$this->execute_query( $fk_sql );
+			}
+
+			// Product seed images table
+			$this->log_debug( 'table_creation', 'Creating product seed images table', [ 'table' => 'product_seed_images' ] );
+			$product_seed_images_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES . " (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				product_id bigint(20) UNSIGNED NOT NULL,
+				attachment_id bigint(20) UNSIGNED NOT NULL,
+				image_url varchar(500) NOT NULL,
+				display_order int(11) DEFAULT 0,
+				created_at datetime DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY (id),
+				KEY idx_product (product_id),
+				KEY idx_order (display_order)
+			) ENGINE=InnoDB $charset_collate;";
+
+			if ( ! $this->execute_query( $product_seed_images_table_sql ) ) {
+				$tables_failed[] = 'product_seed_images';
+				$this->log_error( 'table_creation_failed', 'Failed to create product seed images table', [ 
+					'table' => 'product_seed_images',
+					'error' => $this->wpdb->last_error 
+				] );
+				$success = false;
+			} else {
+				$tables_created[] = 'product_seed_images';
+				$this->log_debug( 'table_creation_success', 'Product seed images table created successfully' );
+				
+				// Add foreign key constraint
+				$fk_sql = "ALTER TABLE " . AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES . " 
+					ADD CONSTRAINT " . AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES . "_ibfk_1 FOREIGN KEY (product_id) 
+					REFERENCES " . AI_BLOG_GENERATOR_TABLE_PRODUCTS . " (id) ON DELETE CASCADE";
+				$this->execute_query( $fk_sql );
+			}
+
+			// Ideas table
+			$this->log_debug( 'table_creation', 'Creating ideas table', [ 'table' => 'ideas' ] );
+			$ideas_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_IDEAS . " (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				title varchar(255) NOT NULL,
+				description text DEFAULT NULL,
+				category_id bigint(20) UNSIGNED DEFAULT NULL,
+				persona_id bigint(20) UNSIGNED DEFAULT NULL,
+				status enum('pending', 'approved', 'denied', 'generated', 'generating', 'failed') DEFAULT 'pending',
+				failed_status varchar(255) DEFAULT NULL,
+				created_at datetime DEFAULT CURRENT_TIMESTAMP,
+				updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+				generation_status text DEFAULT NULL,
+				generation_error text DEFAULT NULL,
+				generation_started_at datetime DEFAULT NULL,
+				generation_completed_at datetime DEFAULT NULL,
+				PRIMARY KEY (id),
+				KEY idx_category (category_id),
+				KEY idx_persona (persona_id),
+				KEY idx_status (status),
+				KEY idx_generation_status (generation_status(768))
+			) ENGINE=InnoDB $charset_collate;";
+
+			if ( ! $this->execute_query( $ideas_table_sql ) ) {
+				$tables_failed[] = 'ideas';
+				$this->log_error( 'table_creation_failed', 'Failed to create ideas table', [ 
+					'table' => 'ideas',
+					'error' => $this->wpdb->last_error 
+				] );
+				$success = false;
+			} else {
+				$tables_created[] = 'ideas';
+				$this->log_debug( 'table_creation_success', 'Ideas table created successfully' );
 			}
 
 			// Blog idea categories connector table
 			$this->log_debug( 'table_creation', 'Creating blog idea categories table', [ 'table' => 'blog_idea_categories' ] );
-			$idea_categories_table_sql = "CREATE TABLE " . AI_BLOG_GENERATOR_TABLE_IDEA_CATEGORIES . " (
+			$idea_categories_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_IDEA_CATEGORIES . " (
 				blog_idea_id int(11) DEFAULT NULL,
 				category_id int(11) DEFAULT NULL,
 				KEY blog_idea_id (blog_idea_id),
 				KEY category_id (category_id)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			) ENGINE=InnoDB $charset_collate;";
 
 			if ( ! $this->execute_query( $idea_categories_table_sql ) ) {
 				$tables_failed[] = 'blog_idea_categories';
@@ -415,66 +417,99 @@ class Database_Manager {
 				$this->log_debug( 'table_creation_success', 'Blog idea categories table created successfully' );
 			}
 
-			// Product seed images table
-			$this->log_debug( 'table_creation', 'Creating product seed images table', [ 'table' => 'product_seed_images' ] );
-			$product_seed_images_table_sql = "CREATE TABLE " . $this->wpdb->prefix . "ai_blog_generator_product_seed_images (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				product_id bigint(20) unsigned NOT NULL,
-				attachment_id bigint(20) unsigned NOT NULL,
-				image_url varchar(500) NOT NULL,
-				display_order int DEFAULT 0,
-				created_at datetime DEFAULT CURRENT_TIMESTAMP,
-				PRIMARY KEY (id),
-				KEY idx_product (product_id),
-				KEY idx_order (display_order)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
-
-			if ( ! $this->execute_query( $product_seed_images_table_sql ) ) {
-				$tables_failed[] = 'product_seed_images';
-				$this->log_error( 'table_creation_failed', 'Failed to create product seed images table', [ 
-					'table' => 'product_seed_images',
-					'error' => $this->wpdb->last_error 
-				] );
-				$success = false;
-			} else {
-				$tables_created[] = 'product_seed_images';
-				$this->log_debug( 'table_creation_success', 'Product seed images table created successfully' );
-			}
-
-			// Brand features table
-			$this->log_debug( 'table_creation', 'Creating brand features table', [ 'table' => 'brand_features' ] );
-			$brand_features_table_sql = "CREATE TABLE " . $this->wpdb->prefix . "ai_blog_brand_features (
-				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
-				name varchar(255) NOT NULL,
-				description text,
-				category enum('informational_page','document','image','video') DEFAULT 'informational_page',
-				url varchar(500) NOT NULL,
+			// Personas table
+			$this->log_debug( 'table_creation', 'Creating personas table', [ 'table' => 'personas' ] );
+			$personas_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_PERSONAS . " (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				name varchar(100) NOT NULL,
+				bio text NOT NULL,
+				expertise text DEFAULT NULL,
+				writing_style text DEFAULT NULL,
+				tone varchar(50) DEFAULT 'professional',
+				layout_style text DEFAULT NULL,
+				layout_rules varchar(255) DEFAULT NULL,
+				wordpress_user_id int(11) DEFAULT NULL,
 				active tinyint(1) DEFAULT 1,
 				created_at datetime DEFAULT CURRENT_TIMESTAMP,
 				updated_at datetime DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+				uses_seed_mages tinyint(1) DEFAULT NULL,
+				number_of_images int(11) DEFAULT NULL,
+				uses_charts tinyint(1) DEFAULT NULL,
+				uses_avada_layouts tinyint(1) DEFAULT NULL,
+				uses_plain_html tinyint(1) DEFAULT NULL,
+				include_contexts varchar(255) DEFAULT NULL,
 				PRIMARY KEY (id),
 				KEY idx_active (active),
-				KEY idx_category (category),
 				KEY idx_name (name)
-			) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;";
+			) ENGINE=InnoDB $charset_collate;";
 
-			if ( ! $this->execute_query( $brand_features_table_sql ) ) {
-				$tables_failed[] = 'brand_features';
-				$this->log_error( 'table_creation_failed', 'Failed to create brand features table', [ 
-					'table' => 'brand_features',
+			if ( ! $this->execute_query( $personas_table_sql ) ) {
+				$tables_failed[] = 'personas';
+				$this->log_error( 'table_creation_failed', 'Failed to create personas table', [ 
+					'table' => 'personas',
 					'error' => $this->wpdb->last_error 
 				] );
 				$success = false;
 			} else {
-				$tables_created[] = 'brand_features';
-				$this->log_debug( 'table_creation_success', 'Brand features table created successfully' );
+				$tables_created[] = 'personas';
+				$this->log_debug( 'table_creation_success', 'Personas table created successfully' );
 			}
 
-			// Run schema updates for any missing columns
-			$this->log_debug( 'schema_update', 'Running schema updates for missing columns' );
-			if ( ! $this->update_table_schemas() ) {
-				$this->log_warning( 'schema_update_failed', 'Some schema updates failed but continuing' );
+			// Seed images table
+			$this->log_debug( 'table_creation', 'Creating seed images table', [ 'table' => 'seed_images' ] );
+			$seed_images_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_SEED_IMAGES . " (
+				id bigint(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+				product_name varchar(100) NOT NULL,
+				context text DEFAULT NULL,
+				image_url varchar(500) NOT NULL,
+				context_id bigint(20) UNSIGNED DEFAULT NULL,
+				created_at datetime DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY (id),
+				KEY idx_product (product_name),
+				KEY idx_context (context_id)
+			) ENGINE=InnoDB $charset_collate;";
+
+			if ( ! $this->execute_query( $seed_images_table_sql ) ) {
+				$tables_failed[] = 'seed_images';
+				$this->log_error( 'table_creation_failed', 'Failed to create seed images table', [ 
+					'table' => 'seed_images',
+					'error' => $this->wpdb->last_error 
+				] );
+				$success = false;
+			} else {
+				$tables_created[] = 'seed_images';
+				$this->log_debug( 'table_creation_success', 'Seed images table created successfully' );
 			}
+
+			// Logs table
+			$this->log_debug( 'table_creation', 'Creating logs table', [ 'table' => 'logs' ] );
+			$logs_table_sql = "CREATE TABLE IF NOT EXISTS " . AI_BLOG_GENERATOR_TABLE_LOGS . " (
+				id bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+				action varchar(100) NOT NULL,
+				message text NOT NULL,
+				level enum('info', 'warning', 'error') DEFAULT 'info',
+				context longtext,
+				created_at datetime DEFAULT CURRENT_TIMESTAMP,
+				PRIMARY KEY (id),
+				KEY idx_action (action),
+				KEY idx_level (level),
+				KEY idx_created (created_at)
+			) ENGINE=InnoDB $charset_collate;";
+
+			if ( ! $this->execute_query( $logs_table_sql ) ) {
+				$tables_failed[] = 'logs';
+				$this->log_error( 'table_creation_failed', 'Failed to create logs table', [ 
+					'table' => 'logs',
+					'error' => $this->wpdb->last_error 
+				] );
+				$success = false;
+			} else {
+				$tables_created[] = 'logs';
+				$this->log_debug( 'table_creation_success', 'Logs table created successfully' );
+			}
+
+			// Skip running schema updates since tables are created with full schema
+			$this->log_debug( 'schema_update', 'Skipping schema updates - tables created with full schema' );
 
 			$final_context = [
 				'tables_created' => $tables_created,
@@ -498,7 +533,7 @@ class Database_Manager {
 			] );
 		}
 
-		$this->end_timer( $start_time, 'database_table_creation', $final_context ?? [] );
+		$this->end_timer( $start_time, 'create_tables', [ 'success' => $success ] );
 		$this->log_function_exit( $success );
 
 		return $success;
@@ -522,8 +557,8 @@ class Database_Manager {
 			AI_BLOG_GENERATOR_TABLE_PRODUCTS,
 			AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES,
 			AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS,
-			$this->wpdb->prefix . 'ai_blog_generator_product_seed_images',
-			$this->wpdb->prefix . 'ai_blog_brand_features',
+			AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES,
+			AI_BLOG_GENERATOR_TABLE_BRAND_FEATURES,
 		];
 
 		$success = true;
@@ -1525,8 +1560,8 @@ class Database_Manager {
 			'products'       => AI_BLOG_GENERATOR_TABLE_PRODUCTS,
 			'product_images' => AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES,
 			'product_links'  => AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS,
-			'product_seed_images' => $this->wpdb->prefix . 'ai_blog_generator_product_seed_images',
-			'ai_blog_brand_features' => $this->wpdb->prefix . 'ai_blog_brand_features',
+			'product_seed_images' => AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES,
+			'ai_blog_brand_features' => AI_BLOG_GENERATOR_TABLE_BRAND_FEATURES,
 		];
 
 		return isset( $table_map[ $table ] ) ? $table_map[ $table ] : false;
@@ -1549,8 +1584,8 @@ class Database_Manager {
 			'products'       => AI_BLOG_GENERATOR_TABLE_PRODUCTS,
 			'product_images' => AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES,
 			'product_links'  => AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS,
-			'product_seed_images' => $this->wpdb->prefix . 'ai_blog_generator_product_seed_images',
-			'ai_blog_brand_features' => $this->wpdb->prefix . 'ai_blog_brand_features',
+			'product_seed_images' => AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES,
+			'ai_blog_brand_features' => AI_BLOG_GENERATOR_TABLE_BRAND_FEATURES,
 		];
 	}
 
@@ -1569,7 +1604,7 @@ class Database_Manager {
 			'logs' => [ 'id', 'action', 'message', 'level', 'context', 'created_at' ],
 			'cost_analytics' => [ 'id', 'service', 'action', 'cost', 'tokens_used', 'created_at' ],
 			'seed_images' => [ 'id', 'product_name', 'image_url', 'context_id', 'created_at' ],
-			'products' => [ 'id', 'name', 'description', 'ideal_uses', 'created_at', 'updated_at' ],
+			'products' => [ 'id', 'product_name', 'product_description', 'ideal_uses', 'woocommerce_product_id', 'created_at', 'updated_at' ],
 			'product_images' => [ 'id', 'product_id', 'attachment_id', 'image_url', 'is_primary', 'display_order', 'created_at' ],
 			'product_links' => [ 'id', 'product_id', 'link_type', 'link_text', 'link_url', 'created_at' ],
 			'product_seed_images' => [ 'id', 'product_id', 'attachment_id', 'image_url', 'display_order', 'created_at' ],

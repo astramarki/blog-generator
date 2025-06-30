@@ -277,7 +277,7 @@ class Brand_Feature_Model extends Model {
 	public function search( $search ) {
 		global $wpdb;
 		
-		$table = $wpdb->prefix . $this->table_name;
+		$table = AI_BLOG_GENERATOR_TABLE_BRAND_FEATURES;
 		$search = '%' . $wpdb->esc_like( $search ) . '%';
 		
 		$sql = $wpdb->prepare(

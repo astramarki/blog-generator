@@ -672,8 +672,8 @@ class Blog_Ideas_Controller_V2 {
 		foreach ( $personas as $persona ) {
 			// Handle both array and object formats
 			$name = is_array( $persona ) ? $persona['name'] : $persona->name;
-			$description = is_array( $persona ) ? $persona['description'] : $persona->description;
-			$personas_list .= "- {$name}: {$description}\n";
+			$bio = is_array( $persona ) ? $persona['bio'] : $persona->bio;
+			$personas_list .= "- {$name}: {$bio}\n";
 		}
 
 		// Build context information

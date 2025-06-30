@@ -29,6 +29,7 @@ $settings = [
 	'enable_idea_generation' => get_option( 'ai_blog_generator_enable_idea_generation', true ),
 	'enable_image_generation' => get_option( 'ai_blog_generator_enable_image_generation', true ),
 	'enable_seo_optimization' => get_option( 'ai_blog_generator_enable_seo_optimization', true ),
+	'delete_data_on_deactivation' => get_option( 'ai_blog_generator_delete_data_on_deactivation', false ),
 ];
 
 // Get available Claude models
@@ -302,6 +303,40 @@ $available_models = $anthropic_service->get_available_models();
 								</label>
 								<p class="description">
 									<?php esc_html_e( 'When enabled, detailed logs will be recorded for all operations and displayed in the browser console for debugging. Disable in production for better performance.', 'ai-blog-generator' ); ?>
+								</p>
+							</td>
+						</tr>
+					</table>
+				</div>
+			</div>
+			
+			<!-- Data Management Settings -->
+			<div class="postbox">
+				<h2 class="hndle"><?php esc_html_e( 'Data Management', 'ai-blog-generator' ); ?></h2>
+				<div class="inside">
+					<table class="form-table">
+						<tr>
+							<th scope="row">
+								<label for="delete_data_on_deactivation"><?php esc_html_e( 'Data Deletion', 'ai-blog-generator' ); ?></label>
+							</th>
+							<td>
+								<label for="delete_data_on_deactivation">
+									<input type="checkbox" id="delete_data_on_deactivation" name="delete_data_on_deactivation" value="1" 
+										<?php checked( $settings['delete_data_on_deactivation'], true ); ?> />
+									<?php esc_html_e( 'Delete all plugin data when deactivating', 'ai-blog-generator' ); ?>
+								</label>
+								<p class="description" style="color: #d63638; font-weight: 500;">
+									<strong><?php esc_html_e( 'WARNING:', 'ai-blog-generator' ); ?></strong> 
+									<?php esc_html_e( 'If enabled, ALL plugin data will be permanently deleted when you deactivate the plugin, including:', 'ai-blog-generator' ); ?>
+								</p>
+								<ul class="description" style="margin-left: 20px; list-style-type: disc;">
+									<li><?php esc_html_e( 'All database tables (ideas, posts, contexts, personas, products, etc.)', 'ai-blog-generator' ); ?></li>
+									<li><?php esc_html_e( 'All plugin settings and options', 'ai-blog-generator' ); ?></li>
+									<li><?php esc_html_e( 'All transients and temporary data', 'ai-blog-generator' ); ?></li>
+									<li><?php esc_html_e( 'All log files and generated images', 'ai-blog-generator' ); ?></li>
+								</ul>
+								<p class="description">
+									<?php esc_html_e( 'If disabled (default), your data will be preserved and available when you reactivate the plugin.', 'ai-blog-generator' ); ?>
 								</p>
 							</td>
 						</tr>

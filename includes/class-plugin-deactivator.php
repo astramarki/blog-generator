@@ -33,14 +33,23 @@ class Plugin_Deactivator {
 		// Log deactivation.
 		Logger::info( 'plugin_deactivation', 'AI Blog Generator plugin deactivated' );
 		
-		// Unschedule cron jobs.
-		self::unschedule_cron_jobs();
+		// Check if user wants to delete all data on deactivation
+		$delete_all_data = get_option( 'ai_blog_generator_delete_data_on_deactivation', false );
 		
-		// Clear plugin cache.
-		self::clear_cache();
-		
-		// Optionally clean up data based on user preference.
-		self::cleanup_data();
+		if ( $delete_all_data ) {
+			Logger::warning( 'data_deletion_on_deactivation', 'User has opted to delete all plugin data on deactivation' );
+			self::delete_all_plugin_data();
+		} else {
+			// Just do normal cleanup
+			// Unschedule cron jobs.
+			self::unschedule_cron_jobs();
+			
+			// Clear plugin cache.
+			self::clear_cache();
+			
+			// Optionally clean up data based on user preference.
+			self::cleanup_data();
+		}
 		
 		// Remove activation flag.
 		delete_option( 'ai_blog_generator_activated' );
@@ -91,8 +100,10 @@ class Plugin_Deactivator {
 			delete_transient( $transient );
 		}
 		
-		// Clear object cache for plugin data.
-		wp_cache_delete_group( 'ai_blog_generator' );
+		// Clear object cache for plugin data if the function exists (from object cache plugins).
+		if ( function_exists( 'wp_cache_delete_group' ) ) {
+			wp_cache_delete_group( 'ai_blog_generator' );
+		}
 		
 		// Trigger action for third-party cache plugins.
 		do_action( 'ai_blog_generator_clear_cache' );
@@ -223,5 +234,118 @@ class Plugin_Deactivator {
 			'from' => $old_version,
 			'to'   => $new_version,
 		], WEEK_IN_SECONDS );
+	}
+
+	/**
+	 * Delete all plugin data including tables, options, and files.
+	 * This is called when user has opted to delete data on deactivation.
+	 */
+	private static function delete_all_plugin_data() {
+		global $wpdb;
+		
+		Logger::warning( 'delete_all_data_start', 'Starting complete plugin data deletion' );
+		
+		// First unschedule all cron jobs
+		self::unschedule_cron_jobs();
+		
+		// Define table names in order (respecting foreign key constraints)
+		$table_prefix = $wpdb->prefix . 'ai_blog_';
+		$tables = [
+			// Drop tables with foreign keys first
+			AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES,
+			AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS,
+			AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES,
+			$table_prefix . 'idea_categories',
+			$table_prefix . 'generated_posts',
+			$table_prefix . 'seed_images',
+			
+			// Then drop the parent tables
+			AI_BLOG_GENERATOR_TABLE_PRODUCTS,
+			$table_prefix . 'ideas',
+			$table_prefix . 'contexts',
+			$table_prefix . 'personas',
+			$table_prefix . 'logs',
+			$table_prefix . 'cost_analytics',
+			AI_BLOG_GENERATOR_TABLE_BRAND_FEATURES,
+		];
+		
+		// Drop all tables
+		foreach ( $tables as $table ) {
+			$wpdb->query( "DROP TABLE IF EXISTS $table" );
+			Logger::info( 'table_dropped', 'Database table dropped', [ 'table' => $table ] );
+		}
+		
+		// Delete all plugin options
+		$wpdb->query( "DELETE FROM {$wpdb->options} WHERE option_name LIKE 'ai_blog_generator_%'" );
+		Logger::info( 'options_deleted', 'All plugin options deleted' );
+		
+		// Delete all transients
+		$transients = [
+			'ai_blog_generator_stats',
+			'ai_blog_generator_costs',
+			'ai_blog_generator_api_status',
+			'ai_blog_generator_idea_cache',
+			'ai_blog_generator_context_cache',
+			'ai_blog_generator_downgrade_notice',
+			'ai_blog_active_generations',
+			'ai_blog_generation_queue',
+		];
+		
+		foreach ( $transients as $transient ) {
+			delete_transient( $transient );
+		}
+		
+		// Delete any transients that match our generation pattern
+		$wpdb->query(
+			"DELETE FROM {$wpdb->options} 
+			WHERE option_name LIKE '_transient_ai_blog_generation_%' 
+			OR option_name LIKE '_transient_timeout_ai_blog_generation_%'"
+		);
+		Logger::info( 'transients_deleted', 'All plugin transients deleted' );
+		
+		// Delete generation log files
+		$upload_dir = wp_upload_dir();
+		$log_dir = $upload_dir['basedir'] . '/ai-blog-generator-logs';
+		
+		if ( file_exists( $log_dir ) ) {
+			// Recursively delete log directory
+			self::delete_directory( $log_dir );
+			Logger::info( 'log_files_deleted', 'Log files directory deleted', [ 'path' => $log_dir ] );
+		}
+		
+		// Clear object cache if function exists
+		if ( function_exists( 'wp_cache_delete_group' ) ) {
+			wp_cache_delete_group( 'ai_blog_generator' );
+		}
+		
+		Logger::warning( 'delete_all_data_complete', 'All plugin data has been deleted' );
+	}
+	
+	/**
+	 * Recursively delete a directory and its contents.
+	 *
+	 * @param string $dir Directory path to delete.
+	 * @return bool True on success, false on failure.
+	 */
+	private static function delete_directory( $dir ) {
+		if ( ! file_exists( $dir ) ) {
+			return true;
+		}
+		
+		if ( ! is_dir( $dir ) ) {
+			return unlink( $dir );
+		}
+		
+		foreach ( scandir( $dir ) as $item ) {
+			if ( $item == '.' || $item == '..' ) {
+				continue;
+			}
+			
+			if ( ! self::delete_directory( $dir . DIRECTORY_SEPARATOR . $item ) ) {
+				return false;
+			}
+		}
+		
+		return rmdir( $dir );
 	}
 } 

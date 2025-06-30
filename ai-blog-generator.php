@@ -72,6 +72,8 @@ define( 'AI_BLOG_GENERATOR_TABLE_IDEA_CATEGORIES', $wpdb->prefix . 'ai_blog_idea
 define( 'AI_BLOG_GENERATOR_TABLE_PRODUCTS', $wpdb->prefix . 'ai_blog_generator_products' );
 define( 'AI_BLOG_GENERATOR_TABLE_PRODUCT_IMAGES', $wpdb->prefix . 'ai_blog_generator_product_images' );
 define( 'AI_BLOG_GENERATOR_TABLE_PRODUCT_LINKS', $wpdb->prefix . 'ai_blog_generator_product_links' );
+define( 'AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES', $wpdb->prefix . 'ai_blog_generator_product_seed_images' );
+define( 'AI_BLOG_GENERATOR_TABLE_BRAND_FEATURES', $wpdb->prefix . 'ai_blog_brand_features' );
 
 /**
  * Autoloader for plugin classes.
@@ -111,6 +113,13 @@ spl_autoload_register( function ( $class ) {
 		require $file;
 	}
 } );
+
+/**
+ * Load critical traits early to ensure they're available during activation.
+ * These must be loaded before any classes that use them.
+ */
+require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'utilities/trait-loggable.php';
+require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'utilities/trait-ajax-handler.php';
 
 /**
  * Main plugin class - Singleton pattern.
@@ -183,10 +192,6 @@ class AI_Blog_Generator {
 		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'includes/class-plugin-activator.php';
 		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'includes/class-plugin-deactivator.php';
 		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'includes/class-plugin-i18n.php';
-		
-		// Load utility traits (must be loaded before classes that use them).
-		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'utilities/trait-loggable.php';
-		require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'utilities/trait-ajax-handler.php';
 		
 		$this->loader = new AI_Blog_Generator\Includes\Plugin_Loader();
 	}
@@ -671,40 +676,4 @@ function ai_blog_generator() {
 // Initialize the plugin.
 add_action( 'plugins_loaded', function() {
 	ai_blog_generator()->run();
-} );
-
-// SSL Fix for Local Development - Apply in all development environments
-// Check for common local development indicators
-$is_local = (
-	defined( 'WP_DEBUG' ) && WP_DEBUG ||
-	strpos( $_SERVER['SERVER_NAME'] ?? '', 'localhost' ) !== false ||
-	strpos( $_SERVER['SERVER_NAME'] ?? '', '127.0.0.1' ) !== false ||
-	strpos( $_SERVER['SERVER_NAME'] ?? '', '.local' ) !== false ||
-	isset( $_SERVER['HTTP_HOST'] ) && (
-		strpos( $_SERVER['HTTP_HOST'], 'localhost' ) !== false ||
-		strpos( $_SERVER['HTTP_HOST'], '127.0.0.1' ) !== false ||
-		strpos( $_SERVER['HTTP_HOST'], '.local' ) !== false
-	)
-);
-
-if ( $is_local ) {
-	// Disable SSL verification for local development
-	add_filter( 'https_ssl_verify', '__return_false' );
-	add_filter( 'https_local_ssl_verify', '__return_false' );
-	add_filter( 'http_request_args', function( $args ) {
-		$args['sslverify'] = false;
-		$args['timeout'] = 600; // Increase timeout to 2 minutes
-		return $args;
-	} );
-	
-	// Log SSL fix application for debugging
-	if ( class_exists( 'AI_Blog_Generator\Utilities\Logger' ) ) {
-		add_action( 'init', function() {
-			AI_Blog_Generator\Utilities\Logger::info( 'ssl_fix_applied', 'SSL verification disabled for local development', [
-				'server_name' => $_SERVER['SERVER_NAME'] ?? 'unknown',
-				'http_host' => $_SERVER['HTTP_HOST'] ?? 'unknown',
-				'wp_debug' => defined( 'WP_DEBUG' ) ? WP_DEBUG : false
-			] );
-		} );
-	}
-} 
+} ); 

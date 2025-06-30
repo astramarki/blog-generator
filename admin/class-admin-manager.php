@@ -1162,7 +1162,8 @@ class Admin_Manager {
 				'debug_logging' => function( $value ) { return (bool) $value; },
 				'enable_idea_generation' => function( $value ) { return (bool) $value; },
 				'enable_image_generation' => function( $value ) { return (bool) $value; },
-				'enable_seo_optimization' => function( $value ) { return (bool) $value; }
+				'enable_seo_optimization' => function( $value ) { return (bool) $value; },
+				'delete_data_on_deactivation' => function( $value ) { return (bool) $value; }
 			] );
 
 			$settings_updated = [];

@@ -157,7 +157,7 @@ class Product_Model extends Model {
 			// Handle search
 			if ( isset( $where['search'] ) ) {
 				$search = '%' . $wpdb->esc_like( $where['search'] ) . '%';
-				$conditions[] = $wpdb->prepare( "(name LIKE %s OR description LIKE %s)", $search, $search );
+				$conditions[] = $wpdb->prepare( "(product_name LIKE %s OR product_description LIKE %s)", $search, $search );
 			}
 			
 			// Add other where conditions here if needed
@@ -171,7 +171,7 @@ class Product_Model extends Model {
 		if ( ! empty( $order_by ) ) {
 			$sql .= " ORDER BY " . $order_by;
 		} else {
-			$sql .= " ORDER BY name ASC";
+			$sql .= " ORDER BY product_name ASC";
 		}
 		
 		// Add limit
@@ -731,7 +731,7 @@ class Product_Model extends Model {
 	public function get_product_seed_images( $product_id ) {
 		global $wpdb;
 		
-		$table_name = $wpdb->prefix . 'ai_blog_generator_product_seed_images';
+		$table_name = AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES;
 		
 		$images = $wpdb->get_results( $wpdb->prepare(
 			"SELECT psi.*, p.guid as image_url, p.post_title as image_title
@@ -765,7 +765,7 @@ class Product_Model extends Model {
 	public function add_seed_image( $product_id, $attachment_id, $display_order = 0 ) {
 		global $wpdb;
 		
-		$table_name = $wpdb->prefix . 'ai_blog_generator_product_seed_images';
+		$table_name = AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES;
 		
 		// Verify it's a PNG file
 		$mime_type = get_post_mime_type( $attachment_id );
@@ -817,7 +817,7 @@ class Product_Model extends Model {
 	public function remove_seed_image( $product_id, $attachment_id ) {
 		global $wpdb;
 		
-		$table_name = $wpdb->prefix . 'ai_blog_generator_product_seed_images';
+		$table_name = AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES;
 		
 		$result = $wpdb->delete(
 			$table_name,
@@ -848,7 +848,7 @@ class Product_Model extends Model {
 	public function update_seed_image_order( $product_id, $image_order ) {
 		global $wpdb;
 		
-		$table_name = $wpdb->prefix . 'ai_blog_generator_product_seed_images';
+		$table_name = AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES;
 		
 		foreach ( $image_order as $order => $attachment_id ) {
 			$wpdb->update(
@@ -879,11 +879,11 @@ class Product_Model extends Model {
 	public function get_all_seed_images() {
 		global $wpdb;
 		
-		$seed_table = $wpdb->prefix . 'ai_blog_generator_product_seed_images';
+		$seed_table = AI_BLOG_GENERATOR_TABLE_PRODUCT_SEED_IMAGES;
 		$products_table = AI_BLOG_GENERATOR_TABLE_PRODUCTS;
 		
 		$sql = $wpdb->prepare(
-			"SELECT psi.*, p.product_name as name, p.product_description as description, att.guid as image_url
+			"SELECT psi.*, p.product_name, p.product_description, att.guid as image_url
 			FROM {$seed_table} psi
 			LEFT JOIN {$products_table} p ON psi.product_id = p.id
 			LEFT JOIN {$wpdb->posts} att ON psi.attachment_id = att.ID
@@ -906,10 +906,11 @@ class Product_Model extends Model {
 
 	/**
 	 * Get all active products.
+	 * Note: Products table doesn't have an active field, so this returns all products.
 	 *
-	 * @return array Array of active products.
+	 * @return array Array of all products.
 	 */
 	public function get_active_products() {
-		return $this->get_all( [ 'active' => 1 ], 'product_name ASC' );
+		return $this->get_all( [], 'product_name ASC' );
 	}
 } 

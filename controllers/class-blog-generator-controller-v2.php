@@ -709,7 +709,7 @@ class Blog_Generator_Controller_V2 {
 		$persona_info = '';
 		if ( $persona ) {
 			$persona_info = "Writing Persona: {$persona['name']}\n";
-			$persona_info .= "Description: {$persona['description']}\n";
+			$persona_info .= "Bio: {$persona['bio']}\n";
 			if ( ! empty( $persona['writing_style'] ) ) {
 				$persona_info .= "Writing Style: {$persona['writing_style']}\n";
 			}

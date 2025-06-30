@@ -2017,58 +2017,6 @@ class Anthropic_Service {
 			throw new \Exception( 'Generation cancelled by user' );
 		}
 
-		// For local development environments, disable SSL verification
-		// This is needed to avoid SSL certificate errors on local Windows systems
-		// Check if we're in a local environment (multiple indicators)
-		$is_local = false;
-		
-		// Check for web-based local environment indicators
-		if ( isset( $_SERVER['HTTP_HOST'] ) && 
-			( $_SERVER['HTTP_HOST'] === 'localhost' || 
-			  strpos( $_SERVER['HTTP_HOST'], '.local' ) !== false ||
-			  strpos( $_SERVER['HTTP_HOST'], '127.0.0.1' ) !== false ) ) {
-			$is_local = true;
-		}
-		
-		// Check if running from a local Windows path (D:, C:, etc)
-		if ( ! $is_local && defined( 'ABSPATH' ) && preg_match( '/^[A-Z]:\\\\/i', ABSPATH ) ) {
-			$is_local = true;
-		}
-		
-		// Check for local server names (CLI or web)
-		if ( ! $is_local && isset( $_SERVER['SERVER_NAME'] ) && 
-			( $_SERVER['SERVER_NAME'] === 'localhost' || 
-			  strpos( $_SERVER['SERVER_NAME'], '.local' ) !== false ||
-			  strpos( $_SERVER['SERVER_NAME'], '127.0.0.1' ) !== false ) ) {
-			$is_local = true;
-		}
-		
-		// Check for AI_BLOG_GENERATOR_DEBUG constant
-		if ( ! $is_local && defined( 'AI_BLOG_GENERATOR_DEBUG' ) && AI_BLOG_GENERATOR_DEBUG ) {
-			$is_local = true;
-		}
-		
-		// FORCE SSL bypass for all requests when running from command line or local environment
-		// This specifically fixes the "SSL certificate problem: unable to get local issuer certificate" error
-		if ( $is_local || php_sapi_name() === 'cli' || ! isset( $_SERVER['HTTP_HOST'] ) ) {
-			$args['sslverify'] = false;
-			$is_local = true; // Update flag for logging
-			
-			// Log that SSL verification is disabled for debugging
-			$this->log_info( 'ssl_verification_disabled', 'SSL verification disabled for local development', [
-				'host' => $_SERVER['HTTP_HOST'] ?? 'none',
-				'server_name' => $_SERVER['SERVER_NAME'] ?? 'none',
-				'abspath' => defined( 'ABSPATH' ) ? ABSPATH : 'unknown',
-				'php_sapi' => php_sapi_name(),
-				'is_local' => $is_local,
-				'force_disabled' => true
-			] );
-			
-			// Also log to debug file for correlation
-			$debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
-			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - ANTHROPIC_SERVICE: SSL verification DISABLED for local environment\n", FILE_APPEND );
-		}
-
 		// Log the request being sent (without full prompt to avoid database issues)
 		$this->log_info( 'anthropic_request_details', 'Sending request to Anthropic API', [
 			'url' => $this->api_url,

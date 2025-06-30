@@ -18,13 +18,24 @@ global $wpdb;
 $table_prefix = $wpdb->prefix . 'ai_blog_';
 
 // Define table names.
+// Note: Order matters due to foreign key constraints - dependent tables must be dropped first.
 $tables = [
-	$table_prefix . 'ideas',
+	// Drop tables with foreign keys first
+	$wpdb->prefix . 'ai_blog_generator_product_images',
+	$wpdb->prefix . 'ai_blog_generator_product_links',
+	$wpdb->prefix . 'ai_blog_generator_product_seed_images',
+	$table_prefix . 'idea_categories',
 	$table_prefix . 'generated_posts',
+	$table_prefix . 'seed_images',
+	
+	// Then drop the parent tables
+	$wpdb->prefix . 'ai_blog_generator_products',
+	$table_prefix . 'ideas',
 	$table_prefix . 'contexts',
+	$table_prefix . 'personas',
 	$table_prefix . 'logs',
 	$table_prefix . 'cost_analytics',
-	$table_prefix . 'seed_images',
+	$wpdb->prefix . 'ai_blog_brand_features',
 ];
 
 // Check if user wants to keep data.
@@ -96,11 +107,20 @@ if ( ! $keep_data ) {
 		'ai_blog_generator_idea_cache',
 		'ai_blog_generator_context_cache',
 		'ai_blog_generator_downgrade_notice',
+		'ai_blog_active_generations',
+		'ai_blog_generation_queue',
 	];
 	
 	foreach ( $transients as $transient ) {
 		delete_transient( $transient );
 	}
+	
+	// Also delete any transients that match our generation pattern
+	$wpdb->query(
+		"DELETE FROM {$wpdb->options} 
+		WHERE option_name LIKE '_transient_ai_blog_generation_%' 
+		OR option_name LIKE '_transient_timeout_ai_blog_generation_%'"
+	);
 	
 	// Remove any scheduled cron jobs.
 	$cron_hooks = [
@@ -108,7 +128,7 @@ if ( ! $keep_data ) {
 		'ai_blog_process_queue',
 		'ai_blog_publish_scheduled',
 		'ai_blog_cleanup_logs',
-		
+		'ai_blog_process_single_generation',
 	];
 	
 	foreach ( $cron_hooks as $hook ) {
@@ -121,7 +141,7 @@ if ( ! $keep_data ) {
 	if ( $delete_posts ) {
 		// Get all post IDs from generated_posts table before dropping it.
 		$post_ids = $wpdb->get_col(
-			"SELECT post_id FROM {$table_prefix}generated_posts"
+			"SELECT post_id FROM {$table_prefix}generated_posts WHERE post_id IS NOT NULL"
 		);
 		
 		// Delete each post permanently.
@@ -137,6 +157,14 @@ if ( ! $keep_data ) {
 	if ( is_dir( $seed_images_dir ) ) {
 		// Recursively delete the directory.
 		ai_blog_generator_delete_directory( $seed_images_dir );
+	}
+	
+	// Delete generation log files.
+	$logs_dir = $upload_dir['basedir'] . '/ai-blog-generator-logs';
+	
+	if ( is_dir( $logs_dir ) ) {
+		// Recursively delete the logs directory.
+		ai_blog_generator_delete_directory( $logs_dir );
 	}
 	
 	// Delete the parent directory if empty.
