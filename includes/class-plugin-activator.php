@@ -157,11 +157,11 @@ class Plugin_Activator {
 			);
 		}
 		
-		// Schedule publishing check every 15 minutes.
+		// Schedule publishing check every 5 minutes.
 		if ( ! wp_next_scheduled( 'ai_blog_publish_scheduled' ) ) {
 			wp_schedule_event( 
-				time() + 15 * MINUTE_IN_SECONDS, 
-				'fifteen_minutes', 
+				time() + 5 * MINUTE_IN_SECONDS, 
+				'five_minutes', 
 				'ai_blog_publish_scheduled' 
 			);
 		}
@@ -186,6 +186,14 @@ class Plugin_Activator {
 	 * @return array Modified cron schedules.
 	 */
 	public static function add_cron_schedules( $schedules ) {
+		// Add 5-minute schedule.
+		if ( ! isset( $schedules['five_minutes'] ) ) {
+			$schedules['five_minutes'] = [
+				'interval' => 5 * MINUTE_IN_SECONDS,
+				'display'  => __( 'Every 5 minutes', 'ai-blog-generator' ),
+			];
+		}
+		
 		// Add 15-minute schedule.
 		if ( ! isset( $schedules['fifteen_minutes'] ) ) {
 			$schedules['fifteen_minutes'] = [

@@ -944,9 +944,9 @@ class Admin_Manager {
 			wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'ai-blog-generator' ) );
 		}
 
-		// Get drafted posts.
-		$blog_model = new Blog_Model();
-		$drafted_posts = $blog_model->get_all_with_details( [ 'status' => 'draft' ], 'gp.created_at DESC' );
+		// Don't fetch posts server-side - let AJAX handle it to ensure proper sync
+		// The AJAX handler properly checks WordPress post status and excludes trashed posts
+		$drafted_posts = [];
 		
 		// Get scheduler service.
 		$scheduler = new Scheduler_Service();
@@ -1201,30 +1201,51 @@ class Admin_Manager {
 
 				// Update option
 				$updated = update_option( $option_name, $value );
-				if ( $updated ) {
+				
+				// Check if update was successful or if value is unchanged
+				// update_option returns false both for failures and when value is the same
+				$current_value = get_option( $option_name );
+				
+				// Use loose comparison for numeric values to handle type differences
+				$is_same_value = false;
+				if ( is_numeric( $value ) && is_numeric( $current_value ) ) {
+					$is_same_value = ( floatval( $value ) == floatval( $current_value ) );
+				} elseif ( is_bool( $value ) || is_bool( $current_value ) ) {
+					// Handle boolean comparisons
+					$is_same_value = ( (bool) $value === (bool) $current_value );
+				} else {
+					// For strings and other types
+					$is_same_value = ( (string) $value === (string) $current_value );
+				}
+				
+				if ( $updated || $is_same_value ) {
 					$settings_updated[ $key ] = $value;
+					if ( ! $updated && $is_same_value ) {
+						$this->log_debug( 'setting_unchanged', 'Setting value unchanged', [
+							'setting_key' => $key,
+							'provided_value' => $value,
+							'current_value' => $current_value,
+							'provided_type' => gettype( $value ),
+							'current_type' => gettype( $current_value )
+						] );
+					} else {
 					$this->log_debug( 'setting_updated', 'Setting updated successfully', [
 						'setting_key' => $key,
 						'option_name' => $option_name,
 						'value_type' => gettype( $value )
 					] );
+					}
 				} else {
-					// Check if value is the same (update_option returns false for same values)
-					$current_value = get_option( $option_name );
-					if ( $current_value !== $value ) {
+					// Only log as error if values are actually different
 						$settings_errors[ $key ] = 'Failed to update setting';
 						$this->log_error( 'setting_update_failed', 'Failed to update setting', [
 							'setting_key' => $key,
 							'option_name' => $option_name,
 							'provided_value' => $value,
-							'current_value' => $current_value
-						] );
-					} else {
-						$settings_updated[ $key ] = $value;
-						$this->log_debug( 'setting_unchanged', 'Setting value unchanged', [
-							'setting_key' => $key
-						] );
-					}
+						'current_value' => $current_value,
+						'provided_type' => gettype( $value ),
+						'current_type' => gettype( $current_value )
+					] );
 				}
 			}
 
@@ -1350,11 +1371,52 @@ class Admin_Manager {
 	 * AJAX handler for testing API connection.
 	 */
 	public function ajax_test_api_connection() {
+		// Suppress error display for AJAX requests to prevent HTML output
+		$original_display_errors = ini_get( 'display_errors' );
+		$original_html_errors = ini_get( 'html_errors' );
+		@ini_set( 'display_errors', '0' );
+		@ini_set( 'html_errors', '0' );
+		
+		// Start output buffering to catch any unexpected output
+		ob_start();
+		
+		// Set up error handler to catch warnings/notices
+		$old_error_handler = set_error_handler( function( $errno, $errstr, $errfile, $errline ) {
+			Logger::error( 'api_test_php_error', 'PHP error during API test', [
+				'error_number' => $errno,
+				'error_message' => $errstr,
+				'error_file' => $errfile,
+				'error_line' => $errline,
+				'error_type' => $this->get_error_type_string( $errno )
+			] );
+			
+			// Don't execute PHP internal error handler
+			return true;
+		} );
+		
+		try {
+			// Log start of request
+			Logger::info( 'api_test_start', 'API test handler started', [
+				'post_data' => $_POST,
+				'user_id' => get_current_user_id()
+			] );
+			
 		// Verify nonce.
-		check_ajax_referer( 'ai_blog_admin_nonce', 'nonce' );
+			if ( ! isset( $_POST['nonce'] ) || ! wp_verify_nonce( $_POST['nonce'], 'ai_blog_admin_nonce' ) ) {
+				Logger::error( 'api_test_nonce_fail', 'Nonce verification failed', [
+					'provided_nonce' => $_POST['nonce'] ?? 'not_provided'
+				] );
+				ob_end_clean(); // Clear any output before sending JSON
+				wp_send_json_error( __( 'Security check failed.', 'ai-blog-generator' ) );
+			}
 		
 		// Check capabilities.
 		if ( ! current_user_can( $this->capability ) ) {
+				Logger::error( 'api_test_capability_fail', 'User lacks required capability', [
+					'required_capability' => $this->capability,
+					'user_id' => get_current_user_id()
+				] );
+				ob_end_clean(); // Clear any output before sending JSON
 			wp_send_json_error( __( 'Unauthorized access.', 'ai-blog-generator' ) );
 		}
 
@@ -1370,27 +1432,90 @@ class Admin_Manager {
 
 		if ( empty( $service ) ) {
 			Logger::error( 'api_test_error', 'Service parameter missing', [ 'POST' => $_POST ] );
+				ob_end_clean(); // Clear any output before sending JSON
 			wp_send_json_error( __( 'Service parameter is required.', 'ai-blog-generator' ) );
 		}
 
 		if ( empty( $api_key ) ) {
 			Logger::error( 'api_test_error', 'API key parameter missing', [ 'service' => $service ] );
+				ob_end_clean(); // Clear any output before sending JSON
 			wp_send_json_error( __( 'API key is required.', 'ai-blog-generator' ) );
 		}
 
-		try {
+			// Clear any output that might have been generated so far
+			$unexpected_output = ob_get_contents();
+			ob_clean();
+			
+			// Log if there was unexpected output
+			if ( ! empty( $unexpected_output ) ) {
+				Logger::warning( 'api_test_unexpected_output', 'Unexpected output detected during API test', [
+					'output' => $unexpected_output,
+					'output_length' => strlen( $unexpected_output ),
+					'service' => $service
+				] );
+			}
+
+			$result = null;
+			
 			if ( 'anthropic' === $service ) {
+				Logger::info( 'api_test_anthropic_init', 'Initializing Anthropic service for test', [
+					'api_key_length' => strlen( $api_key )
+				] );
+				
+				try {
 				$anthropic = new \AI_Blog_Generator\Services\Anthropic_Service( $api_key );
 				$result = $anthropic->test_connection();
+				} catch ( \Exception $e ) {
+					Logger::error( 'api_test_anthropic_exception', 'Exception in Anthropic service', [
+						'error' => $e->getMessage(),
+						'trace' => $e->getTraceAsString()
+					] );
+					throw $e;
+				}
+				
 				Logger::info( 'anthropic_test_result', 'Anthropic test completed', $result );
 			} elseif ( 'openai' === $service ) {
+				Logger::info( 'api_test_openai_init', 'Initializing OpenAI service for test', [
+					'api_key_length' => strlen( $api_key )
+				] );
+				
+				try {
 				$openai = new \AI_Blog_Generator\Services\OpenAI_Service( $api_key );
 				$result = $openai->test_connection();
+				} catch ( \Exception $e ) {
+					Logger::error( 'api_test_openai_exception', 'Exception in OpenAI service', [
+						'error' => $e->getMessage(),
+						'trace' => $e->getTraceAsString()
+					] );
+					throw $e;
+				}
+				
 				Logger::info( 'openai_test_result', 'OpenAI test completed', $result );
 			} else {
 				Logger::error( 'api_test_error', 'Invalid service', [ 'service' => $service ] );
+				ob_end_clean(); // Clear any output before sending JSON
 				wp_send_json_error( sprintf( __( 'Invalid service: %s', 'ai-blog-generator' ), $service ) );
 			}
+
+			// Check for any output again before sending response
+			$final_output = ob_get_contents();
+			if ( ! empty( $final_output ) ) {
+				Logger::error( 'api_test_final_output', 'Output detected before sending response', [
+					'output' => $final_output,
+					'output_length' => strlen( $final_output ),
+					'service' => $service
+				] );
+			}
+			
+			// Clear output buffer before sending JSON
+			ob_end_clean();
+			
+			// Restore error handler
+			restore_error_handler();
+			
+			// Restore original error display settings
+			@ini_set( 'display_errors', $original_display_errors );
+			@ini_set( 'html_errors', $original_html_errors );
 
 			if ( $result['success'] ) {
 				wp_send_json_success( [
@@ -1404,13 +1529,53 @@ class Admin_Manager {
 				] );
 			}
 		} catch ( \Exception $e ) {
+			// Clear any output before sending error
+			ob_end_clean();
+			
+			// Restore error handler
+			if ( isset( $old_error_handler ) ) {
+				restore_error_handler();
+			}
+			
+			// Restore original error display settings
+			@ini_set( 'display_errors', $original_display_errors );
+			@ini_set( 'html_errors', $original_html_errors );
+			
 			Logger::error( 'api_test_exception', 'Exception during API test', [
-				'service' => $service,
+				'service' => $service ?? 'unknown',
 				'error' => $e->getMessage(),
 				'trace' => $e->getTraceAsString(),
 			] );
 			wp_send_json_error( sprintf( __( 'Connection test failed: %s', 'ai-blog-generator' ), $e->getMessage() ) );
 		}
+	}
+
+	/**
+	 * Get error type string from error number.
+	 *
+	 * @param int $errno Error number.
+	 * @return string Error type string.
+	 */
+	private function get_error_type_string( $errno ) {
+		$types = [
+			E_ERROR => 'E_ERROR',
+			E_WARNING => 'E_WARNING',
+			E_PARSE => 'E_PARSE',
+			E_NOTICE => 'E_NOTICE',
+			E_CORE_ERROR => 'E_CORE_ERROR',
+			E_CORE_WARNING => 'E_CORE_WARNING',
+			E_COMPILE_ERROR => 'E_COMPILE_ERROR',
+			E_COMPILE_WARNING => 'E_COMPILE_WARNING',
+			E_USER_ERROR => 'E_USER_ERROR',
+			E_USER_WARNING => 'E_USER_WARNING',
+			E_USER_NOTICE => 'E_USER_NOTICE',
+			E_STRICT => 'E_STRICT',
+			E_RECOVERABLE_ERROR => 'E_RECOVERABLE_ERROR',
+			E_DEPRECATED => 'E_DEPRECATED',
+			E_USER_DEPRECATED => 'E_USER_DEPRECATED',
+		];
+		
+		return $types[ $errno ] ?? "Unknown error type ($errno)";
 	}
 } 
 

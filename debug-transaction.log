@@ -955,3 +955,93 @@ Block 1:
 2025-06-30 16:35:06 - BLOG_MODEL::update - Parent update method completed
 2025-06-30 16:35:06 - BLOG_MODEL::update - DATA: {"result":false,"result_type":"boolean"}
 2025-06-30 16:35:06 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-07-01 02:56:50 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-01 02:56:50 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-07-01 02:56:50 - BLOG_MODEL::update - Method called
+2025-07-01 02:56:50 - BLOG_MODEL::update - DATA: {"id":"77","data":{"status":"publish"},"data_keys":["status"],"memory_usage":89524752}
+2025-07-01 02:56:50 - BLOG_MODEL::update - Calling parent::update method
+2025-07-01 02:56:50 - BLOG_MODEL::update - Parent update method completed
+2025-07-01 02:56:50 - BLOG_MODEL::update - DATA: {"result":false,"result_type":"boolean"}
+2025-07-01 02:56:50 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-07-01 02:57:02 - ACTIVE_PERSONAS_RETRIEVED [INFO]: Retrieved active personas - Context: {"count":6}
+2025-07-01 02:57:13 - GET_CONTEXT_START [INFO]: Starting get context process (AI_Blog_Generator\Controllers\Context_Controller::get_context) - Context: {"context_id":3,"user_id":2}
+2025-07-01 02:57:13 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '3' LIMIT 1","where_clause":"id = '3'","fields":"*"}
+2025-07-01 02:57:13 - CONTEXT_RETRIEVED [INFO]: Context retrieved successfully (AI_Blog_Generator\Controllers\Context_Controller::get_context) - Context: {"context_id":3,"context_name":"SEO Guidelines","context_type":"seo"}
+2025-07-01 02:57:13 - AJAX_SUCCESS_GET_CONTEXT [INFO]: Context loaded successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context"],"response_size":1}
+2025-07-01 03:02:05 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-01 03:06:08 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-07-01 03:06:08 - BLOG_MODEL::update - Method called
+2025-07-01 03:06:08 - BLOG_MODEL::update - DATA: {"id":"77","data":{"status":"publish"},"data_keys":["status"],"memory_usage":89507176}
+2025-07-01 03:06:08 - BLOG_MODEL::update - Calling parent::update method
+2025-07-01 03:06:08 - BLOG_MODEL::update - Parent update method completed
+2025-07-01 03:06:08 - BLOG_MODEL::update - DATA: {"result":false,"result_type":"boolean"}
+2025-07-01 03:08:08 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-01 03:08:09 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-07-01 03:13:11 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-01 03:13:28 - GET_CONTEXT_START [INFO]: Starting get context process (AI_Blog_Generator\Controllers\Context_Controller::get_context) - Context: {"context_id":1,"user_id":2}
+2025-07-01 03:13:28 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '1' LIMIT 1","where_clause":"id = '1'","fields":"*"}
+2025-07-01 03:13:28 - CONTEXT_RETRIEVED [INFO]: Context retrieved successfully (AI_Blog_Generator\Controllers\Context_Controller::get_context) - Context: {"context_id":1,"context_name":"General Business Information","context_type":"general"}
+2025-07-01 03:13:28 - AJAX_SUCCESS_GET_CONTEXT [INFO]: Context loaded successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context"],"response_size":1}
+2025-07-01 03:17:44 - GET_CONTEXT_START [INFO]: Starting get context process (AI_Blog_Generator\Controllers\Context_Controller::get_context) - Context: {"context_id":9,"user_id":2}
+2025-07-01 03:17:44 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '9' LIMIT 1","where_clause":"id = '9'","fields":"*"}
+2025-07-01 03:17:44 - CONTEXT_RETRIEVED [INFO]: Context retrieved successfully (AI_Blog_Generator\Controllers\Context_Controller::get_context) - Context: {"context_id":9,"context_name":"Avada Shortcode Requirements","context_type":"layout"}
+2025-07-01 03:17:44 - AJAX_SUCCESS_GET_CONTEXT [INFO]: Context loaded successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context"],"response_size":1}
+2025-07-01 03:18:24 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-01 03:18:31 - GET_CONTEXT_START [INFO]: Starting get context process (AI_Blog_Generator\Controllers\Context_Controller::get_context) - Context: {"context_id":4,"user_id":2}
+2025-07-01 03:18:31 - DATABASE_GET_QUERY [INFO]: Executing get query (AI_Blog_Generator\Models\Database_Manager::get) - Context: {"table":"contexts","where_conditions":1,"sql_length":58,"raw_sql":"SELECT * FROM psec_ai_blog_contexts WHERE id = '4' LIMIT 1","where_clause":"id = '4'","fields":"*"}
+2025-07-01 03:18:31 - CONTEXT_RETRIEVED [INFO]: Context retrieved successfully (AI_Blog_Generator\Controllers\Context_Controller::get_context) - Context: {"context_id":4,"context_name":"Target Keywords","context_type":"keywords"}
+2025-07-01 03:18:31 - AJAX_SUCCESS_GET_CONTEXT [INFO]: Context loaded successfully. (AI_Blog_Generator\Controllers\Context_Controller::send_ajax_success) - Context: {"data_keys":["context"],"response_size":1}
+2025-07-01 03:19:26 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-07-01 03:19:26 - BLOG_MODEL::update - Method called
+2025-07-01 03:19:26 - BLOG_MODEL::update - DATA: {"id":"77","data":{"status":"publish"},"data_keys":["status"],"memory_usage":89506952}
+2025-07-01 03:19:26 - BLOG_MODEL::update - Calling parent::update method
+2025-07-01 03:19:26 - BLOG_MODEL::update - Parent update method completed
+2025-07-01 03:19:26 - BLOG_MODEL::update - DATA: {"result":false,"result_type":"boolean"}
+2025-07-01 03:23:27 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-01 03:29:29 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-01 10:20:30 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-01 10:20:30 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-07-01 10:20:30 - BLOG_MODEL::update - Method called
+2025-07-01 10:20:30 - BLOG_MODEL::update - DATA: {"id":"77","data":{"status":"publish"},"data_keys":["status"],"memory_usage":89515640}
+2025-07-01 10:20:30 - BLOG_MODEL::update - Calling parent::update method
+2025-07-01 10:20:30 - BLOG_MODEL::update - Parent update method completed
+2025-07-01 10:20:30 - BLOG_MODEL::update - DATA: {"result":false,"result_type":"boolean"}
+2025-07-01 10:20:30 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-07-01 10:20:30 - CRON_DAILY_IDEAS_START [INFO]: Starting daily idea generation
+2025-07-01 12:51:02 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-01 12:51:03 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-07-01 12:51:03 - BLOG_MODEL::update - Method called
+2025-07-01 12:51:03 - BLOG_MODEL::update - DATA: {"id":"77","data":{"status":"publish"},"data_keys":["status"],"memory_usage":89973304}
+2025-07-01 12:51:03 - BLOG_MODEL::update - Calling parent::update method
+2025-07-01 12:51:03 - BLOG_MODEL::update - Parent update method completed
+2025-07-01 12:51:03 - BLOG_MODEL::update - DATA: {"result":false,"result_type":"boolean"}
+2025-07-01 12:51:04 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-07-01 12:57:03 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-01 18:20:55 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-01 18:20:56 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-07-01 18:20:56 - BLOG_MODEL::update - Method called
+2025-07-01 18:20:56 - BLOG_MODEL::update - DATA: {"id":"77","data":{"status":"publish"},"data_keys":["status"],"memory_usage":89511952}
+2025-07-01 18:20:56 - BLOG_MODEL::update - Calling parent::update method
+2025-07-01 18:20:56 - BLOG_MODEL::update - Parent update method completed
+2025-07-01 18:20:56 - BLOG_MODEL::update - DATA: {"result":false,"result_type":"boolean"}
+2025-07-01 18:20:56 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-07-02 10:30:30 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-02 10:30:31 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-07-02 10:30:31 - BLOG_MODEL::update - Method called
+2025-07-02 10:30:31 - BLOG_MODEL::update - DATA: {"id":"77","data":{"status":"publish"},"data_keys":["status"],"memory_usage":89525488}
+2025-07-02 10:30:31 - BLOG_MODEL::update - Calling parent::update method
+2025-07-02 10:30:31 - BLOG_MODEL::update - Parent update method completed
+2025-07-02 10:30:31 - BLOG_MODEL::update - DATA: {"result":false,"result_type":"boolean"}
+2025-07-02 10:30:31 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-07-03 10:40:30 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-03 10:40:30 - CRON_DAILY_IDEAS_START [INFO]: Starting daily idea generation
+2025-07-04 10:50:30 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-04 10:50:30 - CRON_PUBLISH_START [INFO]: Starting scheduled posts publishing
+2025-07-04 10:50:30 - BLOG_MODEL::update - Method called
+2025-07-04 10:50:30 - BLOG_MODEL::update - DATA: {"id":"77","data":{"status":"publish"},"data_keys":["status"],"memory_usage":89614096}
+2025-07-04 10:50:30 - BLOG_MODEL::update - Calling parent::update method
+2025-07-04 10:50:30 - BLOG_MODEL::update - Parent update method completed
+2025-07-04 10:50:30 - BLOG_MODEL::update - DATA: {"result":false,"result_type":"boolean"}
+2025-07-04 10:50:32 - CRON_PROCESS_QUEUE_DISABLED [INFO]: Auto processing is DISABLED to prevent automatic retries
+2025-07-04 12:00:13 - SCHEDULER_INIT [INFO]: Scheduler service initialized and cron jobs registered
+2025-07-04 12:00:14 - CRON_DAILY_IDEAS_START [INFO]: Starting daily idea generation

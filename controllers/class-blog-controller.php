@@ -103,6 +103,7 @@ class Blog_Controller {
 		add_action( 'wp_ajax_ai_blog_get_drafted_posts', [ $this, 'ajax_get_drafted_posts' ] );
 		add_action( 'wp_ajax_ai_blog_publish_post', [ $this, 'ajax_publish_post' ] );
 		add_action( 'wp_ajax_ai_blog_schedule_post', [ $this, 'ajax_schedule_post' ] );
+		add_action( 'wp_ajax_ai_blog_unschedule_post', [ $this, 'ajax_unschedule_post' ] );
 		add_action( 'wp_ajax_ai_blog_bulk_publish_posts', [ $this, 'ajax_bulk_publish_posts' ] );
 		add_action( 'wp_ajax_ai_blog_delete_posts', [ $this, 'ajax_delete_posts' ] );
 		add_action( 'wp_ajax_ai_blog_download_prompts', [ $this, 'ajax_download_prompts' ] );
@@ -1573,7 +1574,7 @@ class Blog_Controller {
 		}
 		
 		// Write to debug log file
-		$log_file = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+		$log_file = AI_BLOG_GENERATOR_DEBUG_LOG;
 		$log_entry = $message . "\n";
 		
 		// Append to log file
@@ -1583,7 +1584,7 @@ class Blog_Controller {
 	}
 
 	/**
-	 * AJAX handler to get drafted posts with statistics
+	 * AJAX handler to get drafted posts with WordPress sync
 	 */
 	public function ajax_get_drafted_posts() {
 		try {
@@ -1599,35 +1600,136 @@ class Blog_Controller {
 
 			Logger::info( 'get_drafted_posts', 'Fetching drafted posts' );
 
-			// Get drafted posts
-			$drafted_posts = $this->blog_model->get_all_with_details( [ 'status' => 'draft' ], 'gp.created_at DESC' );
+			// Get all non-published posts from our database
+			$all_posts = $this->blog_model->get_all_with_details( [], 'gp.created_at DESC' );
 			
-			// Format posts for response
+			// Log the initial database statuses
+			$db_status_counts = [];
+			foreach ( $all_posts as $post ) {
+				$status = $post->status ?? 'null';
+				if ( ! isset( $db_status_counts[ $status ] ) ) {
+					$db_status_counts[ $status ] = 0;
+				}
+				$db_status_counts[ $status ]++;
+			}
+			
+			Logger::info( 'get_drafted_posts_debug', 'Database status counts before sync', [
+				'total_count' => count( $all_posts ),
+				'status_breakdown' => $db_status_counts
+			] );
+			
+			Logger::info( 'get_drafted_posts_debug', 'Total posts fetched from database', [
+				'total_count' => count( $all_posts )
+			] );
+			
+			// Format posts for response and sync with WordPress
 			$formatted_posts = [];
-			foreach ( $drafted_posts as $post ) {
+			$draft_count = 0;
+			$scheduled_count = 0;
+			$skipped_published = 0;
+			$skipped_deleted = 0;
+			$skipped_other = 0;
+			
+			foreach ( $all_posts as $post ) {
+				// Get the actual WordPress post
+				$wp_post = get_post( $post->post_id );
+				
+				if ( ! $wp_post ) {
+					// Post was deleted in WordPress, update our record
+					$this->blog_model->update( $post->id, [
+						'status' => 'deleted'
+					] );
+					$skipped_deleted++;
+					continue;
+				}
+				
+				// Sync status with WordPress
+				$actual_status = 'draft';
+				$scheduled_time = null;
+				
+				// First check if post is trashed - these should be excluded
+				if ( $wp_post->post_status === 'trash' ) {
+					// Post is trashed, update our record and skip
+					$this->blog_model->update( $post->id, [
+						'status' => 'trashed'
+					] );
+					$skipped_other++;
+					Logger::info( 'get_drafted_posts_debug', 'Skipping trashed post', [
+						'post_id' => $post->post_id,
+						'title' => $wp_post->post_title
+					] );
+					continue;
+				} elseif ( $wp_post->post_status === 'publish' ) {
+					// Post was published, update our record and skip
+					$this->blog_model->update( $post->id, [
+						'status' => 'published'
+					] );
+					$skipped_published++;
+					continue;
+				} elseif ( $wp_post->post_status === 'future' ) {
+					// Post is scheduled
+					$actual_status = 'scheduled';
+					$scheduled_time = $wp_post->post_date;
+					$scheduled_count++;
+					
+					// Update our record to sync
+					$this->blog_model->update( $post->id, [
+						'status' => 'scheduled',
+						'scheduled_time' => $scheduled_time
+					] );
+				} elseif ( $wp_post->post_status === 'draft' || $wp_post->post_status === 'auto-draft' ) {
+					// Post is a draft
+					$actual_status = 'draft';
+					$draft_count++;
+					
+					// Update our record to sync
+					$this->blog_model->update( $post->id, [
+						'status' => 'draft'
+					] );
+				} else {
+					// Other status (private, pending, etc.) - skip
+					$skipped_other++;
+					Logger::info( 'get_drafted_posts_debug', 'Skipping post with other status', [
+						'post_id' => $post->post_id,
+						'status' => $wp_post->post_status,
+						'title' => $wp_post->post_title
+					] );
+					continue;
+				}
+				
 				$categories = get_the_category( $post->post_id );
 				$formatted_posts[] = [
 					'id' => $post->id,
 					'post_id' => $post->post_id,
 					'idea_id' => $post->idea_id,
-					'post_title' => $post->post_title,
+					'post_title' => $wp_post->post_title,
 					'idea_title' => $post->idea_title,
 					'cost' => $post->cost,
 					'created_at' => $post->created_at,
-					'scheduled_time' => $post->scheduled_time,
-					'status' => $post->status,
+					'scheduled_time' => $scheduled_time,
+					'status' => $actual_status,
 					'categories' => $categories,
 					'edit_link' => get_edit_post_link( $post->post_id ),
 					'preview_link' => get_preview_post_link( $post->post_id )
 				];
 			}
+			
+			Logger::info( 'get_drafted_posts_debug', 'Post filtering results', [
+				'total_fetched' => count( $all_posts ),
+				'returned_posts' => count( $formatted_posts ),
+				'draft_count' => $draft_count,
+				'scheduled_count' => $scheduled_count,
+				'skipped_published' => $skipped_published,
+				'skipped_deleted' => $skipped_deleted,
+				'skipped_other' => $skipped_other
+			] );
 
-			// Get statistics
+			// Get statistics (these are now accurate after syncing)
 			$statistics = [
-				'drafts' => $this->blog_model->count( [ 'status' => 'draft' ] ),
-				'scheduled' => $this->blog_model->count( [ 'status' => 'scheduled' ] ),
+				'drafts' => $draft_count,
+				'scheduled' => $scheduled_count,
 				'published' => $this->blog_model->count_published_today(),
-				'totalCost' => $this->blog_model->get_total_cost( [ 'status' => 'draft' ] )
+				'totalCost' => $this->blog_model->get_total_cost( [ 'status' => ['draft', 'scheduled'] ] )
 			];
 
 			wp_send_json_success( [
@@ -1813,6 +1915,83 @@ class Blog_Controller {
 				'error' => $e->getMessage()
 			] );
 			wp_send_json_error( [ 'message' => __( 'Failed to schedule post.', 'ai-blog-generator' ) ] );
+		}
+	}
+
+	/**
+	 * AJAX handler to unschedule a single post
+	 */
+	public function ajax_unschedule_post() {
+		try {
+			// Verify security
+			if ( ! check_ajax_referer( 'ai_blog_admin_nonce', 'nonce', false ) ) {
+				wp_send_json_error( [ 'message' => __( 'Security check failed.', 'ai-blog-generator' ) ] );
+			}
+
+			// Check capabilities
+			if ( ! current_user_can( 'manage_options' ) ) {
+				wp_send_json_error( [ 'message' => __( 'Insufficient permissions.', 'ai-blog-generator' ) ] );
+			}
+
+			// Validate input
+			$blog_id = isset( $_POST['blog_id'] ) ? absint( $_POST['blog_id'] ) : 0;
+			$post_id = isset( $_POST['post_id'] ) ? absint( $_POST['post_id'] ) : 0;
+			
+			if ( ! $blog_id || ! $post_id ) {
+				wp_send_json_error( [ 'message' => __( 'Invalid blog or post ID.', 'ai-blog-generator' ) ] );
+			}
+
+			Logger::info( 'unschedule_post', 'Unscheduling post', [
+				'blog_id' => $blog_id,
+				'post_id' => $post_id
+			] );
+
+			// Get the blog record
+			$blog = $this->blog_model->get( $blog_id );
+			if ( ! $blog || $blog->post_id != $post_id ) {
+				wp_send_json_error( [ 'message' => __( 'Blog not found.', 'ai-blog-generator' ) ] );
+			}
+
+			// Unschedule the post
+			$updated_post = wp_update_post( [
+				'ID' => $post_id,
+				'post_status' => 'draft'
+			], true );
+
+			if ( is_wp_error( $updated_post ) ) {
+				Logger::error( 'unschedule_post_error', 'Failed to unschedule post', [
+					'blog_id' => $blog_id,
+					'post_id' => $post_id,
+					'error' => $updated_post->get_error_message()
+				] );
+				wp_send_json_error( [ 'message' => $updated_post->get_error_message() ] );
+			}
+
+			// Update blog status
+			$this->blog_model->update( $blog_id, [
+				'status' => 'draft',
+				'updated_at' => current_time( 'mysql' )
+			] );
+
+			// Get updated statistics
+			$statistics = [
+				'drafts' => $this->blog_model->count( [ 'status' => 'draft' ] ),
+				'scheduled' => $this->blog_model->count( [ 'status' => 'scheduled' ] ),
+				'published' => $this->blog_model->count_published_today(),
+				'totalCost' => $this->blog_model->get_total_cost( [ 'status' => 'draft' ] )
+			];
+
+			wp_send_json_success( [
+				'message' => __( 'Post unscheduled successfully.', 'ai-blog-generator' ),
+				'post_url' => get_permalink( $post_id ),
+				'statistics' => $statistics
+			] );
+
+		} catch ( \Exception $e ) {
+			Logger::error( 'unschedule_post_exception', 'Exception during post unschedule', [
+				'error' => $e->getMessage()
+			] );
+			wp_send_json_error( [ 'message' => __( 'Failed to unschedule post.', 'ai-blog-generator' ) ] );
 		}
 	}
 

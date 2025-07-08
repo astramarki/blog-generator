@@ -276,8 +276,10 @@
                 },
                 error: function(xhr, status, error) {
                     self.log('AJAX error: ' + action, {xhr: xhr, status: status, error: error});
-                    self.showError(self.config.strings.error_generic);
+                    self.showError(self.config.strings.error_generic || 'An error occurred. Please try again.');
+                    if (callbacks.error) {
                     callbacks.error({message: error});
+                    }
                 },
                 complete: function() {
                     delete self.operations[operationId];
@@ -383,15 +385,24 @@
                         $result.fadeOut();
                     }, 5000);
                 },
-                error: function(data) {
-                    console.log('API test failed:', data);
+                error: function(xhr, status, error) {
+                    console.log('API test failed:', {xhr: xhr, status: status, error: error});
                     var message = 'Connection failed';
+                    
+                    // Get error message from the error response data
+                    var data = xhr.responseJSON || {};
                     
                     if (typeof data === 'string') {
                         message = data;
                     } else if (data && data.message) {
                         message = data.message;
+                    } else if (error) {
+                        // Handle JavaScript errors (like SyntaxError)
+                        message = error.toString ? error.toString() : 'Unknown error occurred';
                     }
+                    
+                    // Convert message to string if it's not already
+                    message = String(message);
                     
                     // Provide more helpful error messages
                     if (message.toLowerCase().includes('unauthorized') || message.toLowerCase().includes('api key')) {
@@ -400,6 +411,8 @@
                         message = 'Rate limit exceeded. Please wait a moment and try again.';
                     } else if (message.toLowerCase().includes('network') || message.toLowerCase().includes('timeout')) {
                         message = 'Network error. Please check your internet connection and try again.';
+                    } else if (message.toLowerCase().includes('unexpected token') || message.toLowerCase().includes('not valid json')) {
+                        message = 'Server error: Invalid response format. This may indicate a PHP error. Please check your server logs.';
                     }
                     
                     $result.html('<span class="ai-blog-error"><span class="dashicons dashicons-dismiss"></span> ' + self.escapeHtml(message) + '</span>').show();

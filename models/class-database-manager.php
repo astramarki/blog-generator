@@ -1290,7 +1290,7 @@ class Database_Manager {
 			error_log( 'AI_BLOG_DEBUG: Entering start_transaction method' );
 			
 			// Also write to a direct log file
-			$debug_log = __DIR__ . '/../debug-transaction.log';
+			$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - Entering start_transaction method\n", FILE_APPEND );
 			
 			// Check for stale transactions first
@@ -1385,7 +1385,7 @@ class Database_Manager {
 	 * @return bool True on success, false on failure.
 	 */
 	public function commit() {
-		$debug_log = __DIR__ . '/../debug-transaction.log';
+		$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 		
 		if ( ! $this->in_transaction ) {
 			Logger::warning( 'database_transaction', 'No transaction to commit' );
@@ -1424,7 +1424,7 @@ class Database_Manager {
 	 * @return bool True on success, false on failure.
 	 */
 	public function rollback() {
-		$debug_log = __DIR__ . '/../debug-transaction.log';
+		$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 		
 		if ( ! $this->in_transaction ) {
 			Logger::warning( 'database_transaction', 'No transaction to rollback' );
@@ -1456,7 +1456,7 @@ class Database_Manager {
 	 * @return bool True on success, false on failure.
 	 */
 	private function force_rollback() {
-		$debug_log = __DIR__ . '/../debug-transaction.log';
+		$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FORCE_ROLLBACK: Forcing rollback of timed-out transaction\n", FILE_APPEND );
 		
 		try {
@@ -1478,7 +1478,7 @@ class Database_Manager {
 	 */
 	public function emergency_transaction_cleanup() {
 		if ( $this->in_transaction ) {
-			$debug_log = __DIR__ . '/../debug-transaction.log';
+			$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - EMERGENCY_CLEANUP: Process terminated with open transaction, attempting rollback\n", FILE_APPEND );
 			
 			try {
@@ -1507,7 +1507,7 @@ class Database_Manager {
 			" );
 			
 			if ( ! empty( $long_running ) ) {
-				$debug_log = __DIR__ . '/../debug-transaction.log';
+				$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CLEANUP: Found " . count( $long_running ) . " long-running queries\n", FILE_APPEND );
 				
 				foreach ( $long_running as $process ) {

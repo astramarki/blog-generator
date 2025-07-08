@@ -84,15 +84,24 @@ class Anthropic_Service {
 
 	/**
 	 * Constructor.
+	 *
+	 * @param string|null $api_key Optional API key to override the saved option.
 	 */
-	public function __construct() {
+	public function __construct( $api_key = null ) {
 		$this->log_function_entry();
 		
-		$this->api_key = get_option( 'ai_blog_generator_anthropic_api_key', '' );
+		// Use provided API key or fall back to saved option
+		if ( ! is_null( $api_key ) && ! empty( $api_key ) ) {
+			$this->api_key = $api_key;
+		} else {
+			$this->api_key = get_option( 'ai_blog_generator_anthropic_api_key', '' );
+		}
+		
 		$this->model = get_option( 'ai_blog_generator_anthropic_model', 'claude-sonnet-4-20250514' );
 		$this->cost_model = new Cost_Model();
 		
-		if ( empty( $this->api_key ) ) {
+		// Only log missing API key error if no key was provided and none is saved
+		if ( empty( $this->api_key ) && is_null( $api_key ) ) {
 			$this->log_error( 'anthropic_missing_api_key', 'Anthropic API key not configured', [
 				'key_length' => 0,
 				'key_configured' => false
@@ -104,7 +113,8 @@ class Anthropic_Service {
 			$this->log_info( 'anthropic_service_init', 'Anthropic service initialized', [
 				'api_key_configured' => ! empty( $this->api_key ),
 				'api_key_length' => strlen( $this->api_key ),
-				'model' => $this->model
+				'model' => $this->model,
+				'api_key_source' => ! is_null( $api_key ) ? 'constructor' : 'option'
 			] );
 			set_transient( 'ai_blog_anthropic_service_init_logged', true, 300 ); // 5 minutes
 		}
@@ -397,7 +407,7 @@ class Anthropic_Service {
 	public function generate_blog_content( $idea, $contexts, $seo_keywords = [], $persona = null ) {
 		try {
 			// Log to debug file for correlation
-			$debug_log = __DIR__ . '/../debug-transaction.log';
+			$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - ANTHROPIC_SERVICE: Starting blog content generation\n", FILE_APPEND );
 			
 			$idea_id = is_array( $idea ) ? $idea['id'] : ($idea->id ?? null);
@@ -1926,7 +1936,7 @@ class Anthropic_Service {
 			}, $decoded_content );
 		}
 		
-		return $decoded_content;
+		return $decoded_content; //test
 	}
 	
 	/**
@@ -2011,7 +2021,7 @@ class Anthropic_Service {
 			$this->log_warning( 'anthropic_request_cancelled', 'Request cancelled due to global cancellation flag' );
 			
 			// Log to debug file
-			$debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+			$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - ANTHROPIC_SERVICE: Request cancelled due to global cancellation\n", FILE_APPEND );
 			
 			throw new \Exception( 'Generation cancelled by user' );

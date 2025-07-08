@@ -54,7 +54,7 @@ class Context_Model extends Model {
 	 * Log to debug file for comprehensive debugging
 	 */
 	private function log_debug( $method, $message, $data = [] ) {
-		$debug_log = __DIR__ . '/../debug-transaction.log';
+		$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 		$timestamp = date( 'Y-m-d H:i:s' );
 		$log_entry = "$timestamp - CONTEXT_MODEL::$method - $message\n";
 		if ( ! empty( $data ) ) {

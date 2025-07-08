@@ -41,14 +41,14 @@ class Plugin_Deactivator {
 			self::delete_all_plugin_data();
 		} else {
 			// Just do normal cleanup
-			// Unschedule cron jobs.
-			self::unschedule_cron_jobs();
-			
-			// Clear plugin cache.
-			self::clear_cache();
-			
-			// Optionally clean up data based on user preference.
-			self::cleanup_data();
+		// Unschedule cron jobs.
+		self::unschedule_cron_jobs();
+		
+		// Clear plugin cache.
+		self::clear_cache();
+		
+		// Optionally clean up data based on user preference.
+		self::cleanup_data();
 		}
 		
 		// Remove activation flag.
@@ -102,7 +102,7 @@ class Plugin_Deactivator {
 		
 		// Clear object cache for plugin data if the function exists (from object cache plugins).
 		if ( function_exists( 'wp_cache_delete_group' ) ) {
-			wp_cache_delete_group( 'ai_blog_generator' );
+		wp_cache_delete_group( 'ai_blog_generator' );
 		}
 		
 		// Trigger action for third-party cache plugins.

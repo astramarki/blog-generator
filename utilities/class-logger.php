@@ -29,7 +29,13 @@ class Logger {
 	 * Constructor.
 	 */
 	private function __construct() {
-		$this->debug_file = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+		// Create logs directory if it doesn't exist
+		if ( ! file_exists( AI_BLOG_GENERATOR_LOGS_DIR ) ) {
+			wp_mkdir_p( AI_BLOG_GENERATOR_LOGS_DIR );
+		}
+		
+		// Use the debug log constant
+		$this->debug_file = AI_BLOG_GENERATOR_DEBUG_LOG;
 	}
 
 	/**

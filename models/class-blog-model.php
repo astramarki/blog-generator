@@ -46,7 +46,7 @@ class Blog_Model extends Model {
 	 * Log to debug file for comprehensive debugging
 	 */
 	private function log_debug( $method, $message, $data = [] ) {
-		$debug_log = __DIR__ . '/../debug-transaction.log';
+		$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 		$timestamp = date( 'Y-m-d H:i:s' );
 		$log_entry = "$timestamp - BLOG_MODEL::$method - $message\n";
 		if ( ! empty( $data ) ) {
@@ -328,6 +328,7 @@ class Blog_Model extends Model {
 		global $wpdb;
 		
 		// Handle array parameter for filters
+		$filters = null;
 		if ( is_array( $date_from ) ) {
 			$filters = $date_from;
 			$date_from = $filters['date_from'] ?? null;
@@ -338,7 +339,14 @@ class Blog_Model extends Model {
 		
 		// Handle status filter
 		if ( is_array( $filters ) && ! empty( $filters['status'] ) ) {
-			$sql .= $wpdb->prepare( " AND status = %s", $filters['status'] );
+			if ( is_array( $filters['status'] ) ) {
+				// Handle array of statuses
+				$placeholders = array_fill( 0, count( $filters['status'] ), '%s' );
+				$sql .= $wpdb->prepare( " AND status IN (" . implode( ',', $placeholders ) . ")", $filters['status'] );
+			} else {
+				// Handle single status
+				$sql .= $wpdb->prepare( " AND status = %s", $filters['status'] );
+			}
 		}
 
 		if ( $date_from ) {

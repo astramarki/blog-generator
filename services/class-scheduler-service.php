@@ -250,7 +250,10 @@ class Scheduler_Service {
 		Logger::info( 'cron_publish_start', 'Starting scheduled posts publishing' );
 		
 		try {
-			// Get posts scheduled for publishing.
+			// First, handle WordPress future posts that may have missed their schedule
+			$this->handle_missed_wordpress_schedules();
+			
+			// Then handle our own scheduled posts from the blog_model
 			$scheduled_posts = $this->blog_model->get_scheduled_for_publishing();
 			
 			if ( empty( $scheduled_posts ) ) {
@@ -263,24 +266,24 @@ class Scheduler_Service {
 			foreach ( $scheduled_posts as $blog_post ) {
 				$post_id = $blog_post['post_id'];
 				
-				// Check if WordPress post exists and is still a draft.
+				// Check if WordPress post exists
 				$wp_post = get_post( $post_id );
-				if ( ! $wp_post || $wp_post->post_status !== 'draft' ) {
-					// Update our record to reflect actual status.
+				if ( ! $wp_post ) {
+					// Update our record to reflect deletion
 					$this->blog_model->update( $blog_post['id'], [
-						'status' => $wp_post ? $wp_post->post_status : 'deleted',
+						'status' => 'deleted',
 					] );
 					continue;
 				}
 				
-				// Publish the post.
-				$result = wp_update_post([
-					'ID' => $post_id,
-					'post_status' => 'publish',
-				], true );
+				// Check if it's a future post that should be published now
+				if ( $wp_post->post_status === 'future' && 
+				     strtotime( $wp_post->post_date ) <= current_time( 'timestamp' ) ) {
+					// Publish the post
+					$result = wp_publish_post( $post_id );
 				
-				if ( ! is_wp_error( $result ) ) {
-									// Update blog record.
+					if ( $result ) {
+						// Update blog record
 				$this->blog_model->update( $blog_post['id'], [
 					'status' => 'published',
 				] );
@@ -293,14 +296,19 @@ class Scheduler_Service {
 						'title' => $blog_post['title'],
 					] );
 					
-					// Trigger post-publish actions.
+						// Trigger post-publish actions
 					do_action( 'ai_blog_post_published', $post_id, $blog_post );
 				} else {
 					$failed++;
 					Logger::error( 'cron_publish_failed', 'Failed to publish scheduled post', [
 						'blog_id' => $blog_post['id'],
 						'post_id' => $post_id,
-						'error' => $result->get_error_message(),
+						] );
+					}
+				} elseif ( $wp_post->post_status === 'publish' ) {
+					// Already published, update our record
+					$this->blog_model->update( $blog_post['id'], [
+						'status' => 'published',
 					] );
 				}
 			}
@@ -316,6 +324,52 @@ class Scheduler_Service {
 			Logger::error( 'cron_publish_exception', 'Exception during scheduled publishing', [
 				'error' => $e->getMessage(),
 				'trace' => $e->getTraceAsString(),
+			] );
+		}
+	}
+
+	/**
+	 * Handle WordPress posts that missed their scheduled publish time.
+	 * This is a common WordPress issue where scheduled posts don't publish on time.
+	 */
+	private function handle_missed_wordpress_schedules() {
+		global $wpdb;
+		
+		// Get all posts with 'future' status that should have been published by now
+		$missed_posts = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT ID FROM $wpdb->posts 
+				WHERE post_status = 'future' 
+				AND post_date <= %s 
+				AND post_date > %s",
+				current_time( 'mysql' ),
+				gmdate( 'Y-m-d H:i:s', strtotime( '-24 hours' ) ) // Only check posts from last 24 hours
+			)
+		);
+		
+		if ( empty( $missed_posts ) ) {
+			return;
+		}
+		
+		$published_count = 0;
+		
+		foreach ( $missed_posts as $post ) {
+			// Use wp_publish_post to properly transition the post status
+			$result = wp_publish_post( $post->ID );
+			
+			if ( $result ) {
+				$published_count++;
+				
+				Logger::info( 'missed_schedule_published', 'Published post that missed schedule', [
+					'post_id' => $post->ID,
+					'post_title' => get_the_title( $post->ID ),
+				] );
+			}
+		}
+		
+		if ( $published_count > 0 ) {
+			Logger::info( 'missed_schedules_handled', 'Handled missed scheduled posts', [
+				'count' => $published_count,
 			] );
 		}
 	}
@@ -464,6 +518,9 @@ class Scheduler_Service {
 		add_action( 'ai_blog_auto_generate', [ $this, 'run_auto_generation' ] );
 		add_action( 'ai_blog_process_generation', [ $this, 'process_single_generation' ], 10, 1 );
 		add_action( 'ai_blog_cleanup_logs', [ $this, 'cleanup_old_data' ] );
+		
+		// Hook into WordPress's native scheduled post publishing
+		add_action( 'publish_future_post', [ $this, 'handle_wordpress_scheduled_post' ], 10, 1 );
 
 		
 		// Only log cron hooks registration once per session to prevent log spam
@@ -489,6 +546,9 @@ class Scheduler_Service {
 		remove_action( 'ai_blog_auto_generate', [ $this, 'run_auto_generation' ] );
 		remove_action( 'ai_blog_process_generation', [ $this, 'process_single_generation' ], 10 );
 		remove_action( 'ai_blog_cleanup_logs', [ $this, 'cleanup_old_data' ] );
+
+		// Remove hook into WordPress's native scheduled post publishing
+		remove_action( 'publish_future_post', [ $this, 'handle_wordpress_scheduled_post' ], 10 );
 
 		
 		Logger::info( 'cron_hooks_unregistered', 'All cron hooks unregistered' );
@@ -516,10 +576,10 @@ class Scheduler_Service {
 			] );
 		}
 		
-		// Publish scheduled posts every 15 minutes.
+		// Publish scheduled posts every 5 minutes.
 		if ( ! wp_next_scheduled( 'ai_blog_publish_scheduled' ) ) {
-			$next_run = time() + ( 15 * MINUTE_IN_SECONDS );
-			wp_schedule_event( $next_run, 'fifteen_minutes', 'ai_blog_publish_scheduled' );
+			$next_run = time() + ( 5 * MINUTE_IN_SECONDS );
+			wp_schedule_event( $next_run, 'five_minutes', 'ai_blog_publish_scheduled' );
 			Logger::info( 'cron_scheduled', 'Publish scheduled cron job scheduled', [
 				'next_run' => date( 'Y-m-d H:i:s', $next_run ),
 			] );
@@ -552,7 +612,7 @@ class Scheduler_Service {
 		$cron_jobs = [
 			'ai_blog_daily_ideas' => 'daily',
 			'ai_blog_process_queue' => 'hourly',
-			'ai_blog_publish_scheduled' => 'fifteen_minutes',
+			'ai_blog_publish_scheduled' => 'five_minutes',
 			'ai_blog_cleanup_logs' => 'daily',
 		];
 		
@@ -590,7 +650,7 @@ class Scheduler_Service {
 				$next_run = time() + HOUR_IN_SECONDS;
 				break;
 			case 'ai_blog_publish_scheduled':
-				$next_run = time() + ( 15 * MINUTE_IN_SECONDS );
+				$next_run = time() + ( 5 * MINUTE_IN_SECONDS );
 				break;
 			case 'ai_blog_cleanup_logs':
 				$next_run = strtotime( 'tomorrow 3:00am' );
@@ -658,7 +718,7 @@ class Scheduler_Service {
 			'ai_blog_publish_scheduled' => [
 				'name' => __( 'Publish Scheduled Posts', 'ai-blog-generator' ),
 				'next_run' => wp_next_scheduled( 'ai_blog_publish_scheduled' ),
-				'recurrence' => 'fifteen_minutes',
+				'recurrence' => 'five_minutes',
 			],
 			'ai_blog_cleanup_logs' => [
 				'name' => __( 'Cleanup Old Data', 'ai-blog-generator' ),
@@ -728,6 +788,36 @@ class Scheduler_Service {
 				'success' => false,
 				'message' => $e->getMessage(),
 			];
+		}
+	}
+
+	/**
+	 * Handle WordPress scheduled post publishing.
+	 * This ensures our blog records are updated when WordPress publishes a scheduled post.
+	 *
+	 * @param int $post_id WordPress post ID.
+	 */
+	public function handle_wordpress_scheduled_post( $post_id ) {
+		try {
+			// Find our blog record for this post
+			$blog_record = $this->blog_model->get_by_post_id( $post_id );
+			
+			if ( $blog_record ) {
+				// Update our record to reflect published status
+				$this->blog_model->update( $blog_record['id'], [
+					'status' => 'published',
+				] );
+				
+				Logger::info( 'wordpress_scheduled_post_published', 'Updated blog record for WordPress scheduled post', [
+					'blog_id' => $blog_record['id'],
+					'post_id' => $post_id,
+				] );
+			}
+		} catch ( \Exception $e ) {
+			Logger::error( 'wordpress_scheduled_post_error', 'Error handling WordPress scheduled post', [
+				'post_id' => $post_id,
+				'error' => $e->getMessage(),
+			] );
 		}
 	}
 } 

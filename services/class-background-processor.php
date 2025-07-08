@@ -123,7 +123,7 @@ class Background_Processor {
         $this->update_generation_status( $idea_id, 'starting', 'Generation starting...' );
 
         // Log the generation start
-        $debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+        $debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
         file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: start_generation called for idea_id: $idea_id\n", FILE_APPEND );
         file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Status set to pending for idea_id: $idea_id (lock creation removed to prevent conflicts)\n", FILE_APPEND );
 
@@ -175,7 +175,7 @@ class Background_Processor {
      */
     private function execute_generation_fallback( $idea_id ) {
         // DEBUG: Log the fallback attempt
-        $debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+        $debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
         file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Executing fallback generation for idea_id: $idea_id\n", FILE_APPEND );
         
         // Execute in a separate process to avoid blocking the user interface
@@ -205,7 +205,7 @@ class Background_Processor {
      * @param int $idea_id The idea ID to process
      */
     public function process_generation( $idea_id ) {
-        $debug_log = __DIR__ . '/../debug-transaction.log';
+        $debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
         $start_time = microtime( true );
         
         file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: process_generation CRON JOB STARTED for idea_id: {$idea_id}\n", FILE_APPEND );
@@ -416,7 +416,7 @@ class Background_Processor {
             $last_error = $wpdb->last_error;
             
             // Log to debug file with safe data
-            $debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+            $debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
             $safe_query = $last_query ? substr( preg_replace( '/[^\x20-\x7E]/', '?', $last_query ), 0, 200 ) . '...' : 'None';
             $safe_error = $last_error ? preg_replace( '/[^\x20-\x7E]/', '?', $last_error ) : 'None';
             $safe_message = preg_replace( '/[^\x20-\x7E]/', '?', $message );
@@ -443,7 +443,7 @@ class Background_Processor {
             ] );
         } catch ( \Exception $e ) {
             // Log exception details with safe data
-            $debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+            $debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
             $safe_exception = preg_replace( '/[^\x20-\x7E]/', '?', $e->getMessage() );
             $safe_trace = substr( preg_replace( '/[^\x20-\x7E]/', '?', $e->getTraceAsString() ), 0, 500 ) . '...';
             $safe_message = preg_replace( '/[^\x20-\x7E]/', '?', $message );
@@ -639,7 +639,7 @@ class Background_Processor {
      * @return array Cleanup results.
      */
     public function cleanup_stuck_generations() {
-        $debug_log = __DIR__ . '/../debug-transaction.log';
+        $debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
         file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - BACKGROUND_PROCESSOR: Starting stuck generation cleanup\n", FILE_APPEND );
         
         $cleanup_results = [

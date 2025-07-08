@@ -146,6 +146,15 @@
         // Filter
         $('#statusFilter').on('change.draftedPosts', handleFilterChange);
 
+        // Single post actions
+        $(document).on('click', '.publish-now', handlePublishNow);
+        $(document).on('click', '.schedule-post', handleSchedulePost);
+        $(document).on('click', '.download-prompts', handleDownloadPrompts);
+        $(document).on('click', '.edit-schedule', handleEditSchedule);
+        $(document).on('click', '.unschedule-post', handleUnschedulePost);
+        $(document).on('click', '.save-schedule', handleSaveSchedule);
+        $(document).on('click', '.cancel-edit', handleCancelEdit);
+
         console.log('✅ Event handlers bound successfully');
     }
 
@@ -256,15 +265,12 @@
         // Update count
         $('#draftCount').text(filteredPosts.length);
         
-        // Keep existing HTML if posts already loaded (initial page load)
-        if (tbody.find('tr').length === 0) {
-            // Only rebuild if table is empty
-            tbody.empty();
-            filteredPosts.forEach(function(post) {
-                const row = createPostRow(post);
-                tbody.append(row);
-            });
-        }
+        // Always rebuild the table to ensure proper sync with WordPress
+        tbody.empty();
+        filteredPosts.forEach(function(post) {
+            const row = createPostRow(post);
+            tbody.append(row);
+        });
         
         console.log('✅ Posts display updated successfully');
     }
@@ -281,6 +287,68 @@
         ).join('');
         
         const isSelected = window.DraftedPosts.selectedPosts.includes(post.id);
+        
+        // Create schedule column content based on status
+        let scheduleColumn = '';
+        if (post.status === 'scheduled' && post.scheduled_time) {
+            // For scheduled posts, show the date as text with an edit button
+            const scheduledDate = new Date(post.scheduled_time.replace(' ', 'T'));
+            const formattedDate = scheduledDate.toLocaleString();
+            scheduleColumn = `
+                <div class="d-flex align-items-center">
+                    <span class="scheduled-date me-2">${formattedDate}</span>
+                    <button type="button" class="btn btn-sm btn-outline-secondary edit-schedule" 
+                        data-blog-id="${post.id}" data-post-id="${post.post_id}" 
+                        data-current-time="${formatDateTimeLocal(post.scheduled_time)}"
+                        title="Edit Schedule">
+                        <i class="fas fa-edit"></i>
+                    </button>
+                </div>
+            `;
+        } else {
+            // For draft posts, show the datetime input
+            scheduleColumn = `
+                <input type="datetime-local" class="form-control form-control-sm schedule-time" 
+                    data-blog-id="${post.id}"
+                    value="${formatDateTimeLocal(getDefaultScheduleTime())}" />
+            `;
+        }
+        
+        // Adjust action buttons based on status
+        let actionButtons = '';
+        if (post.status === 'scheduled') {
+            // For scheduled posts, show publish now and unschedule buttons
+            actionButtons = `
+                <button type="button" class="btn btn-success btn-sm publish-now" 
+                    data-post-id="${post.post_id}"
+                    data-blog-id="${post.id}"
+                    title="Publish Now">
+                    <i class="fas fa-check"></i>
+                </button>
+                <button type="button" class="btn btn-secondary btn-sm unschedule-post" 
+                    data-post-id="${post.post_id}"
+                    data-blog-id="${post.id}"
+                    title="Unschedule">
+                    <i class="fas fa-times"></i>
+                </button>
+            `;
+        } else {
+            // For draft posts, show publish and schedule buttons
+            actionButtons = `
+                <button type="button" class="btn btn-success btn-sm publish-now" 
+                    data-post-id="${post.post_id}"
+                    data-blog-id="${post.id}"
+                    title="Publish Now">
+                    <i class="fas fa-check"></i>
+                </button>
+                <button type="button" class="btn btn-warning btn-sm schedule-post" 
+                    data-post-id="${post.post_id}"
+                    data-blog-id="${post.id}"
+                    title="Schedule">
+                    <i class="fas fa-clock"></i>
+                </button>
+            `;
+        }
         
         return `
             <tr data-post-id="${post.post_id}" 
@@ -305,6 +373,7 @@
                         <small class="text-muted">
                             From: ${escapeHtml(post.idea_title)}
                         </small>
+                        ${post.status === 'scheduled' ? '<span class="badge bg-warning ms-2">Scheduled</span>' : ''}
                     </div>
                 </td>
                 <td>
@@ -314,24 +383,11 @@
                     <small>${formatDate(post.created_at)}</small>
                 </td>
                 <td>
-                    <input type="datetime-local" class="form-control form-control-sm schedule-time" 
-                        data-blog-id="${post.id}"
-                        value="${formatDateTimeLocal(post.scheduled_time || getDefaultScheduleTime())}" />
+                    ${scheduleColumn}
                 </td>
                 <td>
                     <div class="btn-group" role="group">
-                        <button type="button" class="btn btn-success btn-sm publish-now" 
-                            data-post-id="${post.post_id}"
-                            data-blog-id="${post.id}"
-                            title="Publish Now">
-                            <i class="fas fa-check"></i>
-                        </button>
-                        <button type="button" class="btn btn-warning btn-sm schedule-post" 
-                            data-post-id="${post.post_id}"
-                            data-blog-id="${post.id}"
-                            title="Schedule">
-                            <i class="fas fa-clock"></i>
-                        </button>
+                        ${actionButtons}
                         <a href="${post.preview_link}" 
                            class="btn btn-outline-secondary btn-sm" target="_blank"
                            title="Preview">
@@ -1001,6 +1057,103 @@
                 showNotice(errorMessage, 'error');
                 
                 if (callback) callback();
+            }
+        });
+    }
+
+    /**
+     * Handle edit schedule button
+     */
+    function handleEditSchedule() {
+        const blogId = $(this).data('blog-id');
+        const postId = $(this).data('post-id');
+        const currentTime = $(this).data('current-time');
+        
+        console.log(`🔧 Editing schedule for post: ${blogId}`);
+        
+        // Create a temporary input to replace the scheduled date display
+        const $row = $(this).closest('tr');
+        const $scheduleCell = $(this).closest('td');
+        
+        const editHtml = `
+            <div class="d-flex align-items-center">
+                <input type="datetime-local" class="form-control form-control-sm schedule-time me-2" 
+                    data-blog-id="${blogId}"
+                    value="${currentTime}" />
+                <button type="button" class="btn btn-sm btn-success save-schedule" 
+                    data-blog-id="${blogId}" data-post-id="${postId}">
+                    <i class="fas fa-check"></i>
+                </button>
+                <button type="button" class="btn btn-sm btn-secondary cancel-edit ms-1">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+        `;
+        
+        $scheduleCell.html(editHtml);
+    }
+
+    /**
+     * Handle unschedule post button
+     */
+    function handleUnschedulePost() {
+        const blogId = $(this).data('blog-id');
+        const postId = $(this).data('post-id');
+        
+        console.log(`⏰ Unscheduling post: ${blogId}`);
+        
+        if (confirm('Are you sure you want to unschedule this post? It will be saved as a draft.')) {
+            unschedulePost(blogId, postId);
+        }
+    }
+    
+    /**
+     * Handle save schedule button
+     */
+    function handleSaveSchedule() {
+        const blogId = $(this).data('blog-id');
+        const postId = $(this).data('post-id');
+        const scheduleTime = $(this).siblings('.schedule-time').val();
+        
+        console.log(`💾 Saving new schedule: ${blogId} for ${scheduleTime}`);
+        
+        schedulePost(blogId, postId, scheduleTime);
+    }
+    
+    /**
+     * Handle cancel edit button
+     */
+    function handleCancelEdit() {
+        console.log('❌ Canceling schedule edit');
+        // Reload to restore original state
+        loadDraftedPosts();
+    }
+    
+    /**
+     * Unschedule a post (convert back to draft)
+     */
+    function unschedulePost(blogId, postId) {
+        const ajaxData = {
+            action: 'ai_blog_unschedule_post',
+            blog_id: blogId,
+            post_id: postId,
+            nonce: ai_blog_admin.nonce
+        };
+
+        $.ajax({
+            url: ai_blog_admin.ajaxurl,
+            type: 'POST',
+            data: ajaxData,
+            success: function(response) {
+                if (response.success) {
+                    showNotice('Post unscheduled successfully!', 'success');
+                    loadDraftedPosts(); // Reload to update display
+                } else {
+                    showNotice(response.data.message || 'Failed to unschedule post', 'error');
+                }
+            },
+            error: function() {
+                showNotice('Failed to unschedule post', 'error');
             }
         });
     }

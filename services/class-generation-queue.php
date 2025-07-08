@@ -272,7 +272,7 @@ class Generation_Queue {
 		Logger::info( 'generation_queue_start', 'Starting generation for idea', [
 			'idea_id' => $idea_id
 		] );
-			//$this->ideas_model = new Blog_Ideas_Model_V2();
+		
 		// Update idea status to generating
 		$this->ideas_model->update_idea( $idea_id, [
 			'status' => 'generating',
@@ -289,32 +289,55 @@ class Generation_Queue {
 		];
 		set_transient( self::ACTIVE_GENERATIONS_KEY, $active, HOUR_IN_SECONDS );
 
-		// In local development, WordPress cron might not work, so execute directly
-		if ( defined( 'WP_DEBUG' ) && WP_DEBUG ) {
-			Logger::info( 'generation_direct_execution', 'Executing generation directly (debug mode)', [
-				'idea_id' => $idea_id
-			] );
+		// Execute generation directly - WordPress cron is unreliable for immediate execution
+		Logger::info( 'generation_direct_execution', 'Executing generation directly', [
+			'idea_id' => $idea_id,
+			'reason' => 'Ensuring immediate execution'
+		] );
+		
+		// Execute generation directly using Background Processor
+		try {
+			$background_processor = new Background_Processor();
 			
-			// Execute generation directly using Background Processor
-			try {
-				$background_processor = new Background_Processor();
-				$background_processor->start_generation( $idea_id );
-			} catch ( \Exception $e ) {
-				Logger::error( 'generation_direct_execution_error', 'Error in direct generation', [
-					'idea_id' => $idea_id,
-					'error' => $e->getMessage()
+			// Use wp_schedule_single_event to run in a separate request if possible
+			// This prevents timeout issues but still runs immediately
+			if ( function_exists( 'wp_remote_post' ) && ! defined( 'AI_BLOG_FORCE_SYNC_GENERATION' ) ) {
+				// Schedule the cron event
+				wp_schedule_single_event( time(), 'ai_blog_process_single_generation', [ $idea_id ] );
+				
+				// Trigger WordPress cron immediately via HTTP request
+				$cron_url = add_query_arg( 'doing_wp_cron', time(), site_url( 'wp-cron.php' ) );
+				wp_remote_post( $cron_url, [
+					'timeout' => 0.01,
+					'blocking' => false,
+					'sslverify' => apply_filters( 'https_local_ssl_verify', false )
 				] );
 				
-				// Mark as failed
-				$this->mark_failed( $idea_id, $e->getMessage() );
-				return false;
+				Logger::info( 'generation_triggered_async', 'Generation triggered via async cron', [
+					'idea_id' => $idea_id,
+					'cron_url' => $cron_url
+				] );
+			} else {
+				// Fallback to direct execution if async not available
+				Logger::info( 'generation_sync_fallback', 'Executing generation synchronously', [
+					'idea_id' => $idea_id
+				] );
+				
+				$background_processor->process_generation( $idea_id );
 			}
-		} else {
-			// In production, use WordPress cron
-			wp_schedule_single_event( time(), 'ai_blog_process_single_generation', [ $idea_id ] );
+			
+			return true;
+			
+		} catch ( \Exception $e ) {
+			Logger::error( 'generation_direct_execution_error', 'Error in generation', [
+				'idea_id' => $idea_id,
+				'error' => $e->getMessage()
+			] );
+			
+			// Mark as failed
+			$this->mark_failed( $idea_id, $e->getMessage() );
+			return false;
 		}
-
-		return true;
 	}
 
 	/**

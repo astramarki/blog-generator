@@ -19,7 +19,11 @@ class Debug_Logger {
 	 * @param mixed  $data    Optional data to log.
 	 */
 	public static function log( $message, $data = null ) {
-		$debug_log = dirname( __DIR__ ) . '/debug-transaction.log';
+		if ( ! defined( 'AI_BLOG_GENERATOR_DEBUG' ) || ! AI_BLOG_GENERATOR_DEBUG ) {
+			return;
+		}
+		
+		$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 		$timestamp = date( 'Y-m-d H:i:s' );
 		
 		// Build log entry
@@ -49,7 +53,7 @@ class Debug_Logger {
 	 * Clear the debug log
 	 */
 	public static function clear() {
-		$debug_log = dirname( __DIR__ ) . '/debug-transaction.log';
+		$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 		file_put_contents( $debug_log, '' );
 	}
 
@@ -57,7 +61,7 @@ class Debug_Logger {
 	 * Initialize debug log with UTF-8 BOM
 	 */
 	public static function init() {
-		$debug_log = dirname( __DIR__ ) . '/debug-transaction.log';
+		$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 		if ( ! file_exists( $debug_log ) ) {
 			// Create with UTF-8 BOM
 			file_put_contents( $debug_log, "\xEF\xBB\xBF" );

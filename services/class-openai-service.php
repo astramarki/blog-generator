@@ -62,11 +62,17 @@ class OpenAI_Service {
 
 	/**
 	 * Constructor.
+	 *
+	 * @param string|null $api_key Optional API key to override the saved option.
 	 */
-	public function __construct() {
-		$this->api_key = get_option( 'ai_blog_generator_openai_api_key', '' );
+	public function __construct( $api_key = null ) {
+		// Use provided API key or fall back to saved option
+		if ( ! is_null( $api_key ) && ! empty( $api_key ) ) {
+			$this->api_key = $api_key;
+		} else {
+			$this->api_key = get_option( 'ai_blog_generator_openai_api_key', '' );
+		}
 		
-		// Initialize cost model
 		$this->cost_model = new \AI_Blog_Generator\Models\Cost_Model();
 	}
 
@@ -147,7 +153,7 @@ class OpenAI_Service {
 				'n' => 1,
 				'size' => '1024x1024', // Always use 1024x1024 as specified
 				'quality' => 'high',
-				'style' => 'vivid',
+
 				// Note: quality parameter may not be supported by gpt-image-1, removed to avoid errors
 			];
 
@@ -387,7 +393,7 @@ class OpenAI_Service {
 			] );
 
 			// Log to debug transaction log as well for easier debugging
-			$debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+			$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 			$log_entry = sprintf(
 				"[%s] OPENAI_IMAGE_EDIT_ERROR: %s\nSeed URL: %s\nPrompt: %s\nTrace:\n%s\n\n",
 				date( 'Y-m-d H:i:s' ),
@@ -1558,7 +1564,7 @@ class OpenAI_Service {
 			Logger::warning( 'openai_request_cancelled', 'Request cancelled due to global cancellation flag' );
 			
 			// Log to debug file
-			$debug_log = AI_BLOG_GENERATOR_PLUGIN_DIR . 'debug-transaction.log';
+			$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - OPENAI_SERVICE: Request cancelled due to global cancellation\n", FILE_APPEND );
 			
 			throw new \Exception( 'Generation cancelled by user' );

@@ -318,7 +318,7 @@ class Blog_Ideas_Model_V2 extends Model {
 		}
 		
 		// Log the update attempt with detailed information
-		$debug_log = __DIR__ . '/../debug-transaction.log';
+					$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 		$log_entry = date( 'Y-m-d H:i:s' ) . " - BLOG_IDEAS_MODEL_V2 UPDATE_IDEA:\n";
 		$log_entry .= "  Idea ID: $idea_id\n";
 		$log_entry .= "  Update Data: " . json_encode( $update_data, JSON_UNESCAPED_SLASHES ) . "\n";

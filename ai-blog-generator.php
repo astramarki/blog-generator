@@ -3,19 +3,19 @@
  * AI Blog Generator
  *
  * @package           AI_Blog_Generator
- * @author            Your Name
- * @copyright         2024 Your Company
+ * @author            Red Circle Solutions
+ * @copyright         2025 Red Circle Solutions
  * @license           GPL-2.0-or-later
  *
  * @wordpress-plugin
  * Plugin Name:       AI Blog Generator
- * Plugin URI:        https://example.com/ai-blog-generator
+ * Plugin URI:        https://redcirclesolutions.com/ai-blog-generator
  * Description:       Automatically generate SEO-optimized blog posts using Claude 4 models (Sonnet 4 & Opus 4) and GPT-Image-1. Features include idea generation, content creation with images, scheduling, and cost tracking.
  * Version:           1.6.0
  * Requires at least: 5.8
  * Requires PHP:      7.4
- * Author:            Your Name
- * Author URI:        https://example.com
+ * Author:            Red Circle Solutions
+ * Author URI:        https://redcirclesolutions.com
  * Text Domain:       ai-blog-generator
  * Domain Path:       /languages
  * License:           GPL v2 or later
@@ -58,6 +58,17 @@ define( 'AI_BLOG_GENERATOR_PLUGIN_FILE', __FILE__ );
 define( 'AI_BLOG_GENERATOR_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
 define( 'AI_BLOG_GENERATOR_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
 define( 'AI_BLOG_GENERATOR_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+
+// Logs directory path
+$upload_dir = wp_upload_dir();
+define( 'AI_BLOG_GENERATOR_LOGS_DIR', $upload_dir['basedir'] . '/ai-blog-generator-logs' );
+
+// Ensure logs directory exists
+if ( ! file_exists( AI_BLOG_GENERATOR_LOGS_DIR ) ) {
+	wp_mkdir_p( AI_BLOG_GENERATOR_LOGS_DIR );
+}
+
+define( 'AI_BLOG_GENERATOR_DEBUG_LOG', AI_BLOG_GENERATOR_LOGS_DIR . '/debug-transaction.log' );
 
 // Database table names
 global $wpdb;
@@ -162,9 +173,10 @@ class AI_Blog_Generator {
 	}
 
 	/**
-	 * Constructor - Initialize the plugin.
+	 * Constructor.
 	 */
 	private function __construct() {
+		// Set version.
 		$this->version = AI_BLOG_GENERATOR_VERSION;
 		
 		// Load dependencies.
@@ -172,6 +184,9 @@ class AI_Blog_Generator {
 		
 		// Set locale for internationalization.
 		$this->set_locale();
+		
+		// Register ApexCharts cleaning filters globally
+		$this->register_apexcharts_filters();
 		
 		// Define admin hooks.
 		$this->define_admin_hooks();
@@ -200,8 +215,8 @@ class AI_Blog_Generator {
 	 * Set plugin locale for internationalization.
 	 */
 	private function set_locale() {
-		$plugin_i18n = new AI_Blog_Generator\Includes\Plugin_I18n();
-		$this->loader->add_action( 'plugins_loaded', $plugin_i18n, 'load_plugin_textdomain' );
+		$this->i18n = new AI_Blog_Generator\Includes\Plugin_I18n();
+		$this->loader->add_action( 'plugins_loaded', $this->i18n, 'load_plugin_textdomain' );
 	}
 
 	/**
@@ -223,6 +238,10 @@ class AI_Blog_Generator {
 		
 		// Initialize controllers for AJAX handling (always needed for AJAX).
 		$this->init_controllers();
+		
+		// Register post-save cleanup handler
+		$this->loader->add_action( 'save_post', $this, 'cleanup_fusion_code_after_save', 99, 3 );
+		$this->loader->add_action( 'wp_insert_post', $this, 'cleanup_fusion_code_after_save', 99, 3 );
 	}
 
 	/**
@@ -231,9 +250,6 @@ class AI_Blog_Generator {
 	private function define_public_hooks() {
 		// Enqueue frontend scripts and styles.
 		$this->loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_frontend_scripts' );
-		
-		// Enqueue ApexCharts globally for any page that might have AI-generated content
-		$this->loader->add_action( 'wp_enqueue_scripts', $this, 'enqueue_apexcharts' );
 	}
 
 	/**
@@ -397,71 +413,94 @@ class AI_Blog_Generator {
 			return;
 		}
 
-		// Enqueue Bootstrap CSS (required for accordion styles)
-		// Commented out to avoid conflicts with theme - accordion styles are in blogs.css
-		// wp_enqueue_style(
-		// 	'bootstrap-css',
-		// 	'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css',
-		// 	[],
-		// 	'5.3.0'
-		// );
+		// Check if this is an AI-generated post or contains AI-generated content
+		global $post;
+		$is_ai_generated = get_post_meta( $post->ID, 'ai_generated', true ) === '1';
+		$has_accordion = strpos( $post->post_content, 'accordion' ) !== false || strpos( $post->post_content, 'ai-blog-accordion' ) !== false;
+		
+		// Only load scripts if this is AI-generated content with accordions
+		if ( ! $is_ai_generated && ! $has_accordion ) {
+			return;
+		}
 
 		// Enqueue the blog styling framework CSS
 		wp_enqueue_style(
 			'ai-blog-generator-blogs-css',
 			AI_BLOG_GENERATOR_PLUGIN_URL . 'admin/assets/css/blogs.css',
-			[], // Remove Bootstrap dependency
+			[],
 			$this->version
 		);
 
-		// Enqueue Bootstrap JavaScript (required for accordions to work)
-		wp_enqueue_script(
-			'bootstrap-js',
-			'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
-			[],
-			'5.3.0',
-			true // Load in footer
-		);
+		// Only enqueue Bootstrap JS for AI-generated content
+		if ( $is_ai_generated && $has_accordion ) {
+			// Check if Bootstrap is already loaded by theme/other plugins
+			if ( ! wp_script_is( 'bootstrap', 'enqueued' ) && ! wp_script_is( 'bootstrap-js', 'enqueued' ) ) {
+				// Enqueue Bootstrap JavaScript with a unique handle to avoid conflicts
+				wp_enqueue_script(
+					'ai-blog-bootstrap-js',
+					'https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js',
+					[],
+					'5.3.0',
+					true // Load in footer
+				);
 
-		// Add accordion initialization script
-		wp_add_inline_script(
-			'bootstrap-js',
-			'
-			// Initialize Bootstrap accordions when DOM is ready
-			document.addEventListener("DOMContentLoaded", function() {
-				// Find all accordions and ensure they\'re initialized
-				const accordions = document.querySelectorAll(".accordion");
-				accordions.forEach(function(accordion) {
-					// Initialize collapse for each accordion item
-					const collapseElements = accordion.querySelectorAll(".accordion-collapse");
-					collapseElements.forEach(function(collapseEl) {
-						if (typeof bootstrap !== "undefined" && bootstrap.Collapse) {
-							// Initialize Bootstrap collapse
-							new bootstrap.Collapse(collapseEl, {
-								toggle: false
+				// Add accordion initialization script with namespace
+				wp_add_inline_script(
+					'ai-blog-bootstrap-js',
+					'
+					// Initialize AI Blog Generator accordions only
+					(function() {
+						// Create isolated Bootstrap instance for AI Blog accordions
+						document.addEventListener("DOMContentLoaded", function() {
+							// Only target AI Blog accordions, not all accordions
+							const aiAccordions = document.querySelectorAll(".ai-blog-accordion, .ai-generated-accordion");
+							
+							if (aiAccordions.length === 0) {
+								return;
+							}
+							
+							aiAccordions.forEach(function(accordion) {
+								// Initialize collapse for each accordion item
+								const collapseElements = accordion.querySelectorAll(".accordion-collapse");
+								collapseElements.forEach(function(collapseEl) {
+									if (typeof bootstrap !== "undefined" && bootstrap.Collapse) {
+										// Check if already initialized
+										if (!collapseEl.classList.contains("ai-blog-initialized")) {
+											// Initialize Bootstrap collapse
+											new bootstrap.Collapse(collapseEl, {
+												toggle: false
+											});
+											collapseEl.classList.add("ai-blog-initialized");
+										}
+									}
+								});
 							});
-						}
-					});
-				});
-				
-				// Debug logging
-				console.log("AI Blog Generator: Initialized " + accordions.length + " accordions");
-			});
-			',
-			'after'
-		);
+							
+							// Debug logging
+							console.log("AI Blog Generator: Initialized " + aiAccordions.length + " AI accordions");
+						});
+					})();
+					',
+					'after'
+				);
+			}
+		}
 
-		// Enqueue frontend JavaScript for interactive elements (accordions, charts, animations)
+		// Enqueue frontend JavaScript for interactive elements
 		wp_enqueue_script(
 			'ai-blog-generator-frontend',
 			AI_BLOG_GENERATOR_PLUGIN_URL . 'admin/assets/js/frontend-blog.js',
-			[ 'jquery', 'bootstrap-js' ], // Add Bootstrap JS as dependency
+			[ 'jquery' ], // Remove Bootstrap JS as hard dependency
 			$this->version,
 			true
 		);
 
-		// Always enqueue ApexCharts on singular posts/pages since AI-generated content uses charts
-		$this->enqueue_apexcharts();
+		// Conditionally add Bootstrap as dependency if loaded
+		if ( wp_script_is( 'ai-blog-bootstrap-js', 'enqueued' ) ) {
+			wp_script_add_data( 'ai-blog-generator-frontend', 'deps', [ 'jquery', 'ai-blog-bootstrap-js' ] );
+		}
+
+		// ApexCharts removed - will be loaded by script tags in posts when needed
 	}
 
 	/**
@@ -500,153 +539,305 @@ class AI_Blog_Generator {
 	}
 
 	/**
-	 * Enqueue ApexCharts.js from CDN.
+	 * Register ApexCharts cleaning filters globally.
+	 * These filters ensure ApexCharts code is properly formatted without p/br tags.
 	 */
-	public function enqueue_apexcharts() {
-		// Only enqueue if not already enqueued.
-		if ( wp_script_is( 'apexcharts', 'enqueued' ) ) {
-			return;
+	private function register_apexcharts_filters() {
+		// Clean content before saving
+		add_filter( 'content_save_pre', [ $this, 'clean_apexcharts_content' ], 99, 1 );
+		add_filter( 'content_filtered_save_pre', [ $this, 'clean_apexcharts_content' ], 99, 1 );
+		
+		// Clean content when displaying - run AFTER wpautop (priority 10)
+		add_filter( 'the_content', [ $this, 'clean_apexcharts_display' ], 11, 1 );
+		
+		// Also add a very late filter to catch any remaining issues
+		add_filter( 'the_content', [ $this, 'clean_apexcharts_final' ], 9999, 1 );
+		
+		// Clean when editing
+		add_filter( 'content_edit_pre', [ $this, 'clean_apexcharts_content' ], 99, 1 );
+		
+		// For Avada theme - run after their processing
+		add_filter( 'avada_blog_post_content', [ $this, 'clean_apexcharts_display' ], 9999, 1 );
+		
+		// Disable wpautop for posts that contain fusion_code
+		add_filter( 'the_content', [ $this, 'conditionally_remove_wpautop' ], 1 );
+	}
+	
+	/**
+	 * Clean ApexCharts content before saving.
+	 *
+	 * @param string $content The content to clean.
+	 * @return string The cleaned content.
+	 */
+	public function clean_apexcharts_content( $content ) {
+		// Only process if content might contain ApexCharts
+		if ( stripos( $content, 'ApexCharts' ) === false && 
+		     stripos( $content, '[fusion_code]' ) === false ) {
+			return $content;
 		}
-
-		// Enqueue ApexCharts.js from CDN.
-		wp_enqueue_script(
-			'apexcharts',
-			'https://cdn.jsdelivr.net/npm/apexcharts@latest/dist/apexcharts.min.js',
-			[],
-			'3.44.0', // Latest stable version as of 2024
-			true // Load in footer for better performance
+		
+		// Clean fusion_code blocks
+		$content = preg_replace_callback( 
+			'/\[fusion_code\](.*?)\[\/fusion_code\]/s',
+			[ $this, 'clean_fusion_code_block' ],
+			$content
 		);
-
-		// Add inline script to make ApexCharts available globally.
-		wp_add_inline_script(
-			'apexcharts',
-			'window.ApexCharts = window.ApexCharts || ApexCharts;
+		
+		return $content;
+	}
+	
+	/**
+	 * Clean a single fusion_code block.
+	 *
+	 * @param array $matches The regex matches.
+	 * @return string The cleaned fusion_code block.
+	 */
+	private function clean_fusion_code_block( $matches ) {
+		// Use the deep clean method for consistency
+		$full_block = $matches[0];
+		return $this->deep_clean_fusion_code( $full_block );
+	}
+	
+	/**
+	 * Clean ApexCharts content when displaying.
+	 *
+	 * @param string $content The content to clean.
+	 * @return string The cleaned content.
+	 */
+	public function clean_apexcharts_display( $content ) {
+		if ( empty( $content ) ) {
+			return $content;
+		}
+		
+		// Use deep clean method for fusion_code blocks
+		if ( strpos( $content, '[fusion_code]' ) !== false ) {
+			$content = $this->deep_clean_fusion_code( $content );
+		}
+		
+		// Clean ApexCharts code outside of fusion_code blocks
+		$content = preg_replace_callback(
+			'/<script[^>]*>.*?new\s+ApexCharts.*?<\/script>/s',
+			function( $matches ) {
+				$code = $matches[0];
+				// Remove all p and br tags
+				$code = str_replace( array( '<p>', '</p>', '<br>', '<br />', '<br/>' ), '', $code );
+				return $code;
+			},
+			$content
+		);
+		
+		return $content;
+	}
+	
+	/**
+	 * Conditionally remove wpautop for posts containing fusion_code.
+	 * 
+	 * @param string $content The content to check.
+	 * @return string The content, potentially without wpautop applied.
+	 */
+	public function conditionally_remove_wpautop( $content ) {
+		if ( strpos( $content, '[fusion_code]' ) !== false ) {
+			// Remove wpautop filter for this content
+			remove_filter( 'the_content', 'wpautop' );
 			
-			// Initialize ApexCharts when DOM is ready
-			document.addEventListener("DOMContentLoaded", function() {
-				console.log("ApexCharts DOM ready, checking for charts...");
-				
-				function initializeCharts() {
-					if (typeof ApexCharts === "undefined") {
-						console.log("ApexCharts not loaded yet, retrying...");
-						setTimeout(initializeCharts, 500);
-						return;
-					}
-					
-					console.log("ApexCharts available, initializing charts");
-					
-					// Find all chart elements
-					const chartElements = document.querySelectorAll("[id^=\'chart\'], .blog-chart");
-					console.log("Found " + chartElements.length + " chart elements");
-					
-					chartElements.forEach(function(chartEl) {
-						// Skip if already initialized
-						if (chartEl.querySelector(".apexcharts-canvas")) {
-							return;
-						}
-						
-						// Look for chart configuration
-						let chartConfig = null;
-						
-						// Check for data attributes
-						if (chartEl.dataset.chartConfig) {
-							try {
-								chartConfig = JSON.parse(chartEl.dataset.chartConfig);
-							} catch (e) {
-								console.error("Invalid chart config in data attribute", e);
-							}
-						}
-						
-						// Check for configuration in script tags
-						if (!chartConfig) {
-							const scriptTag = document.querySelector("script[data-chart-id=\'" + chartEl.id + "\']");
-							if (scriptTag) {
-								try {
-									chartConfig = JSON.parse(scriptTag.textContent);
-								} catch (e) {
-									console.error("Invalid chart config in script tag", e);
-								}
-							}
-						}
-						
-						// Initialize chart if config found
-						if (chartConfig && chartConfig.series && chartConfig.series.length > 0) {
-							try {
-								chartConfig.chart = chartConfig.chart || {};
-								chartConfig.chart.height = chartConfig.chart.height || 400;
-								
-								const chart = new ApexCharts(chartEl, chartConfig);
-								chart.render();
-								
-								chartEl.classList.remove("blog-chart-loading");
-								console.log("Chart initialized successfully for", chartEl.id);
-							} catch (e) {
-								console.error("Failed to initialize chart", chartEl.id, e);
-								chartEl.innerHTML = "<div style=\"padding: 20px; text-align: center; color: #666;\">Chart failed to load</div>";
-							}
-						} else {
-							console.log("No valid chart data found for", chartEl.id);
-							chartEl.innerHTML = "<div style=\"padding: 20px; text-align: center; color: #666;\">Chart data not available</div>";
-						}
-					});
-				}
-				
-				// Start chart initialization
-				initializeCharts();
-			});',
-			'after'
-		);
+			// Add it back after our other filters run
+			add_filter( 'the_content', function( $content ) {
+				add_filter( 'the_content', 'wpautop' );
+				return $content;
+			}, 12 );
+		}
+		return $content;
+	}
+	
+	/**
+	 * Final cleanup pass for ApexCharts code.
+	 * This runs at very high priority to catch any tags added by other plugins/themes.
+	 * 
+	 * @param string $content The content to clean.
+	 * @return string The cleaned content.
+	 */
+	public function clean_apexcharts_final( $content ) {
+		if ( empty( $content ) || ( strpos( $content, 'fusion_code' ) === false && strpos( $content, 'ApexCharts' ) === false ) ) {
+			return $content;
+		}
+		
+		// Use deep clean method which handles all encoding and formatting issues
+		return $this->deep_clean_fusion_code( $content );
 	}
 
 	/**
-	 * Check if a post might need chart functionality.
+	 * Clean fusion code after post save.
+	 * This runs after WordPress saves a post to ensure fusion_code blocks are properly formatted.
 	 *
+	 * @param int $post_id Post ID.
 	 * @param \WP_Post $post Post object.
-	 * @return bool True if post might need charts.
+	 * @param bool $update Whether this is an existing post being updated or not.
 	 */
-	private function post_might_need_charts( $post ) {
-		// Check for chart-related keywords in post content.
-		$chart_keywords = [
-			'chart',
-			'graph',
-			'data',
-			'statistics',
-			'analytics',
-			'metrics',
-			'dashboard',
-			'visualization',
-			'apexcharts',
-		];
-
-		$content_lower = strtolower( $post->post_content );
+	public function cleanup_fusion_code_after_save( $post_id, $post, $update ) {
+		// Skip if this is an autosave, revision, or if we're already cleaning
+		if ( wp_is_post_autosave( $post_id ) || wp_is_post_revision( $post_id ) ) {
+			return;
+		}
 		
-		foreach ( $chart_keywords as $keyword ) {
-			if ( strpos( $content_lower, $keyword ) !== false ) {
-				return true;
+		// Prevent infinite loops - check if we're already cleaning this post
+		static $cleaning_posts = [];
+		if ( isset( $cleaning_posts[$post_id] ) ) {
+			return;
+		}
+		
+		// Check if post content contains fusion_code blocks
+		if ( strpos( $post->post_content, '[fusion_code]' ) === false ) {
+			return;
+		}
+		
+		// Mark this post as being cleaned
+		$cleaning_posts[$post_id] = true;
+		
+		// Get the current content
+		$content = $post->post_content;
+		$original_content = $content;
+		
+		// Perform comprehensive cleaning
+		$content = $this->deep_clean_fusion_code( $content );
+		
+		// Only update if content actually changed
+		if ( $content !== $original_content ) {
+			// Remove save_post action temporarily to prevent recursion
+			remove_action( 'save_post', [ $this, 'cleanup_fusion_code_after_save' ], 99 );
+			remove_action( 'wp_insert_post', [ $this, 'cleanup_fusion_code_after_save' ], 99 );
+			
+			// Update the post
+			wp_update_post( [
+				'ID' => $post_id,
+				'post_content' => $content
+			] );
+			
+			// Re-add the actions
+			add_action( 'save_post', [ $this, 'cleanup_fusion_code_after_save' ], 99, 3 );
+			add_action( 'wp_insert_post', [ $this, 'cleanup_fusion_code_after_save' ], 99, 3 );
+			
+			// Log the cleanup
+			if ( class_exists( 'AI_Blog_Generator\Utilities\Logger' ) ) {
+				\AI_Blog_Generator\Utilities\Logger::info( 'fusion_code_cleaned', 'Fusion code blocks cleaned after save', [
+					'post_id' => $post_id,
+					'post_title' => $post->post_title
+				] );
 			}
 		}
-
-		// Check for specific chart-related HTML elements or classes.
-		if ( preg_match( '/<div[^>]*class="[^"]*chart[^"]*"[^>]*>/i', $post->post_content ) ) {
-			return true;
-		}
-
-		// Check if post has chart-related categories or tags.
-		$categories = get_the_category( $post->ID );
-		$tags = get_the_tags( $post->ID );
 		
-		$terms_to_check = array_merge(
-			wp_list_pluck( $categories, 'name' ),
-			wp_list_pluck( $tags, 'name' )
-		);
-
-		foreach ( $terms_to_check as $term ) {
-			if ( in_array( strtolower( $term ), $chart_keywords, true ) ) {
-				return true;
+		// Clear the cleaning flag
+		unset( $cleaning_posts[$post_id] );
+	}
+	
+	/**
+	 * Perform deep cleaning of fusion_code blocks.
+	 * This method handles all types of encoding issues and formatting problems.
+	 *
+	 * @param string $content The content to clean.
+	 * @return string The cleaned content.
+	 */
+	private function deep_clean_fusion_code( $content ) {
+		// Pattern to match fusion_code blocks
+		$pattern = '/(\[fusion_code\])([\s\S]*?)(\[\/fusion_code\])/';
+		
+		$content = preg_replace_callback( $pattern, function( $matches ) {
+			$code = $matches[2];
+			
+			// Step 1: Decode HTML entities (may need multiple passes)
+			$max_decode_attempts = 3;
+			for ( $i = 0; $i < $max_decode_attempts; $i++ ) {
+				$decoded = html_entity_decode( $code, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+				if ( $decoded === $code ) {
+					break; // No more entities to decode
+				}
+				$code = $decoded;
 			}
-		}
-
-		return false;
+			
+			// Step 2: Remove all HTML tags that WordPress adds
+			$tags_to_remove = [
+				// Direct tags
+				'<p>', '</p>', '<p/>', '<p />',
+				'<br>', '<br/>', '<br />', '</br>',
+				'<div>', '</div>',
+				'<span>', '</span>',
+				// Encoded versions (in case they appear after decoding)
+				'&lt;p&gt;', '&lt;/p&gt;', '&lt;p/&gt;', '&lt;p /&gt;',
+				'&lt;br&gt;', '&lt;br/&gt;', '&lt;br /&gt;', '&lt;/br&gt;',
+			];
+			
+			// Remove tags
+			$code = str_replace( $tags_to_remove, '', $code );
+			
+			// Also use regex to catch any p or br tags with attributes
+			$code = preg_replace( '/<p[^>]*>/', '', $code );
+			$code = preg_replace( '/<\/p>/', '', $code );
+			$code = preg_replace( '/<br[^>]*>/', '', $code );
+			$code = preg_replace( '/<div[^>]*>/', '', $code );
+			$code = preg_replace( '/<\/div>/', '', $code );
+			$code = preg_replace( '/<span[^>]*>/', '', $code );
+			$code = preg_replace( '/<\/span>/', '', $code );
+			
+			// Step 3: Fix common encoding issues
+			$replacements = [
+				'&amp;' => '&',
+				'&nbsp;' => ' ',
+				'&#039;' => "'",
+				'&quot;' => '"',
+				'&apos;' => "'",
+			];
+			$code = str_replace( array_keys( $replacements ), array_values( $replacements ), $code );
+			
+			// Step 4: Clean up whitespace
+			$code = trim( $code );
+			
+			// Step 5: Check if this is JavaScript code that needs script tags
+			$is_javascript = false;
+			
+			// Check for JavaScript indicators
+			$js_indicators = [
+				'ApexCharts',
+				'function',
+				'var ',
+				'const ',
+				'let ',
+				'document.',
+				'window.',
+				'getElementById',
+				'querySelector',
+				'addEventListener',
+				'=>', // Arrow functions
+				'chart',
+				'Chart',
+				'options',
+				'series',
+				'new ',
+				'return ',
+				'if (',
+				'for (',
+				'while (',
+			];
+			
+			foreach ( $js_indicators as $indicator ) {
+				if ( stripos( $code, $indicator ) !== false ) {
+					$is_javascript = true;
+					break;
+				}
+			}
+			
+			// Also check for common JavaScript patterns
+			if ( ! $is_javascript && preg_match( '/\b(chart|Chart|options|series)\s*[=:{]/', $code ) ) {
+				$is_javascript = true;
+			}
+			
+			// Wrap in script tags if needed
+			if ( $is_javascript && stripos( $code, '<script' ) === false ) {
+				$code = '<script>' . "\n" . $code . "\n" . '</script>';
+			}
+			
+			return $matches[1] . $code . $matches[3];
+		}, $content );
+		
+		return $content;
 	}
 }
 

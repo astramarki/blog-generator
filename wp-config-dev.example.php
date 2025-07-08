@@ -42,4 +42,4 @@ define( 'SAVEQUERIES', true );
  * - Screen: Errors will appear directly on your WordPress pages
  * - Log file: /wp-content/debug.log
  * - Plugin log: /wp-content/plugins/blog-generator/debug.log
- */ 
+ */

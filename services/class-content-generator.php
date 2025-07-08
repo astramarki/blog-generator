@@ -14,9 +14,12 @@ use AI_Blog_Generator\Models\Blog_Model;
 use AI_Blog_Generator\Models\Context_Model;
 use AI_Blog_Generator\Models\Cost_Model;
 use AI_Blog_Generator\Models\Persona_Model;
+use AI_Blog_Generator\Models\Product_Model;
 use AI_Blog_Generator\Services\Anthropic_Service;
 use AI_Blog_Generator\Services\OpenAI_Service;
 use AI_Blog_Generator\Services\Prompt_Compiler_Service;
+use AI_Blog_Generator\Services\Budget_Manager;
+use AI_Blog_Generator\Services\Generation_Queue;
 use AI_Blog_Generator\Utilities\Logger;
 use AI_Blog_Generator\Utilities\Loggable;
 use AI_Blog_Generator\Utilities\Generation_Logger;
@@ -68,7 +71,7 @@ class Content_Generator {
 	/**
 	 * Idea model instance.
 	 *
-	 * @var Blog_Ideas_Model_V2
+	 * @var \AI_Blog_Generator\Models\Idea_Model
 	 */
 	private $idea_model;
 
@@ -92,6 +95,27 @@ class Content_Generator {
 	 * @var Persona_Model
 	 */
 	private $persona_model;
+
+	/**
+	 * Product model instance.
+	 *
+	 * @var Product_Model
+	 */
+	private $product_model;
+
+	/**
+	 * Budget manager instance.
+	 *
+	 * @var Budget_Manager
+	 */
+	private $budget_manager;
+
+	/**
+	 * Generation queue instance.
+	 *
+	 * @var Generation_Queue
+	 */
+	private $generation_queue;
 
 	/**
 	 * Generation Logger instance for detailed logging.
@@ -150,37 +174,43 @@ class Content_Generator {
 	private $prompt_compiler;
 
 	/**
+	 * Current persona being used for generation.
+	 *
+	 * @var array|null
+	 */
+	private $current_persona = null;
+
+	/**
 	 * Constructor.
 	 */
 	public function __construct() {
 		$this->log_function_entry();
 		
-		$this->database_manager = Database_Manager::get_instance();
+		// Services are initialized lazily when needed
+		$this->anthropic_service = new Anthropic_Service();
+		$this->openai_service = new OpenAI_Service();
 		$this->idea_model = new Blog_Ideas_Model_V2();
 		$this->blog_model = new Blog_Model();
 		$this->context_model = new Context_Model();
-		$this->cost_model = new Cost_Model();
 		$this->persona_model = new Persona_Model();
+		$this->product_model = new Product_Model();
+		$this->cost_model = new Cost_Model();
+		$this->budget_manager = new Budget_Manager();
+		$this->generation_queue = new Generation_Queue();
+		$this->database_manager = Database_Manager::get_instance();
 		
-		// Initialize API services.
-		$this->anthropic_service = new Anthropic_Service();
-		$this->openai_service = new OpenAI_Service();
+		// Set default batch update interval
+		$this->batch_update_interval = 5; // 5 seconds
+		$this->last_db_update_time = 0;
+		$this->pending_status_update = null;
 		
-		// Prompt Compiler Service will be initialized lazily when needed
-		$this->prompt_compiler = null;
-		
-		// Only log initialization once per session to prevent log spam
-		if ( ! get_transient( 'ai_blog_content_generator_init_logged' ) ) {
-			$this->log_info( 'content_generator_init', 'Content Generator service initialized', [
-				'database_manager_ready' => ! is_null( $this->database_manager ),
-				'models_initialized' => 4,
-				'api_services_ready' => 2,
-				'prompt_compiler_lazy' => true
-			] );
-			set_transient( 'ai_blog_content_generator_init_logged', true, 300 ); // 5 minutes
+		// Ensure traits are properly loaded
+		if ( ! trait_exists( '\AI_Blog_Generator\Utilities\Loggable' ) ) {
+			require_once AI_BLOG_GENERATOR_PLUGIN_DIR . 'utilities/trait-loggable.php';
 		}
 		
-		$this->log_function_exit();
+		// Remove duplicate filter registrations - these are already registered in main plugin file
+		// to avoid conflicts and ensure proper execution order
 	}
 
 	/**
@@ -425,7 +455,7 @@ class Content_Generator {
 	 */
 	public function generate_blog_post( $idea_id ) {
 		$transaction_started = false; // Track if we started a transaction
-		$debug_log = __DIR__ . '/../debug-transaction.log'; // Debug log path
+		$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG; // Debug log path
 		
 		try {
 			// Prevent multiple simultaneous generations for the same idea
@@ -731,6 +761,9 @@ class Content_Generator {
 				// Use the idea and persona from prompt compiler results
 				$idea = $prompt_data['idea'];
 				$persona = $prompt_data['persona'];
+				
+				// Store persona for use during image generation
+				$this->current_persona = $persona;
 				
 				if ( $this->generation_logger ) {
 					$this->generation_logger->info( 'About to call Anthropic service for content generation', [
@@ -1212,12 +1245,22 @@ class Content_Generator {
 					] );
 				}
 				
+				// Safely get the WordPress user ID from persona (handles both array and object)
+				$persona_wordpress_user_id = null;
+				if ( $this->current_persona ) {
+					if ( is_array( $this->current_persona ) && ! empty( $this->current_persona['wordpress_user_id'] ) ) {
+						$persona_wordpress_user_id = $this->current_persona['wordpress_user_id'];
+					} elseif ( is_object( $this->current_persona ) && ! empty( $this->current_persona->wordpress_user_id ) ) {
+						$persona_wordpress_user_id = $this->current_persona->wordpress_user_id;
+					}
+				}
+				
 				$post_data = [
 					'post_title'   => $proper_title,
 					'post_content' => $final_html,
 					'post_status'  => 'draft',
 					'post_type'    => 'post',
-					'post_author'  => get_current_user_id(),
+					'post_author'  => $persona_wordpress_user_id ?: get_current_user_id(),
 					'post_category' => $post_categories,
 					'meta_input'   => [
 						'_yoast_wpseo_metadesc' => $content['meta_description'],
@@ -1230,6 +1273,34 @@ class Content_Generator {
 						'_ai_blog_has_references' => ! empty( $content['references'] ) ? '1' : '0',
 					],
 				];
+				
+				// Log which author is being used
+				if ( $this->generation_logger ) {
+					$author_id = $persona_wordpress_user_id ?: get_current_user_id();
+					$author_user = get_user_by( 'id', $author_id );
+					
+					// Safely get persona id and name
+					$persona_id = null;
+					$persona_name = null;
+					if ( $this->current_persona ) {
+						if ( is_array( $this->current_persona ) ) {
+							$persona_id = $this->current_persona['id'] ?? null;
+							$persona_name = $this->current_persona['name'] ?? null;
+						} elseif ( is_object( $this->current_persona ) ) {
+							$persona_id = $this->current_persona->id ?? null;
+							$persona_name = $this->current_persona->name ?? null;
+						}
+					}
+					
+					$this->generation_logger->info( 'Post author determined', [
+						'author_id' => $author_id,
+						'author_name' => $author_user ? $author_user->display_name : 'Unknown',
+						'persona_id' => $persona_id ?: 'none',
+						'persona_name' => $persona_name ?: 'none',
+						'persona_has_wordpress_user' => $persona_wordpress_user_id ? 'yes' : 'no',
+						'using_fallback' => $persona_wordpress_user_id ? 'no' : 'yes'
+					] );
+				}
 				
 				if ( $this->generation_logger ) {
 					$this->generation_logger->debug( 'Post data prepared, calling wp_insert_post' );
@@ -1297,8 +1368,19 @@ class Content_Generator {
 					// Continue without transaction
 				}
 				
+				// Safely get persona ID for blog record
+				$persona_id_for_blog = null;
+				if ( $this->current_persona ) {
+					if ( is_array( $this->current_persona ) ) {
+						$persona_id_for_blog = $this->current_persona['id'] ?? null;
+					} elseif ( is_object( $this->current_persona ) ) {
+						$persona_id_for_blog = $this->current_persona->id ?? null;
+					}
+				}
+				
 				$blog_id = $this->blog_model->create([
 					'idea_id' => $idea_id,
+					'persona_id' => $persona_id_for_blog,
 					'post_id' => $post_id,
 					'title' => $proper_title,
 					'status' => 'draft',
@@ -1477,6 +1559,9 @@ class Content_Generator {
 					$this->generation_logger->log_generation_complete( true, $final_result );
 				}
 				
+				// Clear current persona after successful generation
+				$this->current_persona = null;
+				
 				return $final_result;
 				
 			} catch ( \Exception $e ) {
@@ -1485,6 +1570,9 @@ class Content_Generator {
 				
 				// Clear generation lock using closure
 				$clear_lock();
+				
+				// Clear current persona after failed generation
+				$this->current_persona = null;
 				
 				if ( $this->generation_logger ) {
 					$this->generation_logger->error( 'Generation failed with exception', [
@@ -1592,6 +1680,9 @@ class Content_Generator {
 				];
 			}
 		} catch ( \Exception $e ) {
+			// Clear current persona after failed generation
+			$this->current_persona = null;
+			
 			if ( $this->generation_logger ) {
 				$this->generation_logger->error( 'Generation failed with outer exception', [
 					'error' => $e->getMessage(),
@@ -2069,119 +2160,113 @@ class Content_Generator {
 	}
 
 	/**
-	 * Clean fusion_code content by removing HTML markup and wrapping in script tags.
-	 * 
-	 * This fixes the issue where Avada adds HTML markup (p tags, br tags) to JavaScript
-	 * code within fusion_code shortcodes, breaking the JavaScript functionality.
+	 * Clean fusion_code content to remove p and br tags and add script tags.
 	 *
-	 * @param string $html The HTML content to process.
-	 * @return string The processed HTML with cleaned fusion_code content.
+	 * @param string $content The content to clean.
+	 * @return string The cleaned content.
 	 */
-	private function clean_fusion_code_content( $html ) {
-		if ( $this->generation_logger ) {
-			$this->generation_logger->debug( 'Starting fusion_code cleanup' );
-		}
+	public function clean_fusion_code_content( $content ) {
+		// Pattern to match fusion_code blocks
+		$pattern = '/(\[fusion_code\])([\s\S]*?)(\[\/fusion_code\])/';
 		
-		// Debug log file path
-		$debug_log = __DIR__ . '/../debug-transaction.log';
-		
-		// Find all fusion_code blocks
-		$pattern = '/\[fusion_code\](.*?)\[\/fusion_code\]/s';
-		
-		// Count fusion_code blocks found
-		$fusion_code_count = preg_match_all( $pattern, $html, $matches_count );
-		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: Found {$fusion_code_count} fusion_code blocks\n", FILE_APPEND );
-		
-		$cleaned_html = preg_replace_callback( $pattern, function( $matches ) use ( $debug_log ) {
-			$original_content = $matches[1];
-			$code_content = $matches[1];
+		$content = preg_replace_callback( $pattern, function( $matches ) {
+			$code = $matches[2];
 			
-			// Log the ORIGINAL content before any cleaning
-			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: === BEFORE CLEANING ===\n", FILE_APPEND );
-			file_put_contents( $debug_log, "Original fusion_code content:\n", FILE_APPEND );
-			file_put_contents( $debug_log, $original_content . "\n", FILE_APPEND );
-			file_put_contents( $debug_log, "=== END BEFORE ===\n\n", FILE_APPEND );
-			
-			if ( $this->generation_logger ) {
-				$this->generation_logger->debug( 'Found fusion_code block', [
-					'original_length' => strlen( $code_content ),
-					'sample' => substr( $code_content, 0, 100 ) . '...'
-				] );
+			// Step 1: Decode HTML entities (may need multiple passes)
+			$max_decode_attempts = 3;
+			for ( $i = 0; $i < $max_decode_attempts; $i++ ) {
+				$decoded = html_entity_decode( $code, ENT_QUOTES | ENT_HTML5, 'UTF-8' );
+				if ( $decoded === $code ) {
+					break; // No more entities to decode
+				}
+				$code = $decoded;
 			}
 			
-			// First check if the content already has script tags
-			$has_script_tags = preg_match( '/<script[^>]*>.*<\/script>/is', $code_content );
+			// Step 2: Remove all HTML tags that WordPress adds
+			$tags_to_remove = [
+				// Direct tags
+				'<p>', '</p>', '<p/>', '<p />',
+				'<br>', '<br/>', '<br />', '</br>',
+				'<div>', '</div>',
+				'<span>', '</span>',
+				// Encoded versions (in case they appear after decoding)
+				'&lt;p&gt;', '&lt;/p&gt;', '&lt;p/&gt;', '&lt;p /&gt;',
+				'&lt;br&gt;', '&lt;br/&gt;', '&lt;br /&gt;', '&lt;/br&gt;',
+			];
 			
-			if ( $has_script_tags ) {
-				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: Content already has <script> tags, cleaning only HTML\n", FILE_APPEND );
-				
-				// If it already has script tags, just clean any HTML that might have been added around it
-				// Remove <p> and </p> tags
-				$code_content = preg_replace( '/<\/?p[^>]*>/i', '', $code_content );
-				
-				// Remove <br> and <br /> tags
-				$code_content = preg_replace( '/<br\s*\/?>/i', "\n", $code_content );
-				
-				// Trim any extra whitespace
-				$code_content = trim( $code_content );
-			} else {
-				// No script tags, so clean and add them if it's JavaScript
-				file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: No script tags found, processing content\n", FILE_APPEND );
-				
-				// Remove all HTML tags that Avada might have added
-				// Remove <p> and </p> tags
-				$code_content = preg_replace( '/<\/?p[^>]*>/i', '', $code_content );
-				
-				// Remove <br> and <br /> tags
-				$code_content = preg_replace( '/<br\s*\/?>/i', "\n", $code_content );
-				
-				// Remove any other HTML tags that might have been added
-				// But preserve the actual JavaScript/code content
-				$code_content = strip_tags( $code_content );
-				
-				// Trim any extra whitespace
-				$code_content = trim( $code_content );
-				
-				// Check if this is JavaScript code (contains function, var, const, etc.)
-				$js_indicators = ['function', 'var ', 'const ', 'let ', 'document.', 'window.', 'new ', 'ApexCharts'];
-				$is_javascript = false;
-				
-				foreach ( $js_indicators as $indicator ) {
-					if ( stripos( $code_content, $indicator ) !== false ) {
-						$is_javascript = true;
-						break;
-					}
-				}
-				
-				// If it's JavaScript, wrap in script tags
-				if ( $is_javascript ) {
-					$code_content = '<script>' . "\n" . $code_content . "\n" . '</script>';
-					
-					file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: Detected JavaScript content, wrapping in script tags\n", FILE_APPEND );
-					
-					if ( $this->generation_logger ) {
-						$this->generation_logger->debug( 'Wrapped JavaScript code in script tags' );
-					}
+			// Remove tags
+			$code = str_replace( $tags_to_remove, '', $code );
+			
+			// Also use regex to catch any p or br tags with attributes
+			$code = preg_replace( '/<p[^>]*>/', '', $code );
+			$code = preg_replace( '/<\/p>/', '', $code );
+			$code = preg_replace( '/<br[^>]*>/', '', $code );
+			$code = preg_replace( '/<div[^>]*>/', '', $code );
+			$code = preg_replace( '/<\/div>/', '', $code );
+			$code = preg_replace( '/<span[^>]*>/', '', $code );
+			$code = preg_replace( '/<\/span>/', '', $code );
+			
+			// Step 3: Fix common encoding issues
+			$replacements = [
+				'&amp;' => '&',
+				'&nbsp;' => ' ',
+				'&#039;' => "'",
+				'&quot;' => '"',
+				'&apos;' => "'",
+			];
+			$code = str_replace( array_keys( $replacements ), array_values( $replacements ), $code );
+			
+			// Step 4: Clean up whitespace
+			$code = trim( $code );
+			
+			// Step 5: Check if this is JavaScript code that needs script tags
+			$is_javascript = false;
+			
+			// Check for JavaScript indicators
+			$js_indicators = [
+				'ApexCharts',
+				'function',
+				'var ',
+				'const ',
+				'let ',
+				'document.',
+				'window.',
+				'getElementById',
+				'querySelector',
+				'addEventListener',
+				'=>', // Arrow functions
+				'chart',
+				'Chart',
+				'options',
+				'series',
+				'new ',
+				'return ',
+				'if (',
+				'for (',
+				'while (',
+			];
+			
+			foreach ( $js_indicators as $indicator ) {
+				if ( stripos( $code, $indicator ) !== false ) {
+					$is_javascript = true;
+					break;
 				}
 			}
 			
-			// Log the CLEANED content after processing
-			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: === AFTER CLEANING ===\n", FILE_APPEND );
-			file_put_contents( $debug_log, "Cleaned fusion_code content:\n", FILE_APPEND );
-			file_put_contents( $debug_log, $code_content . "\n", FILE_APPEND );
-			file_put_contents( $debug_log, "=== END AFTER ===\n\n", FILE_APPEND );
+			// Also check for common JavaScript patterns
+			if ( ! $is_javascript && preg_match( '/\b(chart|Chart|options|series)\s*[=:{]/', $code ) ) {
+				$is_javascript = true;
+			}
 			
-			// Return the cleaned fusion_code block
-			return '[fusion_code]' . $code_content . '[/fusion_code]';
-		}, $html );
+			// Wrap in script tags if needed
+			if ( $is_javascript && stripos( $code, '<script' ) === false ) {
+				$code = '<script>' . "\n" . $code . "\n" . '</script>';
+			}
+			
+			return $matches[1] . $code . $matches[3];
+		}, $content );
 		
-		if ( $this->generation_logger ) {
-			$this->generation_logger->debug( 'Fusion_code cleanup completed' );
-		}
-		
-		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - FUSION_CODE_CLEANUP: Cleanup completed\n\n", FILE_APPEND );
-		
-		return $cleaned_html;
+		return $content;
 	}
 
 	/**
@@ -2357,31 +2442,70 @@ class Content_Generator {
 	}
 
 	/**
-	 * Create image HTML with proper attributes.
+	 * Create HTML for an image.
 	 *
 	 * @param array $image Image data from generation.
 	 * @return string Image HTML.
 	 */
 	private function create_image_html( $image ) {
-		// Determine image size class based on context
-		$size_class = 'img-fluid';
-		$wrapper_class = 'my-4';
+		// Check if current persona uses Avada layouts
+		$uses_avada = false;
 		
-		// If the image is meant to be full-width
-		if ( strpos( strtolower( $image['prompt'] ?? '' ), 'hero' ) !== false || 
-		     strpos( strtolower( $image['prompt'] ?? '' ), 'banner' ) !== false ) {
-			$wrapper_class = 'my-5';
+		if ( ! empty( $this->current_persona ) ) {
+			if ( is_array( $this->current_persona ) && ! empty( $this->current_persona['uses_avada_layouts'] ) ) {
+				$uses_avada = true;
+			} elseif ( is_object( $this->current_persona ) && ! empty( $this->current_persona->uses_avada_layouts ) ) {
+				$uses_avada = true;
+			}
 		}
 		
-		$img_html = sprintf(
-			'<figure class="figure %s ai-generated-image">
-				<img src="%s" alt="%s" class="figure-img %s rounded" loading="lazy" />
-			</figure>',
-			esc_attr( $wrapper_class ),
-			esc_url( $image['url'] ),
-			esc_attr( $image['alt_text'] ),
-			esc_attr( $size_class )
-		);
+		// If Avada layout, use fusion_imageframe shortcode
+		if ( $uses_avada ) {
+			// Get attachment ID from URL if available
+			$attachment_id = ! empty( $image['attachment_id'] ) ? $image['attachment_id'] : 0;
+			
+			// If no attachment ID, try to get it from URL
+			if ( ! $attachment_id && ! empty( $image['url'] ) ) {
+				$attachment_id = attachment_url_to_postid( $image['url'] );
+			}
+			
+			// Build fusion_imageframe shortcode
+			$img_html = sprintf(
+				'[fusion_imageframe lightbox="no" style_type="bottomshadow" hover_type="liftup" borderradius="10" align="center" max_width="400px" animation_direction="left" animation_speed="0.5" alt="%s" image_id="%d|full"]%s[/fusion_imageframe]',
+				esc_attr( $image['alt_text'] ),
+				$attachment_id,
+				esc_url( $image['url'] )
+			);
+			
+			if ( $this->generation_logger ) {
+				$this->generation_logger->info( 'Using Avada fusion_imageframe for persona with Avada layout' );
+			}
+		} else {
+			// Use HTML format for non-Avada personas
+			// Determine image size class based on context
+			$size_class = 'img-fluid';
+			$wrapper_class = 'my-4';
+			
+			// If the image is meant to be full-width
+			if ( strpos( strtolower( $image['prompt'] ?? '' ), 'hero' ) !== false || 
+			     strpos( strtolower( $image['prompt'] ?? '' ), 'banner' ) !== false ) {
+				$wrapper_class = 'my-5';
+			}
+			
+			$img_html = sprintf(
+				'<figure class="figure %s ai-generated-image">
+					<img src="%s" alt="%s" class="figure-img %s rounded" loading="lazy" />
+				</figure>',
+				esc_attr( $wrapper_class ),
+				esc_url( $image['url'] ),
+				esc_attr( $image['alt_text'] ),
+				esc_attr( $size_class )
+			);
+			
+			if ( $this->generation_logger ) {
+				$this->generation_logger->info( 'Using HTML format for persona with HTML layout' );
+			}
+		}
 		
 		return $img_html;
 	}
@@ -2620,7 +2744,7 @@ class Content_Generator {
 			] );
 			
 			// Log to debug file
-			$debug_log = __DIR__ . '/../debug-transaction.log';
+			$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 			file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Global cancel detected for idea {$idea_id}\n", FILE_APPEND );
 			
 			return true;
@@ -2664,7 +2788,7 @@ class Content_Generator {
 		$this->clear_generation_lock( $idea_id );
 		
 		// Log to debug file
-		$debug_log = __DIR__ . '/../debug-transaction.log';
+		$debug_log = AI_BLOG_GENERATOR_DEBUG_LOG;
 		file_put_contents( $debug_log, date( 'Y-m-d H:i:s' ) . " - CONTENT_GENERATOR: Generation cancelled at stage '{$stage}' for idea {$idea_id}\n", FILE_APPEND );
 		
 		throw new \Exception( 'Generation cancelled by user' );
@@ -2882,6 +3006,92 @@ class Content_Generator {
 		}
 		
 		return $alt_text;
+	}
+
+	/**
+	 * WordPress filter to clean ApexCharts code when saving posts.
+	 * This acts as a safety net to ensure all ApexCharts code is properly formatted.
+	 *
+	 * @param string $content The post content before save.
+	 * @return string The cleaned content.
+	 */
+	public function clean_apexcharts_on_save( $content ) {
+		// Only process if content contains ApexCharts or chart-related code
+		if ( stripos( $content, 'ApexCharts' ) !== false || 
+		     ( stripos( $content, 'chart' ) !== false && 
+		       ( stripos( $content, 'var options' ) !== false || 
+		         stripos( $content, 'const options' ) !== false || 
+		         stripos( $content, 'let options' ) !== false ) ) ) {
+			
+			// Log that we're cleaning the content
+			$this->log_info( 'clean_apexcharts_on_save', 'Cleaning ApexCharts code in post content', [
+				'content_length' => strlen( $content ),
+				'has_apexcharts' => stripos( $content, 'ApexCharts' ) !== false,
+				'has_fusion_code' => stripos( $content, '[fusion_code]' ) !== false
+			] );
+			
+			// Use our existing cleaning method
+			return $this->clean_fusion_code_content( $content );
+		}
+		
+		return $content;
+	}
+	
+	/**
+	 * WordPress filter to clean ApexCharts code when displaying posts.
+	 * This catches any p/br tags that WordPress might add after saving.
+	 *
+	 * @param string $content The post content before display.
+	 * @return string The cleaned content.
+	 */
+	public function clean_apexcharts_on_display( $content ) {
+		// Only process if content contains fusion_code blocks with potential issues
+		if ( stripos( $content, '[fusion_code]' ) !== false && 
+		     ( stripos( $content, '<p>' ) !== false || stripos( $content, '<br' ) !== false ) ) {
+			
+			// Pattern to find fusion_code blocks that contain p or br tags
+			$pattern = '/\[fusion_code\](.*?)\[\/fusion_code\]/s';
+			
+			$content = preg_replace_callback( $pattern, function( $matches ) {
+				$code_content = $matches[1];
+				
+				// Check if this block has p or br tags inside
+				if ( strpos( $code_content, '<p>' ) !== false || 
+				     strpos( $code_content, '</p>' ) !== false || 
+				     strpos( $code_content, '<br' ) !== false ) {
+					
+					// Check if it's JavaScript code
+					$js_indicators = ['ApexCharts', 'var ', 'const ', 'let ', 'function', 'document.', 'options'];
+					$is_javascript = false;
+					
+					foreach ( $js_indicators as $indicator ) {
+						if ( stripos( $code_content, $indicator ) !== false ) {
+							$is_javascript = true;
+							break;
+						}
+					}
+					
+					if ( $is_javascript ) {
+						// Clean the content
+						// Remove all p tags
+						$code_content = preg_replace( '/<p[^>]*>/i', '', $code_content );
+						$code_content = preg_replace( '/<\/p>/i', '', $code_content );
+						
+						// Replace br tags with newlines
+						$code_content = preg_replace( '/<br\s*\/?>/i', "\n", $code_content );
+						
+						// Ensure script tags are present
+						if ( ! preg_match( '/<script[^>]*>/i', $code_content ) ) {
+							$code_content = '<script type="text/javascript">' . "\n" . trim( $code_content ) . "\n" . '</script>';
+						}
+					}
+				}
+				
+				return '[fusion_code]' . $code_content . '[/fusion_code]';
+			}, $content );
+		}
+		
+		return $content;
 	}
 } 
  

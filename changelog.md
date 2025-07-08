@@ -7,6 +7,90 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Current Development]
 
+### Fixed
+- **Frontend Modal Conflict Fixed**: Resolved conflict with existing website modals (like pricing modal)
+  - **Problem**: 
+    - Plugin was loading Bootstrap 5.3.0 JS globally on all frontend pages
+    - This conflicted with existing modals using older Bootstrap syntax (data-dismiss vs data-bs-dismiss)
+    - Pricing modal and other frontend modals stopped working when plugin was activated
+  - **Solution**:
+    - Made Bootstrap loading conditional - only loads for AI-generated posts with accordions
+    - Changed script handle from 'bootstrap-js' to 'ai-blog-bootstrap-js' to avoid naming conflicts
+    - Added checks to prevent loading Bootstrap if already loaded by theme/other plugins
+    - Scoped accordion initialization to only target AI-specific classes (.ai-blog-accordion, .ai-generated-accordion)
+    - Wrapped initialization in isolated function to prevent global scope pollution
+  - **Technical Changes**:
+    - Modified `enqueue_frontend_scripts()` to check post meta for AI-generated content
+    - Only loads scripts when content actually needs them
+    - Prevents interference with existing modal systems on the site
+  - **Result**: Website modals (pricing, etc.) now work correctly alongside AI Blog Generator
+- **Removed Global ApexCharts Enqueuing**: ApexCharts is no longer loaded globally on frontend pages
+  - **Rationale**: ApexCharts script tags are included directly in generated blog posts when needed
+  - **Changes Made**:
+    - Removed `enqueue_apexcharts()` method entirely
+    - Removed `post_might_need_charts()` method as it's no longer needed
+    - Removed all calls to enqueue ApexCharts on frontend
+    - Fixed fatal error by removing orphaned hook registration for deleted method
+  - **Result**: Reduced unnecessary script loading - ApexCharts only loads when posts contain charts via embedded script tags
+- **Comprehensive Fusion Code Cleaning After Post Save**: Fixed HTML entities and formatting issues in fusion_code blocks
+  - **Problem**: 
+    - Fusion code blocks were getting worse with HTML entities like `&gt;`, `&lt;`, `&amp;` being added
+    - Manual editing was required for every post to fix code inside fusion_code blocks
+    - Previous cleaning filters weren't comprehensive enough
+    - Tags were inadequately closed in Avada layouts
+  - **Solution**:
+    - Added `deep_clean_fusion_code` method that performs comprehensive cleaning:
+      - Decodes HTML entities (multiple passes to handle double-encoding)
+      - Removes all HTML tags (p, br, div, span) in various forms
+      - Fixes common encoding issues (&amp;, &nbsp;, &quot;, etc.)
+      - Detects JavaScript code and adds script tags when missing
+      - Handles arrow functions and modern JavaScript syntax
+    - Registered `cleanup_fusion_code_after_save` hook that runs after WordPress saves posts
+    - Added infinite loop protection to prevent recursion
+    - Only updates posts if content actually changed
+  - **Technical Changes**:
+    - Added post-save hooks in `define_admin_hooks` (save_post and wp_insert_post)
+    - Created comprehensive cleaning method with multi-step processing
+    - Updated all existing cleaning methods to use the new deep clean approach
+    - Updated Content_Generator's clean method to match
+    - Enhanced fix-existing-apexcharts.php script to use new cleaning method
+  - **Result**: Fusion code blocks are now automatically cleaned after saving - no manual editing required
+- **Live System Error Fixes**: Fixed errors encountered during live system deployment
+  - **Settings Save Logic**: Fixed false "SETTING_UPDATE_FAILED" errors when saving unchanged settings
+    - Updated type comparison logic to handle numeric strings vs integers properly  
+    - WordPress `update_option()` returns false for unchanged values, now properly handled
+  - **API Key Initialization**: Fixed "ANTHROPIC_MISSING_API_KEY" errors during plugin initialization
+    - Updated Anthropic_Service constructor to accept optional API key parameter
+    - Updated OpenAI_Service constructor to accept optional API key parameter
+    - Prevents error logging when API keys are provided via test connection
+  - **API Connection Test Errors**: Fixed JSON parse errors when testing API connections
+    - Added output buffering to prevent PHP notices/warnings from corrupting JSON responses
+    - Fixed JavaScript error handling to properly handle non-string error messages
+    - Fixed incorrect context reference in AJAX error handler (this vs self)
+    - Fixed error callback parameters to properly access xhr, status, and error
+    - Added better error messages for server-side issues
+    - Added logging to capture unexpected output during API tests
+    - **Enhanced error handling to prevent HTML output in JSON responses**:
+      - Added PHP error handler to catch all errors/warnings during AJAX requests
+      - Suppressed error display with `ini_set('display_errors', '0')` during AJAX
+      - Added comprehensive logging for debugging without breaking JSON output
+      - Improved error tracking to identify source of HTML output issues
+
+### Enhanced
+- **Automatic ApexCharts Code Cleaning**: Enhanced the blog post generation process to automatically fix ApexCharts markup issues
+  - **Enhanced `clean_fusion_code_content` method** to more aggressively clean ApexCharts code:
+    - Detects ApexCharts code both inside and outside of fusion_code blocks
+    - Removes all HTML tags (`<p>`, `</p>`, `<br />`) that WordPress adds
+    - Automatically wraps JavaScript code in `<script>` tags
+    - Handles multiple patterns of ApexCharts code insertion
+    - Preserves code that's already properly formatted
+  - **Added WordPress filter** (`content_save_pre`) as a safety net:
+    - Runs automatically when any post is saved
+    - Cleans ApexCharts code even if WordPress modifies it after initial generation
+    - Only processes content that contains ApexCharts or chart-related code
+    - Prevents the need for manual cleanup on every post
+  - **Result**: ApexCharts code is now automatically cleaned during generation and maintained clean on every save
+
 ### Changed
 - **Plugin Cleanup for Production Deployment**: Removed all test scripts, debug files, and temporary migration scripts
   - **Test Scripts Removed**:
@@ -1869,6 +1953,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
       - Modal-based editing interface
       - Integration ready for AI content generation
       - Comprehensive error handling and logging
+        
       
     - **UI/UX Improvements**:
       - **Product Modal Button Styling**: Fixed Save/Cancel buttons in product modal
@@ -4383,3 +4468,443 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
                                 - Added context type labels to JavaScript localization data
                                 - Context cards now show "Layout Guidelines" instead of "layout" after saving
                                 
+                              - **Context Card Hover Effect**: Added gradient line hover effect to context cards
+                                - Matches the persona cards' gradient line that appears on hover
+                                - Uses the same blue-purple-pink gradient for consistency
+                                - Provides visual feedback when hovering over context cards
+                                
+                              - **Product Cards Redesign**: Updated product cards to match personas and contexts style
+                                - Replaced text buttons with icon buttons (edit and delete)
+                                - Added gradient line hover effect matching other admin cards
+                                - Improved typography and spacing consistency
+                                - Updated color scheme to match modern design language
+                                - Better visual hierarchy with icon-based actions
+                                
+                              - **Drafted Posts Page Script and Style Loading**: Fixed scripts and styles not loading on drafted posts page
+                                - **Root Cause**: Menu slug mismatch - page registered as `-drafts` but scripts checking for `-drafted-posts`
+                                - **Solution**: Updated enqueue script patterns to match actual menu slug registration
+                                - **Files Modified**: 
+                                  - `admin/class-admin-manager.php` - Fixed pattern detection from '-drafted-posts' to '-drafts'
+                                  - `admin/assets/js/drafted-posts.js` - Enhanced dependency verification and Bootstrap modal handling
+                                - **Result**: Bootstrap 5, FontAwesome, and all JavaScript functionality now loads correctly on drafted posts page
+                                
+                              - **Drafted Posts Table Width**: Fixed table only using half the screen width
+                                - **Root Cause**: WordPress default `.wrap` class applies width constraints
+                                - **Solution**: Added CSS overrides to make the page full width
+                                - **CSS Changes**: 
+                                  - Override `.wrap` max-width constraint
+                                  - Ensure table and cards use 100% width
+                                  - Scoped WordPress admin overrides to drafted posts page only
+                                - **Result**: Drafted posts table now uses full available screen width
+                                
+                              - **Drafted Posts JavaScript Localization**: Fixed missing `ai_blog_admin` object error
+                                - **Root Cause**: Script was enqueued but not localized with AJAX data
+                                - **Solution**: Added `wp_localize_script` call for drafted posts script
+                                - **Files Modified**: 
+                                  - `admin/class-admin-manager.php` - Added localization in `localize_scripts()` method
+                                - **Result**: Drafted posts page now loads properly with AJAX functionality working
+                                
+                              - **Drafted Posts Table Bootstrap Card Constraint**: Fixed table being limited to 520px width
+                                - **Root Cause**: Bootstrap card component was constraining table width
+                                - **Solution**: Replaced card wrapper with custom div structure
+                                - **Changes Made**: 
+                                  - Replaced `<div class="card">` wrapper with `<div class="drafted-posts-table-wrapper">`
+                                  - Added custom CSS for table wrapper with full width
+                                  - Also updated filter actions bar to use consistent wrapper approach
+                                - **Result**: Table now uses full available screen width without Bootstrap card constraints
+                                
+                              - **Schedule Post AJAX Error**: Fixed fatal error when scheduling posts in drafted posts page
+                                - **Root Cause**: Duplicate AJAX action registration in Admin_Manager for handlers that don't exist in that class
+                                - **Error**: `class AI_Blog_Generator\Admin\Admin_Manager does not have a method "ajax_schedule_post"`
+                                - **Solution**: Removed duplicate AJAX registrations from Admin_Manager
+                                - **Changes Made**:
+                                  - Removed `wp_ajax_ai_blog_schedule_post` registration from Admin_Manager
+                                  - Removed `wp_ajax_ai_blog_generate_post` registration (method doesn't exist)
+                                  - Removed `wp_ajax_ai_blog_publish_post` registration (duplicate of Blog_Controller)
+                                - **Result**: Schedule post functionality now works correctly without fatal errors
+                                
+                              - **Approved Ideas Page Naming**: Simplified the menu item and page title from "Approved Ideas V2" to "Approved Ideas"
+                                - **Files Modified**:
+                                  - `controllers/class-approved-ideas-controller-v2.php` - Updated menu configuration
+                                  - `admin/views/approved-ideas-view-v2.php` - Updated page title 
+                                  - `admin/class-admin-manager.php` - Updated submenu registration
+                                - **Note**: Menu slug remains unchanged (`ai-blog-generator-approved-ideas-v2`) to preserve existing links
+                                
+                              - **Generation Queue Status Visibility**: Improved visibility of generation queue status
+                                - **Issue**: Users couldn't see that ideas beyond the 5th were being queued
+                                - **Solution**: Enhanced the queue status indicator UI
+                                - **Changes Made**:
+                                  - Made queue status indicator more prominent with badges and icons
+                                  - Added list of queued items showing position and title
+                                  - Added notification when items are queued
+                                  - Added automatic queue status fetching after bulk generation
+                                  - Added function to fetch queue status on demand
+                                
+                                - **Result**: Users now clearly see when ideas are queued and their position in the queue
+                                
+                              - **Generation Queue System**: Complete overhaul of blog generation with concurrent processing
+                                - Queue management service supporting up to 5 simultaneous generations
+                                - FIFO queue for excess generation requests
+                                - Real-time queue status display with active generations and positions
+                                - Automatic processing when slots become available
+                                - Individual and bulk generation support
+                                
+                              - **Live Generation Status Updates**: Real-time progress tracking without page refresh
+                                - Database `generation_status` field for persistent status storage
+                                - Immediate UI updates when generation starts
+                                - Progress bar with detailed status messages
+                                - Fast refresh mode (2s) during active generations
+                                
+                              - **Live Log Viewer**: Tail generation logs in real-time
+                                - Incremental log loading (only new lines)
+                                - Color-coded log entries (error, warning, info, success)
+                                - Auto-scroll to bottom for new content
+                                - Automatic stop when generation completes
+                                - Shows generation completion status
+                                
+                              - **Error Recovery Features**: Comprehensive error handling and recovery
+                                - One-click retry for failed generations
+                                - Error messages stored in database
+                                - Automatic cleanup of stuck generations (10+ minutes)
+                                - Clear error feedback in UI
+                                
+                              - **Database Schema Updates**: New fields for generation tracking
+                                - `generation_status` - Current generation progress message
+                                - `generation_error` - Error message storage
+                                - `generation_started_at` - Generation start timestamp
+                                - `generation_completed_at` - Generation completion timestamp
+                                - Index on `generation_status` for performance
+                                
+                              - **New Services**: Generation queue management
+                                - `services/class-generation-queue.php` - Complete queue management system
+                                - Supports concurrent processing with queue overflow
+                                - Automatic retry and error recovery
+                                
+                              - **Brand Features Management System**: Complete internal linking management with:
+                                - New database table: `ai_blog_brand_features`
+                                - Full CRUD operations for brand features (services, pages, documents, etc.)
+                                - Four category types: informational_page, document, image, video
+                                - Active/inactive state management for features
+                                - Real-time search and category filtering
+                                - Grid layout with modern card-based design
+                                - Modal-based editing interface
+                                - Integration ready for AI content generation
+                                - Comprehensive error handling and logging
+                                
+                              - **SEO Improvements**: Comprehensive SEO enhancements for better search engine optimization
+                                - **Meta Description Length**: Updated from 160 to 140 characters for optimal SEO performance
+                                  - Updated all AI prompts to request 120-140 character meta descriptions
+                                  - Updated validation logic to check for 140-character limit instead of 160
+                                  - Applied changes to both Prompt Compiler Service and Anthropic Service
+                                - **Focus Keyphrase in Image Alt Text**: Automatically include focus keyphrase in all image alt tags for improved SEO
+                                  - Modified `generate_alt_text_from_prompt()` methods to accept focus keyphrase parameter
+                                  - Smart integration: prepends keyphrase for short alt text, appends naturally for longer alt text
+                                  - Only adds keyphrase if not already present to avoid duplication
+                                  - Applied to both Content Generator and Anthropic Service classes
+                                - **Focus Keyphrase in Image Filenames**: Include target keyphrase in image filenames for enhanced SEO
+                                  - Enhanced `generate_descriptive_filename()` and `generate_filename()` methods in OpenAI_Service
+                                  - Focus keyphrase appears first in filename followed by descriptive keywords
+                                  - Smart deduplication logic prevents overlap between keyphrase and content keywords
+                                  - Automatic propagation from content generation to image requirements
+                                  - Applied to both content images and featured images
+                                - Ensures all SEO elements meet current best practices
+                                
+                              - **Brand Features Management System**: Complete internal linking management with:
+                                - New database table: `ai_blog_brand_features`
+                                - Full CRUD operations for brand features (services, pages, documents, etc.)
+                                - Four category types: informational_page, document, image, video
+                                - Active/inactive state management for features
+                                - Real-time search and category filtering
+                                - Grid layout with modern card-based design
+                                - Modal-based editing interface
+                                - Integration ready for AI content generation
+                                - Comprehensive error handling and logging
+                                
+                              - **UI/UX Improvements**:
+                                - **Product Modal Button Styling**: Fixed Save/Cancel buttons in product modal
+                                  - Added proper button styling with colors and hover effects
+                                  - Save button uses primary blue (#2271b1) with hover state
+                                  - Cancel button uses secondary gray (#f0f0f1) with hover state
+                                  - Added consistent padding, border radius, and transitions
+                                  
+                                - **Product Links Pill Design**: Enhanced product links display
+                                  - Added pill-style design with rounded borders and padding
+                                  - Colored type badges with specific colors for each link type
+                                  - Product Page links show green badge
+                                  - Purchase links show orange badge
+                                  - Documentation links show purple badge
+                                  - Other links show gray badge
+                                  - Added hover effects with shadow and transform
+                                  - Fixed link type labels to show proper text instead of database values
+                                  
+                                - **Products Page Redesign**: Applied modern design style to products page matching personas page
+                                  - Enhanced product cards with gradient backgrounds and hover effects
+                                  - Improved search box styling with focus states
+                                  - Modernized product modal with better form styling and section dividers
+                                  - Updated image and link management UI with better visual hierarchy
+                                  - Added colored badges for link types (product page, purchase, documentation)
+                                  - Improved pagination styling with better hover states
+                                  - Enhanced responsive design for mobile devices
+                                  
+                                - **Contexts Page Redesign**: Applied consistent modern design style to contexts page
+                                  - Enhanced context cards with improved shadows and hover effects
+                                  - Added gradient backgrounds to context type badges
+                                  - Improved badge styling for usage categories and always-include indicators
+                                  - Modernized context edit modal with better form controls
+                                  - Enhanced seed images section with better card design
+                                  - Updated seed image upload modal to match personas modal styling
+                                  - Improved button styling with hover effects and better spacing
+                                  - Added responsive design improvements for mobile devices
+                                  
+                                - **Layout Consistency**: Made all admin pages full-width
+                                  - Removed max-width restrictions from contexts and products pages
+                                  - All pages now use 100% width like the personas page
+                                  - Consistent layout across all admin sections
+                                  
+                                - **Icon-Based Actions**: Replaced text buttons with icons on contexts page
+                                  - Changed Edit, Deactivate/Activate, and Delete buttons to icon buttons
+                                  - Consistent icon style matching personas page design
+                                  - Applied same icon treatment to seed images section
+                                  - Better visual hierarchy and cleaner interface
+                                  
+                                - **Context Type Saving**: Fixed "Layout Guidelines" type not saving correctly
+                                  - Added 'layout' as a valid enum option in the database
+                                  - Fixed JavaScript to display type labels instead of database values
+                                  - Added context type labels to JavaScript localization data
+                                  - Context cards now show "Layout Guidelines" instead of "layout" after saving
+                                  
+                                - **Context Card Hover Effect**: Added gradient line hover effect to context cards
+                                  - Matches the persona cards' gradient line that appears on hover
+                                  - Uses the same blue-purple-pink gradient for consistency
+                                  - Provides visual feedback when hovering over context cards
+                                  
+                                - **Product Cards Redesign**: Updated product cards to match personas and contexts style
+                                  - Replaced text buttons with icon buttons (edit and delete)
+                                  - Added gradient line hover effect matching other admin cards
+                                  - Improved typography and spacing consistency
+                                  - Updated color scheme to match modern design language
+                                  - Better visual hierarchy with icon-based actions
+                                  
+                                - **Drafted Posts Page Script and Style Loading**: Fixed scripts and styles not loading on drafted posts page
+                                  - **Root Cause**: Menu slug mismatch - page registered as `-drafts` but scripts checking for `-drafted-posts`
+                                  - **Solution**: Updated enqueue script patterns to match actual menu slug registration
+                                  - **Files Modified**: 
+                                    - `admin/class-admin-manager.php` - Fixed pattern detection from '-drafted-posts' to '-drafts'
+                                    - `admin/assets/js/drafted-posts.js` - Enhanced dependency verification and Bootstrap modal handling
+                                  - **Result**: Bootstrap 5, FontAwesome, and all JavaScript functionality now loads correctly on drafted posts page
+                                  
+                                - **Drafted Posts Table Width**: Fixed table only using half the screen width
+                                  - **Root Cause**: WordPress default `.wrap` class applies width constraints
+                                  - **Solution**: Added CSS overrides to make the page full width
+                                  - **CSS Changes**: 
+                                    - Override `.wrap` max-width constraint
+                                    - Ensure table and cards use 100% width
+                                    - Scoped WordPress admin overrides to drafted posts page only
+                                  - **Result**: Drafted posts table now uses full available screen width
+                                  
+                                - **Drafted Posts JavaScript Localization**: Fixed missing `ai_blog_admin` object error
+                                  - **Root Cause**: Script was enqueued but not localized with AJAX data
+                                  - **Solution**: Added `wp_localize_script` call for drafted posts script
+                                  - **Files Modified**: 
+                                    - `admin/class-admin-manager.php` - Added localization in `localize_scripts()` method
+                                  - **Result**: Drafted posts page now loads properly with AJAX functionality working
+                                  
+                                - **Drafted Posts Table Bootstrap Card Constraint**: Fixed table being limited to 520px width
+                                  - **Root Cause**: Bootstrap card component was constraining table width
+                                  - **Solution**: Replaced card wrapper with custom div structure
+                                  - **Changes Made**: 
+                                    - Replaced `<div class="card">` wrapper with `<div class="drafted-posts-table-wrapper">`
+                                    - Added custom CSS for table wrapper with full width
+                                    - Also updated filter actions bar to use consistent wrapper approach
+                                  - **Result**: Table now uses full available screen width without Bootstrap card constraints
+                                  
+                                - **Schedule Post AJAX Error**: Fixed fatal error when scheduling posts in drafted posts page
+                                  - **Root Cause**: Duplicate AJAX action registration in Admin_Manager for handlers that don't exist in that class
+                                  - **Error**: `class AI_Blog_Generator\Admin\Admin_Manager does not have a method "ajax_schedule_post"`
+                                  - **Solution**: Removed duplicate AJAX registrations from Admin_Manager
+                                  - **Changes Made**:
+                                    - Removed `wp_ajax_ai_blog_schedule_post` registration from Admin_Manager
+                                    - Removed `wp_ajax_ai_blog_generate_post` registration (method doesn't exist)
+                                    - Removed `wp_ajax_ai_blog_publish_post` registration (duplicate of Blog_Controller)
+                                  - **Result**: Schedule post functionality now works correctly without fatal errors
+                                  
+                                - **Approved Ideas Page Naming**: Simplified the menu item and page title from "Approved Ideas V2" to "Approved Ideas"
+                                  - **Files Modified**:
+                                    - `controllers/class-approved-ideas-controller-v2.php` - Updated menu configuration
+                                    - `admin/views/approved-ideas-view-v2.php` - Updated page title 
+                                    - `admin/class-admin-manager.php` - Updated submenu registration
+                                  - **Note**: Menu slug remains unchanged (`ai-blog-generator-approved-ideas-v2`) to preserve existing links
+                                  
+                                - **Generation Queue Status Visibility**: Improved visibility of generation queue status
+                                  - **Issue**: Users couldn't see that ideas beyond the 5th were being queued
+                                  - **Solution**: Enhanced the queue status indicator UI
+                                  - **Changes Made**:
+                                    - Made queue status indicator more prominent with badges and icons
+                                    - Added list of queued items showing position and title
+                                    - Added notification when items are queued
+                                    - Added automatic queue status fetching after bulk generation
+                                    - Added function to fetch queue status on demand
+                                  
+                                  - **Result**: Users now clearly see when ideas are queued and their position in the queue
+                                  
+                                - **Generation Queue System**: Complete overhaul of blog generation with concurrent processing
+                                  - Queue management service supporting up to 5 simultaneous generations
+                                  - FIFO queue for excess generation requests
+                                  - Real-time queue status display with active generations and positions
+                                  - Automatic processing when slots become available
+                                  - Individual and bulk generation support
+                                  
+                                - **Live Generation Status Updates**: Real-time progress tracking without page refresh
+                                  - Database `generation_status` field for persistent status storage
+                                  - Immediate UI updates when generation starts
+                                  - Progress bar with detailed status messages
+                                  - Fast refresh mode (2s) during active generations
+                                  
+                                - **Live Log Viewer**: Tail generation logs in real-time
+                                  - Incremental log loading (only new lines)
+                                  - Color-coded log entries (error, warning, info, success)
+                                  - Auto-scroll to bottom for new content
+                                  - Automatic stop when generation completes
+                                  - Shows generation completion status
+                                  
+                                - **Error Recovery Features**: Comprehensive error handling and recovery
+                                  - One-click retry for failed generations
+                                  - Error messages stored in database
+                                  - Automatic cleanup of stuck generations (10+ minutes)
+                                  - Clear error feedback in UI
+                                  
+                                - **Database Schema Updates**: New fields for generation tracking
+                                  - `generation_status` - Current generation progress message
+                                  - `generation_error` - Error message storage
+                                  - `generation_started_at` - Generation start timestamp
+                                  - `generation_completed_at` - Generation completion timestamp
+                                  - Index on `generation_status` for performance
+                                  
+                                - **New Services**: Generation queue management
+                                  - `services/class-generation-queue.php` - Complete queue management system
+                                  - Supports concurrent processing with queue overflow
+                                  - Automatic retry and error recovery
+                                  
+                                - **Brand Features Management System**: Complete internal linking management with:
+                                  - New database table: `ai_blog_brand_features`
+                                  - Full CRUD operations for brand features (services, pages, documents, etc.)
+                                  - Four category types: informational_page, document, image, video
+                                  - Active/inactive state management for features
+                                  - Real-time search and category filtering
+                                  - Grid layout with modern card-based design
+                                  - Modal-based editing interface
+                                  - Integration ready for AI content generation
+                                  - Comprehensive error handling and logging
+                                  
+                                - **SEO Improvements**: Comprehensive SEO enhancements for better search engine optimization
+                                  - **Meta Description Length**: Updated from 160 to 140 characters for optimal SEO performance
+                                    - Updated all AI prompts to request 120-140 character meta descriptions
+                                    - Updated validation logic to check for 140-character limit instead of 160
+                                    - Applied changes to both Prompt Compiler Service and Anthropic Service
+                                  - **Focus Keyphrase in Image Alt Text**: Automatically include focus keyphrase in all image alt tags for improved SEO
+                                    - Modified `generate_alt_text_from_prompt()` methods to accept focus keyphrase parameter
+                                    - Smart integration: prepends keyphrase for short alt text, appends naturally for longer alt text
+                                    - Only adds keyphrase if not already present to avoid duplication
+                                    - Applied to both Content Generator and Anthropic Service classes
+                                  - **Focus Keyphrase in Image Filenames**: Include target keyphrase in image filenames for enhanced SEO
+                                    - Enhanced `generate_descriptive_filename()` and `generate_filename()` methods in OpenAI_Service
+                                    - Focus keyphrase appears first in filename followed by descriptive keywords
+                                    - Smart deduplication logic prevents overlap between keyphrase and content keywords
+                                    - Automatic propagation from content generation to image requirements
+                                    - Applied to both content images and featured images
+                                  - Ensures all SEO elements meet current best practices
+                                  
+                                - **Brand Features Management System**: Complete internal linking management with:
+                                  - New database table: `ai_blog_brand_features`
+                                  - Full CRUD operations for brand features (services, pages, documents, etc.)
+                                  - Four category types: informational_page, document, image, video
+                                  - Active/inactive state management for features
+                                  - Real-time search and category filtering
+                                  - Grid layout with modern card-based design
+                                  - Modal-based editing interface
+                                  - Integration ready for AI content generation
+                                  - Comprehensive error handling and logging
+                                  
+                                - **UI/UX Improvements**:
+                                  - **Product Modal Button Styling**: Fixed Save/Cancel buttons in product modal
+                                    - Added proper button styling with colors and hover effects
+                                    - Save button uses primary blue (#2271b1) with hover state
+                                    - Cancel button uses secondary gray (#f0f0f1) with hover state
+                                    - Added consistent padding, border radius, and transitions
+                                    
+                                  - **Product Links Pill Design**: Enhanced product links display
+                                    - Added pill-style design with rounded borders and padding
+                                    - Colored type badges with specific colors for each link type
+                                    - Product Page links show green badge
+                                    - Purchase links show orange badge
+                                    - Documentation links show purple badge
+                                    - Other links show gray badge
+                                    - Added hover effects with shadow and transform
+                                    - Fixed link type labels to show proper text instead of database values
+                                    
+                                  - **Products Page Redesign**: Applied modern design style to products page matching personas page
+                                    - Enhanced product cards with gradient backgrounds and hover effects
+                                    - Improved search box styling with focus states
+                                    - Modernized product modal with better form styling and section dividers
+                                    - Updated image and link management UI with better visual hierarchy
+                                    - Added colored badges for link types (product page, purchase, documentation)
+                                    - Improved pagination styling with better hover states
+                                    - Enhanced responsive design for mobile devices
+                                    
+                                  - **Contexts Page Redesign**: Applied consistent modern design style to contexts page
+                                    - Enhanced context cards with improved shadows and hover effects
+                                    - Added gradient backgrounds to context type badges
+                                    - Improved badge styling for usage categories and always-include indicators
+                                    - Modernized context edit modal with better form controls
+                                    - Enhanced seed images section with better card design
+                                    - Updated seed image upload modal to match personas modal styling
+                                    - Improved button styling with hover effects and better spacing
+                                    - Added responsive design improvements for mobile devices
+                                    
+                                  - **Layout Consistency**: Made all admin pages full-width
+                                    - Removed max-width restrictions from contexts and products pages
+                                    - All pages now use 100% width like the personas page
+                                    - Consistent layout across all admin sections
+                                    
+                                  - **Icon-Based Actions**: Replaced text buttons with icons on contexts page
+                                    - Changed Edit, Deactivate/Activate, and Delete buttons to icon buttons
+                                    - Consistent icon style matching personas page design
+                                    - Applied same icon treatment to seed images section
+                                    - Better visual hierarchy and cleaner interface
+                                    
+                                  - **Context Type Saving**: Fixed "Layout Guidelines" type not saving correctly
+                                    - Added 'layout' as a valid enum option in the database
+                                    - Fixed JavaScript to display type labels instead of database values
+                                    - Added context type labels to JavaScript localization data
+                                    - Context cards now show "Layout Guidelines" instead of "layout" after saving
+                                    
+                                  - **Context Card Hover Effect**: Added gradient line hover effect to context cards
+                                    - Matches the persona cards' gradient line that appears on hover
+                                    - Uses the same blue-purple-pink gradient for consistency
+                                    - Provides visual feedback when hovering over context cards
+                                    
+                                  - **Product Cards Redesign**: Updated product cards to match personas and contexts style
+                                    - Replaced text buttons with icon buttons (edit and delete)
+                                    - Added gradient line hover effect matching other admin cards
+                                    - Improved typography and spacing consistency
+                                    - Updated color scheme to match modern design language
+                                    - Better visual hierarchy with icon-based actions
+                                    
+                                  - **Drafted Posts Page Script and Style Loading**: Fixed scripts and styles not loading on drafted posts page
+                                    - **Root Cause**: Menu slug mismatch - page registered as `-drafts` but scripts checking for `-drafted-posts`
+                                    - **Solution**: Updated enqueue script patterns to match actual menu slug registration
+                                    - **Files Modified**: 
+                                      - `admin/class-admin-manager.php` - Fixed pattern detection from '-drafted-posts' to '-drafts'
+                                      - `admin/assets/js/drafted-posts.js` - Enhanced dependency verification and Bootstrap modal handling
+                                    - **Result**: Bootstrap 5, FontAwesome, and all JavaScript functionality now loads correctly on drafted posts page
+                                    
+                                  - **Drafted Posts Table Width**: Fixed table only using half the screen width
+                                    - **Root Cause**: WordPress default `.wrap` class applies width constraints
+                                    - **Solution**: Added CSS overrides to make the page full width
+                                    - **CSS Changes**: 
+                                      - Override `.wrap` max-width constraint
+                                      - Ensure table and cards use 100% width
+                                      - Scoped WordPress admin overrides to drafted posts page only
+                                    - **Result**: Drafted posts table now uses full available screen width
+                                    
+                                  - **Drafted Posts JavaScript Localization**: Fixed missing `ai_blog_admin` object error
